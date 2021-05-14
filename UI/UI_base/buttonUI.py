@@ -271,6 +271,18 @@ class Button(Rectangle):
 
         return surface
 
+    def set_active_text(self, text):
+        self._text_text = text
+        self.build()
+
+    def set_non_active_text(self, text):
+        self._non_active_text_text = text
+        self.build()
+
+    def set_text_size(self, size):
+        self._text_size = size
+        self.build()
+
     @property
     def text(self):
         return self._text_text

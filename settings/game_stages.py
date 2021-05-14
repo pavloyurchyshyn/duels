@@ -1,9 +1,9 @@
 CURRENT_STAGE = 'current_stage'
 
-TEST_DRAW = 'test_draw'
+TEST_DRAW_S = 'test_draw'
 
-MAIN_MENU_SETTINGS = 'main_menu_settings'
+MAIN_MENU_SETTINGS_S = 'main_menu_settings'
 
-START = 'start'
+START_S = 'start'
 
-MAIN_MENU = 'main_menu'
+MAIN_MENU_S = 'main_menu'

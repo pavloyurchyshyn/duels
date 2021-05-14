@@ -91,6 +91,19 @@ class MenuUI(Rectangle):
         self._elements.sort(key=self.__sort_value, reverse=True)
         self._buttons.sort(key=self.__sort_value, reverse=True)
 
+    def create_button_from_data(self, buttons_data: dict, surface=None):
+        buttons = []
+        surface = surface if surface else self._surface
+        for button in buttons_data:
+            b = Button(*buttons_data[button]['args'], **buttons_data[button]['kwargs'],
+                       screen=surface)
+            buttons.append(b)
+            setattr(self, button, b)
+
+        buttons.sort(key=self.__sort_value, reverse=True)
+
+        return buttons
+
     def get_surface(self):
         flags = 0
         if self._background_t:

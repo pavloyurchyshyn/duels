@@ -1,5 +1,5 @@
 from settings.global_parameters import GLOBAL_SETTINGS
-from settings.game_stages import CURRENT_STAGE, MAIN_MENU, MAIN_MENU_SETTINGS
+from settings.game_stages import CURRENT_STAGE, MAIN_MENU_S, MAIN_MENU_SETTINGS_S
 
 from UI.UI_menus.main_menu import MAIN_MENU_UI
 
@@ -13,8 +13,8 @@ from pygame import quit as QUIT
 class GameBody:
     def __init__(self):
         self.stages = {
-            MAIN_MENU: self.MAIN_MENU,
-            MAIN_MENU_SETTINGS: self.MAIN_MENU_SETTINGS,
+            MAIN_MENU_S: self.MAIN_MENU,
+            MAIN_MENU_SETTINGS_S: self.MAIN_MENU_SETTINGS,
         }
         self._g_settings = GLOBAL_SETTINGS
 
