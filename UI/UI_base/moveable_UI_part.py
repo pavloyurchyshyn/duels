@@ -8,7 +8,7 @@ from settings.global_parameters import GLOBAL_SETTINGS
 
 from pygame import Surface, SRCALPHA, draw
 
-from UI.UI_base.textUI import Text
+from UI.UI_base.text_UI import Text
 
 
 class MoveableUI(Rectangle):

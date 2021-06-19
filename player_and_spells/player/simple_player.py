@@ -67,12 +67,12 @@ class SimplePlayer:
 
         self._angle = angle
 
-    def draw(self) -> None:
+    def draw(self, dx=0, dy=0) -> None:
         x0, y0 = self.center
         # circle(SimplePlayer.MAIN_SCREEN, (255, 255, 255), mouse.get_pos(), 3)  # draw mouse pos
         img_copy = transform.rotate(self.image, -degrees(self._angle))
 
-        SimplePlayer.MAIN_SCREEN.blit(img_copy, (x0 - img_copy.get_width() // 2, y0 - img_copy.get_height() // 2))
+        SimplePlayer.MAIN_SCREEN.blit(img_copy, (dx + x0 - img_copy.get_width() // 2, dy + y0 - img_copy.get_height() // 2))
 
         self.face_anim.draw(0, 0)
 

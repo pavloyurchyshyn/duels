@@ -5,7 +5,7 @@ from pygame.draw import rect as DrawRect
 from pygame.constants import SRCALPHA
 from pygame import draw
 
-from UI.UI_base.textUI import Text
+from UI.UI_base.text_UI import Text
 from common_things.global_clock import GLOBAL_CLOCK
 from common_things.global_mouse import GLOBAL_MOUSE
 

@@ -13,6 +13,7 @@ from settings.window_settings import MAIN_SCREEN, MAIN_SCREEN_RECT, SCREEN_H, SC
 
 from common_things.global_clock import GLOBAL_CLOCK
 from common_things.global_mouse import GLOBAL_MOUSE
+from common_things.global_keyboard import GLOBAL_KEYBOARD
 
 from time import time
 from sys import exit as SYS_EXIT
@@ -46,6 +47,7 @@ def TEST_ELEMENT_DRAW(*args):
 
         G_Clock.update(dt)
         G_Mouse.update()
+        GLOBAL_KEYBOARD.update()
 
         events = EVENT.get()
         for event in events:

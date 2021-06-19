@@ -1,6 +1,6 @@
 from game_tests.window_for_tests import *
-from UI.UI_base.buttonUI import Button
-from UI.UI_base.transition import TransitionUI
+from UI.UI_base.button_UI import Button
+from UI.UI_base.transition_UI import TransitionUI
 
 # import clipboard
 # clipboard.copy("abc")

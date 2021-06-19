@@ -6,8 +6,10 @@ from pygame import MOUSEBUTTONDOWN
 from pygame import display, draw, Surface, constants
 
 from settings.colors import WHITE
+from settings.global_parameters import GLOBAL_SETTINGS
 from settings.common_settings import DEFAULT_FONT, VERSION
 from settings.window_settings import MAIN_SCREEN, MAIN_SCREEN_RECT, SCREEN_H, SCREEN_W  # main screen of all game
+from settings.game_stages import ROUND_S, CURRENT_STAGE, START_ROUND_S
 
 from common_things.global_clock import GLOBAL_CLOCK, ROUND_CLOCK
 from common_things.global_mouse import GLOBAL_MOUSE
@@ -40,7 +42,7 @@ if __name__ == "__main__":
     G_Mouse = GLOBAL_MOUSE
     G_Keyboard = GLOBAL_KEYBOARD
 
-    GAMEBODY = GameBody()
+    GAME_BODY = GameBody()
 
     while 1:
         events = EVENT.get()
@@ -49,13 +51,14 @@ if __name__ == "__main__":
 
         # update time
         G_Clock.update(dt)
-        R_Clock.update(dt)
+        if GLOBAL_SETTINGS[CURRENT_STAGE] == ROUND_S:
+            R_Clock.update(dt)
 
         # update mouse and keyboard
         G_Mouse.update()
         G_Keyboard.update()
 
-        # MAIN_SCREEN.fill((110, 110, 110))
+        MAIN_SCREEN.fill((0, 0, 0))
 
         # scroll up and scroll down update
         for event in events:
@@ -67,7 +70,7 @@ if __name__ == "__main__":
 
         # MAIN_SCREEN.blit(surface, (50, 50))
 
-        GAMEBODY.game_loop()
+        GAME_BODY.game_loop()
 
         update_fps()
         G_Mouse.draw()
@@ -76,5 +79,5 @@ if __name__ == "__main__":
         #     for x in range(0, SCREEN_W, 50):
         #         draw.circle(MAIN_SCREEN, (255, 255, 155), (x, y), 2)
 
-        #display.update(MAIN_SCREEN_RECT)
-        display.update()
+        display.update(MAIN_SCREEN_RECT)
+        # display.update()

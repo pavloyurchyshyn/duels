@@ -1,5 +1,5 @@
 from game_tests.window_for_tests import *
-from UI.UI_base.buttonUI import Button
+from UI.UI_base.button_UI import Button
 from UI.UI_base.scroll_UI import Scroll
 
 # import clipboard

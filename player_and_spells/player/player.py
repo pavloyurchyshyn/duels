@@ -14,8 +14,9 @@ from settings.window_settings import MAIN_SCREEN
 
 # global things
 from UI.camera import GLOBAL_CAMERA
-from world_arena.world import GLOBAL_WORLD
+# from world_arena.world import GLOBAL_WORLD
 from settings.global_parameters import GLOBAL_SETTINGS
+from common_things.global_clock import ROUND_CLOCK
 import time
 
 
@@ -36,10 +37,6 @@ class Player(Circle):  # , PhysicalObj):
         super().__init__(x, y, size)
         # PhysicalObj.__init__(self, mass)
 
-        self.WORLD = kwargs.get('world', GLOBAL_WORLD)
-        self.CURRENT_CELL = self.WORLD.current_cell
-        # self.item_con = ITEM_CONTROLLER
-
         self.hands_radius = PLAYER_HANDS_SIZE + PLAYER_SIZE
 
         self._angle = 0
@@ -48,18 +45,6 @@ class Player(Circle):  # , PhysicalObj):
         # =======================
         self._full_hp = kwargs.get('hp', Player.PLAYER_HP)
         self._hp = self._full_hp
-
-        # self.hp_bar = Loader(stage=self.hp,
-        #                      stages_num=self._full_hp,
-        #                      bar_pos=(30, 40),
-        #                      bar_x_size=200,
-        #                      bar_y_size=20,
-        #                      text_pos=(30, 27),
-        #                      text=str(self._hp),
-        #                      bar_inner_color=PLAYER_HP_BAR_COLOR,
-        #
-        #                      )
-        # =======================
 
         self.camera = kwargs.get('camera', GLOBAL_CAMERA)
 
@@ -82,34 +67,27 @@ class Player(Circle):  # , PhysicalObj):
         # =======================================
         self.cursor(mouse.get_pos())
 
-        # self._messages = Messages(self.camera, (x + 50, y))
-
         self.hands = None
         self.hands_endpoint = [0, 0]
         self.hands_force = Player.PLAYER_PUSH_FORCE
 
-        # self.spell = FireBallSkill(arena=self.arena,
-                                   # item_con=self.item_con)
-
         self.particles = []
 
-        # self._blood_drops = BloodDrops(x=x, y=y, arena=self.arena)
-
-        # circle(self.arena.floor_surface, (255, 255, 255), self._center, 100)
         self.face_anim = Animation(self._center, idle_frames=IDLE_ANIMATION, **OTHER_ANIMATIONS)
 
         self._time = 0.000000001
         self._d_time = 0.00000001
 
-    def update(self, time_d):
+    def update(self):
+        time_d = ROUND_CLOCK.d_time
+        self._d_time = time_d
 
         self._time += time_d
-        self._d_time = time_d
 
         mouse_buttons = mouse.get_pressed()
         m_pos = mouse.get_pos()
         keys = key.get_pressed()
-        self._velocity.zero()
+        # self._velocity.zero()
         self.step(keys)
 
         self.cursor(m_pos)
@@ -235,7 +213,7 @@ class Player(Circle):  # , PhysicalObj):
         self._angle = angle
 
     def step(self, keys):
-        self._use_self_force()
+#        self._use_self_force()
 
         x_step = 0
         if keys[K_d]:
@@ -259,10 +237,10 @@ class Player(Circle):  # , PhysicalObj):
             y_add = 0 if y_step == 0 else (y_step / abs(y_step)) * self._size
             new_x, new_y = x + x_step * self._d_time, y + y_step * self._d_time
 
-            if not self.arena.can_go(new_x + x_add, new_y + y_add):
-                self._make_dots_with_angle(self._angle)
-                return
-            self._push_another_items()
+            # if not self.arena.can_go(new_x + x_add, new_y + y_add):
+            #     self._make_dots_with_angle(self._angle)
+            #     return
+            # self._push_another_items()
             self._change_position((new_x, new_y))
 
             # items = self.item_con.items.copy()
@@ -307,7 +285,7 @@ class Player(Circle):  # , PhysicalObj):
                 weapon.draw(dx, dy)
 
         self.face_anim.draw(dx, dy)
-        self.hp_bar.draw()
+        # self.hp_bar.draw()
 
     def _grab_item(self, m_pos):
         dot = m_pos if dist(self._center, m_pos) <= self.hands_radius else self.hands_endpoint
@@ -332,10 +310,8 @@ class Player(Circle):  # , PhysicalObj):
                     self.hands = item
                     break
 
-
     def update_cell(self):
         self.CURRENT_CELL = self.WORLD.current_cell
-
 
     @property
     def position(self):
@@ -397,3 +373,4 @@ class Player(Circle):  # , PhysicalObj):
     @property
     def dead(self):
         return self._hp <= 0
+

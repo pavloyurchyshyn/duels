@@ -1,9 +1,9 @@
-from UI.UI_base.menuUI import MenuUI
+from UI.UI_base.menu_UI import MenuUI
 
 from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.global_keyboard import GLOBAL_KEYBOARD
 
-from settings.UI_setings.menus_settings.main_menu_settings import MAIN_MENU_SETTINGS_BUTTONS
+from settings.UI_setings.menus_settings.main_menu_settings import MAIN_MENU_SETTINGS_BUTTONS, back_to_menu
 
 from pygame import Rect
 
@@ -18,6 +18,9 @@ class MainMenuSettings(MenuUI):
     def update(self):
         for button in self._buttons:
             button.update()
+
+        if GLOBAL_KEYBOARD.ESC:
+            back_to_menu()
 
         if GLOBAL_MOUSE.lmb:
             for button in self._buttons:

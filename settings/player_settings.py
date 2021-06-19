@@ -1,7 +1,7 @@
 from pygame import image, error, transform
 from sys import exit
 from common_things.img_loader import load_image
-
+import os
 PLAYER_HP_BAR_COLOR = (55, 155, 55)
 
 PLAYER_SIZE = 45

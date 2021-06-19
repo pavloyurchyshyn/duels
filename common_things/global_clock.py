@@ -9,7 +9,7 @@ class Clock:
 
     @property
     def d_time(self):
-        return self._time
+        return self._d_time
 
     def update(self, d_time):
         self._d_time = d_time

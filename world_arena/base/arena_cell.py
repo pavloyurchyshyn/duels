@@ -2,10 +2,10 @@ from obj_properties.rect_form import Rectangle
 from settings.arena_settings import STANDARD_ARENA_CELL_SIZE, STANDARD_ARENA_BORDER_SIZE, \
     ELEMENT_SIZE, SUB_CELL_SIZE
 from settings.colors import DARK_GREEN
-
+from settings.window_settings import MAIN_SCREEN
 from common_things.common_lists import BULLETS_LIST, WALLS_SET, \
     ITEMS_LIST, PLAYERS_LIST, UNITS_LIST, PARTICLE_LIST, DOORS_LIST, BREAKABLE_WALLS
-
+from UI.camera import GLOBAL_CAMERA
 from pygame import Surface, SRCALPHA
 
 
@@ -25,27 +25,28 @@ class ArenaCell:
 
     BORDER_POSITIONS = {
         # top border
-        'top': {'x': 0, 'y': 0, 'x_size': CELL_SIZE, 'y_size': BORDER_SIZE},
+        'top': {'x': 0, 'y': 0, 'size_x': CELL_SIZE, 'size_y': BORDER_SIZE},
         # right border
-        'right': {'x': CELL_SIZE - BORDER_SIZE, 'y': 0, 'x_size': BORDER_SIZE, 'y_size': CELL_SIZE},
+        'right': {'x': CELL_SIZE - BORDER_SIZE, 'y': 0, 'size_x': BORDER_SIZE, 'size_y': CELL_SIZE},
         # bot border
-        'bot': {'x': 0, 'y': CELL_SIZE - BORDER_SIZE, 'x_size': CELL_SIZE, 'y_size': BORDER_SIZE},
+        'bot': {'x': 0, 'y': CELL_SIZE - BORDER_SIZE, 'size_x': CELL_SIZE, 'size_y': BORDER_SIZE},
         # left border
-        'left': {'x': 0, 'y': 0, 'x_size': BORDER_SIZE, 'y_size': CELL_SIZE},
+        'left': {'x': 0, 'y': 0, 'size_x': BORDER_SIZE, 'size_y': CELL_SIZE},
     }
 
-    def __init__(self, data, opened=True, dead_cell=False):
+    def __init__(self, data=[], opened=True, dead_cell=False):
+        self._size = ArenaCell.CELL_SIZE
+
         self._data = data
 
         self._sub_cells = {}
         self._build_sub_cells()
 
-        self._size = ArenaCell.CELL_SIZE
-
         self._exit_borders = {}
         self.__create_borders()
 
         self._PICTURE = self.get_surface(self._size, self._size)  # MAIN SURFACE OF CELL
+        self._PICTURE.fill(DARK_GREEN)
 
         self._opened = opened
         self._dead_cell = dead_cell  # if dead -> can`t be opened
@@ -59,6 +60,15 @@ class ArenaCell:
         self._bullets = BULLETS_LIST
         self._units = UNITS_LIST
         self._particles = PARTICLE_LIST
+
+        self.draw_grid()
+
+    def update(self):
+        pass
+
+    def draw(self):
+        dx, dy = GLOBAL_CAMERA.camera
+        MAIN_SCREEN.blit(self._PICTURE, (dx, dy))
 
     def can_go(self):
         # TODO
@@ -78,9 +88,7 @@ class ArenaCell:
         """
         for key in ArenaCell.BORDER_POSITIONS:
             data = ArenaCell.BORDER_POSITIONS[key]
-            self._exit_borders[key] = Rectangle(x=data['x'], y=data['y'],
-                                                size_x=['x_size'],
-                                                size_y=['y_size'])
+            self._exit_borders[key] = Rectangle(**data)
 
     def _build_sub_cells(self):
         """
@@ -128,6 +136,20 @@ class ArenaCell:
     def normalize_xy_for_element(self, x, y):
         return (x // ArenaCell.ELEMENT_SIZE) * ArenaCell.ELEMENT_SIZE, \
                (y // ArenaCell.ELEMENT_SIZE) * ArenaCell.ELEMENT_SIZE
+
+    def draw_grid(self):
+        from pygame import draw
+        x_size, y_size = self._PICTURE.get_size()
+
+        for x in range(0, x_size, SUB_CELL_SIZE):
+            draw.line(self._PICTURE, (0, 0, 255), (x, 0), (x, y_size))
+        for y in range(0, y_size, SUB_CELL_SIZE):
+            draw.line(self._PICTURE, (0, 0, 255), (0, y), (x_size, y))
+
+        for x in range(0, x_size, ELEMENT_SIZE):
+            draw.line(self._PICTURE, (255, 255, 255), (x, 0), (x, y_size))
+        for y in range(0, y_size, ELEMENT_SIZE):
+            draw.line(self._PICTURE, (255, 255, 255), (0, y), (x_size, y))
 
     @property
     def picture(self):
