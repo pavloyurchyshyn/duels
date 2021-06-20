@@ -1,7 +1,11 @@
 import json
+from os.path import exists
 
 
 def load_json_config(path: str) -> dict:
+    if not exists(path):
+        return {}
+
     with open(path, 'r') as k_conf:
         return json.load(k_conf)
 

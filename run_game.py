@@ -8,7 +8,7 @@ from pygame import display, draw, Surface, constants
 from settings.colors import WHITE
 from settings.global_parameters import GLOBAL_SETTINGS
 from settings.common_settings import DEFAULT_FONT, VERSION
-from settings.window_settings import MAIN_SCREEN, MAIN_SCREEN_RECT, SCREEN_H, SCREEN_W  # main screen of all game
+from settings.window_settings import MAIN_SCREEN, MAIN_SCREEN_RECT, SCREEN_H, SCREEN_W, MAIN_SCREEN_DEF_COLOR  # main screen of all game
 from settings.game_stages import ROUND_S, CURRENT_STAGE, START_ROUND_S
 
 from common_things.global_clock import GLOBAL_CLOCK, ROUND_CLOCK
@@ -58,7 +58,7 @@ if __name__ == "__main__":
         G_Mouse.update()
         G_Keyboard.update()
 
-        MAIN_SCREEN.fill((0, 0, 0))
+        # MAIN_SCREEN.fill(MAIN_SCREEN_DEF_COLOR)
 
         # scroll up and scroll down update
         for event in events:

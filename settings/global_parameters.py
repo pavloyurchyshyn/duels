@@ -1,9 +1,9 @@
 from time import time as cur_time
 import os
 
-ROOT_OF_GAME = os.path.abspath(os.getcwd())
-SETTINGS_PATH = os.path.join(ROOT_OF_GAME, 'settings')
-SOUNDS_FOLDER = os.path.join(ROOT_OF_GAME, 'sounds')
+
+
+
 
 GLOBAL_SETTINGS = {
     'current_stage': 'main_menu',

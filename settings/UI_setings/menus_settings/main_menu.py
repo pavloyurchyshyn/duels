@@ -2,7 +2,7 @@ from settings.global_parameters import GLOBAL_SETTINGS
 from settings.colors import WHITE, GREY_GREEN, GREY_RED
 from settings.window_settings import HALF_SCREEN_W, HALF_SCREEN_H, MAIN_SCREEN
 from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE
-from settings.game_stages import MAIN_MENU_SETTINGS_S, CURRENT_STAGE, START_ROUND_S, TEST_DRAW_S, MULTIPLAYER_S, EXIT_S
+from settings.game_stages import MAIN_MENU_SETTINGS_S, CURRENT_STAGE, START_ROUND_S, TEST_DRAW_S, MULTIPLAYER_MENU_S, EXIT_S
 
 from common_things.global_clock import ROUND_CLOCK
 
@@ -21,7 +21,7 @@ def settings():
 
 
 def multiplayer():
-    GLOBAL_SETTINGS[CURRENT_STAGE] = MULTIPLAYER_S
+    GLOBAL_SETTINGS[CURRENT_STAGE] = MULTIPLAYER_MENU_S
 
 
 def close_game():

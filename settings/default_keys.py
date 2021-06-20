@@ -1,6 +1,6 @@
 from pygame.constants import *
 import os
-from settings.global_parameters import SETTINGS_PATH
+from settings.common_settings import SETTINGS_PATH
 
 KEYS_CONFIG_FILE = os.path.join(SETTINGS_PATH, 'keyboard_settings.json')
 

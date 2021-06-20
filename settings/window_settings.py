@@ -10,6 +10,7 @@ HALF_SCREEN_W, HALF_SCREEN_H = SCREEN_W//2, SCREEN_H//2
 # SCREEN_W, SCREEN_H = display.get_window_size()
 
 flags = FULLSCREEN | DOUBLEBUF | HWACCEL
+MAIN_SCREEN_DEF_COLOR = (0, 0, 0)
 
 MAIN_SCREEN = display.set_mode((SCREEN_W, SCREEN_H), flags, 32)
 MAIN_SCREEN.set_alpha(None)  # main screen of all game

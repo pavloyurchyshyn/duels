@@ -1,8 +1,10 @@
 from UI.UI_base.menu_UI import MenuUI
 
-from settings.colors import BLACK, HALF_EMPTY
-
-from settings.UI_setings.menus_settings.multiplayer import MULTIPLAYER_BUTTONS, SERVER_PASSWORD
+from settings.colors import BLACK, HALF_EMPTY_L, WHITE
+from settings.window_settings import HALF_SCREEN_W, SCREEN_H
+from settings.UI_setings.menus_settings.multiplayer import MULTIPLAYER_BUTTONS, SERVER_PASSWORD, IP_VALUE,\
+    P_NUM, PLAYER_NUMBER
+from pygame.draw import line as DrawLine
 
 
 class Multiplayer(MenuUI):
@@ -11,7 +13,7 @@ class Multiplayer(MenuUI):
         self.create_buttons()
         self._exit_warning = False
         self._fade_surface = self.get_surface(transparent=True)
-        self._fade_surface.fill(HALF_EMPTY)
+        self._fade_surface.fill(HALF_EMPTY_L)
         self._fade_surface.convert_alpha()
         self._server_pswrd = SERVER_PASSWORD
 
@@ -32,6 +34,11 @@ class Multiplayer(MenuUI):
             self.surface.blit(self._fade_surface, (0, 0))
 
         self._server_pswrd.draw(dx, dy)
+        IP_VALUE.draw(dx, dy)
+        P_NUM.draw(dx, dy)
+        PLAYER_NUMBER.draw(dx, dy)
+
+        DrawLine(self.surface, WHITE, (HALF_SCREEN_W, 0), (HALF_SCREEN_W, SCREEN_H), 2)
 
     def _update(self):
         pass

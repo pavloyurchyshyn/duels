@@ -1,10 +1,13 @@
 from UI.UI_base.menu_UI import MenuUI
+from UI.UI_buttons.test_draw import TEST_DRAW_BUTTON
 
-from settings.colors import HALF_EMPTY
-from settings.UI_setings.menus_settings.round_pause import ROUND_PAUSE_BUTTONS
+from common_things.global_keyboard import GLOBAL_KEYBOARD
+
+from settings.colors import HALF_EMPTY_L
+from settings.UI_setings.menus_settings.round_pause import ROUND_PAUSE_BUTTONS, \
+    PAUSE_MAIN_SCREEN_COPY, PAUSE_SCREEN
 from settings.global_parameters import GLOBAL_SETTINGS
 from settings.game_stages import CURRENT_STAGE, ROUND_S, MAIN_MENU_S
-from UI.UI_buttons.test_draw import TEST_DRAW_BUTTON
 
 
 class RoundPause(MenuUI):
@@ -17,10 +20,49 @@ class RoundPause(MenuUI):
         self._exit_warning = False
 
         self._fade_surface = self.get_surface(transparent=True)
-        self._fade_surface.fill(HALF_EMPTY)
+        self._fade_surface.fill((0, 0, 0, 150))
         self._fade_surface.convert_alpha()
 
+    def activate_exit_buttons(self):
+        self._exit_yes.make_active()
+        self._exit_yes.make_visible()
+        self._exit_no.make_active()
+        self._exit_no.make_visible()
+
+        for button in self._buttons:
+            if button == self._exit_yes or button == self._exit_no:
+                continue
+            button.make_inactive()
+
+        self._exit_warning = 1
+        self.draw_round()
+
+        self.surface.blit(self._fade_surface, (0, 0))
+
+    def deactivate_exit_buttons(self):
+        self._exit_yes.make_inactive()
+        self._exit_yes.make_invisible()
+        self._exit_no.make_inactive()
+        self._exit_no.make_invisible()
+
+        for button in self._buttons:
+            if button == self._exit_yes or button == self._exit_no:
+                continue
+            button.make_active()
+
+        self._exit_warning = 0
+        self._surface.fill((0, 0, 0, 0))
+        self.draw_round()
+
+    def draw_round(self, fill=1):
+        self._surface.blit(PAUSE_MAIN_SCREEN_COPY, (0, 0))
+        if fill:
+            self.surface.blit(self._fade_surface, (0, 0))
+
     def update(self):
+        if GLOBAL_KEYBOARD.ESC and self._exit_warning:
+            self.deactivate_exit_buttons()
+
         for button in self._elements:
             button.update()
 
@@ -34,35 +76,19 @@ class RoundPause(MenuUI):
 
                 self._exit.click(xy=xy)
                 if self._exit.clicked:
-                    self._exit_yes.make_active()
-                    self._exit_yes.make_visible()
-                    self._exit_no.make_active()
-                    self._exit_no.make_visible()
-                    self._exit_warning = 1
+                    self.activate_exit_buttons()
             else:
                 if self._exit_yes.click(xy):
-                    self._exit_yes.make_inactive()
-                    self._exit_yes.make_invisible()
-                    self._exit_no.make_inactive()
-                    self._exit_no.make_invisible()
-                    self._exit_warning = 0
-                    self._surface.fill(self.Pause_back_color)
-
+                    self.deactivate_exit_buttons()
                     GLOBAL_SETTINGS[CURRENT_STAGE] = MAIN_MENU_S
                     return
 
                 else:
-                    self._exit_yes.make_inactive()
-                    self._exit_yes.make_invisible()
-                    self._exit_no.make_inactive()
-                    self._exit_no.make_invisible()
-                    self._exit_warning = 0
-                    self._surface.fill(self.Pause_back_color)
+                    self.deactivate_exit_buttons()
 
     def draw(self, dx=0, dy=0):
         self._draw(dx, dy)
         if self._exit_warning:
-            # self.surface.blit(self._fade_surface, (0, 0))
             self._exit_no.draw()
             self._exit_yes.draw()
 

@@ -5,7 +5,7 @@ from pygame import draw
 from pygame import Rect
 
 
-class Loader:
+class Progress_Bar:
     MAIN_SCREEN = MAIN_SCREEN
     BAR_X_SIZE = 1200
     BAR_Y_SIZE = 10
@@ -21,7 +21,7 @@ class Loader:
         self._current_stage = stage
         self.stages_num = stages_num
 
-        self.screen = screen if screen else Loader.MAIN_SCREEN
+        self.screen = screen if screen else Progress_Bar.MAIN_SCREEN
         self.percent = 0
 
         self._message = text
@@ -36,7 +36,7 @@ class Loader:
         self._text_color = text_color
 
         if self._message:
-            self.__render_text()
+            self._render_text()
 
         self.bar_position = ((SCREEN_W - self.x_size) // 2, HALF_SCREEN_H) if bar_pos is None else bar_pos
 
@@ -47,25 +47,28 @@ class Loader:
         # ======================================
 
         self.borders_rect = Rect(self.bar_position[0] - 5,
-                                 self.bar_position[1] - 15,
+                                 self.bar_position[1] - 9,
                                  self.x_size + 10,
                                  self.y_size + 10)
 
-    def __get_percent(self):
+    def _get_percent(self):
         self.percent = round(self._current_stage / self.stages_num * 100, 2)
 
-    def __render_text(self):
+    def _render_text(self):
         self._text = DEFAULT_FONT.render(self._message, 1, self._text_color)
 
-    def __bar_endpos(self):
+    def _bar_endpos(self):
         endpos = (int(self.bar_position[0] + self.x_size * (self._current_stage / self.stages_num)),
                   self.bar_position[1])
 
         return endpos
 
-    def update(self, current_stage=None, text=None, stages_num=None, text_pos=None, bar_pos=None):
+    def update(self, current_stage=None, text=None, stages_num=None, text_pos=None, bar_pos=None, bar_color=None):
         if text_pos:
             self.text_position = text_pos
+
+        if bar_color:
+            self.bar_color = bar_color
 
         if bar_pos:
             self.bar_position = bar_pos
@@ -78,11 +81,11 @@ class Loader:
         else:
             self._current_stage = current_stage
 
-        self.__get_percent()
+        self._get_percent()
 
         if text:
             self._message = str(text)
-            self.__render_text()
+            self._render_text()
         else:
             self._text = None
 
@@ -101,7 +104,7 @@ class Loader:
             draw.line(surface=self.screen,
                       color=self.bar_color,
                       start_pos=self.bar_position,
-                      end_pos=self.__bar_endpos(),
+                      end_pos=self._bar_endpos(),
                       width=self.y_size)
 
         if self._text:

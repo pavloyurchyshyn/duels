@@ -1,7 +1,7 @@
 from UI.UI_base.button_UI import Button
 from settings.global_parameters import GLOBAL_SETTINGS
 from settings.colors import WHITE, GREY_GREEN, GREY_RED
-from settings.game_stages import TEST_DRAW_S, MULTIPLAYER_S, EXIT_S
+from settings.game_stages import TEST_DRAW_S, MULTIPLAYER_MENU_S, EXIT_S
 from settings.window_settings import MAIN_SCREEN
 
 

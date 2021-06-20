@@ -3,15 +3,14 @@ from pygame.mixer import music as Music
 
 import os
 import random
-from settings.global_parameters import SOUNDS_FOLDER
-from settings.global_parameters import SETTINGS_PATH
-
+from settings.common_settings import SOUNDS_FOLDER, COMMON_GAME_SETTINGS
+from settings.default_common_settings import DEFAULT_MUSIC_VOLUME
+from common_things.save_and_load_json_config import load_json_config, save_json_config
 
 FOLDER_WITH_BACK_MUSIC = os.path.join(SOUNDS_FOLDER, 'back_music')
 
-
-def load_sound(path):
-    return Sound(os.path.join(SOUNDS_FOLDER, path))
+MUSIC_VOLUME = 'music_volume'
+MUSIC_MUTED = 'music_muted'
 
 
 class MusicPlayer:
@@ -27,11 +26,18 @@ class MusicPlayer:
 
         self.played_list = set()
 
+        settings = load_json_config(COMMON_GAME_SETTINGS)
+
         self._current_song = None
         self._current_song_path = None
 
-        self._volume_lvl = 1.0  # sound lvl from 0.0 to 1.0
+        self._volume_lvl = settings.get(MUSIC_VOLUME, DEFAULT_MUSIC_VOLUME)  # sound lvl from 0.0 to 1.0
+
+        self._muted = settings.get(MUSIC_MUTED, 0)
+        self._paused = 0
+
         Music.set_volume(self._volume_lvl)
+        self.save_settings()
 
     def update(self):
         if not Music.get_busy():
@@ -39,7 +45,8 @@ class MusicPlayer:
             self.play_back_music()
 
     def load_back_music_list(self):
-        music_list = filter(lambda file: file.endswith('.mp3') or file.endswith('.wav'), os.listdir(FOLDER_WITH_BACK_MUSIC))
+        music_list = filter(lambda file: file.endswith('.mp3') or file.endswith('.wav'),
+                            os.listdir(FOLDER_WITH_BACK_MUSIC))
         music_list = map(lambda music: os.path.abspath(os.path.join(FOLDER_WITH_BACK_MUSIC, music)), music_list)
         music_list = set(music_list)
 
@@ -59,35 +66,76 @@ class MusicPlayer:
         self._current_song = os.path.basename(second_comp)
         self._current_song_path = second_comp
 
+    def save_settings(self):
+        config = load_json_config(COMMON_GAME_SETTINGS)
+        config[MUSIC_VOLUME] = self._volume_lvl
+        config[MUSIC_MUTED] = self._muted
+        save_json_config(config, COMMON_GAME_SETTINGS)
+
     def play_back_music(self):
-        if self._current_song_path:
+        if self._current_song_path and not self._muted:
             Music.load(self._current_song_path)
             Music.play(fade_ms=MusicPlayer.FADE)
 
     def pause_back_music(self):
         Music.pause()
+        self._paused = 1
 
     def resume_back_music(self):
         Music.unpause()
+        self._paused = 0
 
     def stop_back_music(self):
         Music.stop()
 
     def add_volume(self):
+        self._muted = 0
+        if self._paused:
+            self.resume_back_music()
+
         self._volume_lvl += self.VOL_STEP
         if self._volume_lvl > self.MAX_VOLUME:
             self._volume_lvl = self.MAX_VOLUME
+
+        Music.set_volume(self._volume_lvl)
+        self.save_settings()
 
     def minus_volume(self):
         self._volume_lvl -= self.VOL_STEP
         if self._volume_lvl < self.MIN_VOLUME:
             self._volume_lvl = self.MIN_VOLUME
 
-    def __del__(self):
-        pass
-        # if Music.get_busy():
-        #     Music.stop()
+        Music.set_volume(self._volume_lvl)
+        self.save_settings()
 
-        #Music.unload()
+    def mute(self):
+        self._muted = 1
+        self.pause_back_music()
+        self.save_settings()
+
+    def unmute(self):
+        self._muted = 0
+        self.resume_back_music()
+        self.save_settings()
+
+    @staticmethod
+    def load_sound(path):
+        return Sound(os.path.join(SOUNDS_FOLDER, path))
+
+    @property
+    def volume(self):
+        return self._volume_lvl
+
+    @property
+    def volume_stages(self):
+        return (self.MAX_VOLUME - self.MIN_VOLUME) // self.VOL_STEP
+
+    @property
+    def volume_stage(self):
+        return (self.MAX_VOLUME - self.MIN_VOLUME) // self.VOL_STEP * self._volume_lvl
+
+    @property
+    def muted(self):
+        return self._muted
 
 GLOBAL_MUSIC_PLAYER = MusicPlayer()

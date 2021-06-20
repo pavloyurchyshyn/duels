@@ -156,7 +156,7 @@ class Button(Rectangle):
         non_active_button_s.fill(self._background_color)
         self._text_size = self._text_size * k if self._text_size * k >= 1 else self._text_size
 
-        if self._text_text:
+        if len(self._text_text) > 0:
             # render text
             self._active_text = Text(text=self._text_text,
                                      screen=active_button_s,
@@ -172,11 +172,12 @@ class Button(Rectangle):
                                          size=self._text_size)
             self._non_active_text.draw()
 
-        DrawRect(active_button_s, color=self._border_active_color,
-                 rect=self._border, width=self._border_width)
+        if self._border_width > 0:
+            DrawRect(active_button_s, color=self._border_active_color,
+                     rect=self._border, width=self._border_width)
 
-        DrawRect(non_active_button_s, color=self._border_non_active_color,
-                 rect=self._border, width=self._border_width)
+            DrawRect(non_active_button_s, color=self._border_non_active_color,
+                     rect=self._border, width=self._border_width)
 
         self._r_active_button = active_button_s  # should be created button picture
         self._r_active_button.convert_alpha()
@@ -232,11 +233,19 @@ class Button(Rectangle):
                 self._value = self._on_click_action(*self.on_click_args, *args, **self.on_click_kwargs, **kwargs)
 
             if self._change_after_click:
-                self._current_button_pic = self._r_active_button if self._current_button_pic == self._r_non_active_button else self._r_non_active_button
+                self.change_picture()
             else:
                 self._current_button_pic = self._r_active_button if self._active else self._r_non_active_button
 
             return 1
+
+    def change_picture(self, active=None):
+        if active == 1:
+            self._current_button_pic = self._r_active_button
+        elif active == 0:
+            self._current_button_pic = self._r_non_active_button
+        else:
+            self._current_button_pic = self._r_active_button if self._current_button_pic == self._r_non_active_button else self._r_non_active_button
 
     def draw(self, dx=0, dy=0):
         self._draw(dx, dy)
@@ -314,6 +323,7 @@ class Button(Rectangle):
     @text.setter
     def text(self, message):
         self._text_text = message
+        self.build()
 
     @property
     def active(self) -> bool:

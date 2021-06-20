@@ -12,7 +12,14 @@ ROUND_S = 'round'
 
 ROUND_PAUSE_S = 'round_pause'
 
-MULTIPLAYER_S = 'multiplayer'
+MULTIPLAYER_MENU_S = 'multiplayer_menu'
+
+HOST_SERVER = 'multiplayer_host_server'
+
+MULTIPLAYER_CLIENT_ROUND_S = 'multiplayer_round'
+MULTIPLAYER_CLIENT_ROUND_PAUSE_S = 'multiplayer_round_pause'
+
+
 MULTIPLAYER_HOST_S = 'multiplayer_host'
 MULTIPLAYER_CLIENT_S = 'multiplayer_client'
 
