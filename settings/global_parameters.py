@@ -1,10 +1,6 @@
 from time import time as cur_time
 import os
 
-
-
-
-
 GLOBAL_SETTINGS = {
     'current_stage': 'main_menu',
     'current_cell': None,

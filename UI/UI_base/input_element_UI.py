@@ -22,6 +22,7 @@ class InputElement(Rectangle):
 
     def __init__(self, x, y, size_x=DEF_X_SIZE, size_y=DEF_Y_SIZE,
                  surface=None,
+                 text='',
                  default_text='',
                  background_color=(0, 0, 0, 120),  # r, g, b, t
                  transparent=1,
@@ -36,6 +37,8 @@ class InputElement(Rectangle):
                  active_border_color=WHITE,
                  non_active_border_width=DEFAULT_BORDER_WIDTH,
                  non_active_border_color=GREY,
+
+                 on_change_action=None,
                  ):
         super().__init__(x, y, size_x, size_y)
         self._mouse = GLOBAL_MOUSE
@@ -44,7 +47,7 @@ class InputElement(Rectangle):
         self._default_text = default_text
         self._first_enter = 1
 
-        self._text_text = default_text
+        self._text_text = text if text else default_text
         self._r_text_active = None
         self._text_active_color = text_active_color
         self._r_text_non_active = None
@@ -78,6 +81,8 @@ class InputElement(Rectangle):
 
         self._surface_to_draw = self.get_surface()
         self._border = self._surface_to_draw.get_rect()
+
+        self._on_change_action = on_change_action
 
         if autobuild:
             self.build()
@@ -116,6 +121,8 @@ class InputElement(Rectangle):
                 self.set_default_text()
 
             if prev_text != self._text_text:
+                if self._on_change_action:
+                    self._on_change_action()
                 self.build()
 
     def set_default_text(self):

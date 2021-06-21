@@ -29,25 +29,6 @@ def close_game():
 
 
 MAIN_MENU_BUTTONS = {
-    # test draw button 
-    # '_test_draw': {
-    #     'args': (),
-    #     'kwargs': {
-    #         'x': 50,
-    #         'y': 50,
-    #         'text': 'Turn On TEST_DRAW',
-    #         'non_active_text': 'Turn Off TEST_DRAW',
-    #         'on_click_action': test_draw,
-    #         'non_active_after_click': 0,
-    #         'change_after_click': 1,
-    #         'text_size': 10,
-    #         'border_color': GREY_GREEN,
-    #         'border_non_active_color': GREY_RED,
-    #         'text_non_active_color': WHITE,
-    #         'active_pic': not GLOBAL_SETTINGS[TEST_DRAW_S]
-    #     }
-    # },
-
     'start': {
         'args': (HALF_SCREEN_W - DEFAULT_BUTTON_X_SIZE // 2, 500),
         'kwargs': {

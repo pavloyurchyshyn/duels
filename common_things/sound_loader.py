@@ -3,20 +3,17 @@ from pygame.mixer import music as Music
 
 import os
 import random
-from settings.common_settings import SOUNDS_FOLDER, COMMON_GAME_SETTINGS
-from settings.default_common_settings import DEFAULT_MUSIC_VOLUME
+from settings.common_settings import SOUNDS_FOLDER, COMMON_GAME_SETTINGS_JSON_PATH
+from settings.default_common_settings import DEFAULT_MUSIC_VOLUME, MUSIC_MUTED, MUSIC_VOLUME
 from common_things.save_and_load_json_config import load_json_config, save_json_config
 
 FOLDER_WITH_BACK_MUSIC = os.path.join(SOUNDS_FOLDER, 'back_music')
 
-MUSIC_VOLUME = 'music_volume'
-MUSIC_MUTED = 'music_muted'
-
 
 class MusicPlayer:
-    MAX_VOLUME = 1.0
     MIN_VOLUME = 0.0
     VOL_STEP = 0.1
+    MAX_VOLUME = 1.0 + VOL_STEP
 
     FADE = 2000
 
@@ -26,7 +23,7 @@ class MusicPlayer:
 
         self.played_list = set()
 
-        settings = load_json_config(COMMON_GAME_SETTINGS)
+        settings = load_json_config(COMMON_GAME_SETTINGS_JSON_PATH)
 
         self._current_song = None
         self._current_song_path = None
@@ -67,10 +64,10 @@ class MusicPlayer:
         self._current_song_path = second_comp
 
     def save_settings(self):
-        config = load_json_config(COMMON_GAME_SETTINGS)
+        config = load_json_config(COMMON_GAME_SETTINGS_JSON_PATH)
         config[MUSIC_VOLUME] = self._volume_lvl
         config[MUSIC_MUTED] = self._muted
-        save_json_config(config, COMMON_GAME_SETTINGS)
+        save_json_config(config, COMMON_GAME_SETTINGS_JSON_PATH)
 
     def play_back_music(self):
         if self._current_song_path and not self._muted:
@@ -102,7 +99,7 @@ class MusicPlayer:
 
     def minus_volume(self):
         self._volume_lvl -= self.VOL_STEP
-        if self._volume_lvl < self.MIN_VOLUME:
+        if self._volume_lvl < self.MIN_VOLUME or self._volume_lvl < self.VOL_STEP:
             self._volume_lvl = self.MIN_VOLUME
 
         Music.set_volume(self._volume_lvl)
@@ -128,14 +125,15 @@ class MusicPlayer:
 
     @property
     def volume_stages(self):
-        return (self.MAX_VOLUME - self.MIN_VOLUME) // self.VOL_STEP
+        return (self.MAX_VOLUME - self.MIN_VOLUME) // self.VOL_STEP + 1
 
     @property
     def volume_stage(self):
-        return (self.MAX_VOLUME - self.MIN_VOLUME) // self.VOL_STEP * self._volume_lvl
+        return int((self.MAX_VOLUME - self.MIN_VOLUME) // self.VOL_STEP * self._volume_lvl)
 
     @property
     def muted(self):
         return self._muted
+
 
 GLOBAL_MUSIC_PLAYER = MusicPlayer()

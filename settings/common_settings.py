@@ -17,4 +17,6 @@ SETTINGS_PATH = os.path.join(ROOT_OF_GAME, 'settings')
 SOUNDS_FOLDER = os.path.join(ROOT_OF_GAME, 'sounds')
 SERVER_FOLDER = os.path.join(ROOT_OF_GAME, 'network')
 
-COMMON_GAME_SETTINGS = os.path.join(SETTINGS_PATH, 'common_game_settings.json')
+COMMON_GAME_SETTINGS_JSON_PATH = os.path.join(SETTINGS_PATH, 'common_game_settings.json')
+
+PLAYER_NICKNAME_KEY = 'player_nickname'

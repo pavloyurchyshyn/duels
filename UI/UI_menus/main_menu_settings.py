@@ -6,6 +6,8 @@ from common_things.global_keyboard import GLOBAL_KEYBOARD
 from settings.UI_setings.menus_settings.main_menu_settings import MAIN_MENU_SETTINGS_BUTTONS, back_to_menu, \
     MUSIC_VOLUME_VALUE, VOLUME_PROGRESS_BAR, MUTE_MUSIC
 
+from settings.global_parameters import pause_available, pause_step
+
 
 class MainMenuSettings(MenuUI):
     def __init__(self):
@@ -19,7 +21,8 @@ class MainMenuSettings(MenuUI):
         for button in self._buttons:
             button.update()
 
-        if GLOBAL_KEYBOARD.ESC:
+        if GLOBAL_KEYBOARD.ESC and pause_available():
+            pause_step()
             back_to_menu()
 
         if GLOBAL_MOUSE.lmb:

@@ -30,7 +30,7 @@ class RoundPause(MenuUI):
         self._exit_no.make_visible()
 
         for button in self._buttons:
-            if button == self._exit_yes or button == self._exit_no:
+            if button in (self._exit_yes, self._exit_no, TEST_DRAW_BUTTON):
                 continue
             button.make_inactive()
 
@@ -46,7 +46,7 @@ class RoundPause(MenuUI):
         self._exit_no.make_invisible()
 
         for button in self._buttons:
-            if button == self._exit_yes or button == self._exit_no:
+            if button in (self._exit_yes, self._exit_no, TEST_DRAW_BUTTON):
                 continue
             button.make_active()
 

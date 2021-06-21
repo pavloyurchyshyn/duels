@@ -1,9 +1,11 @@
 from UI.UI_base.menu_UI import MenuUI
 from UI.UI_buttons.test_draw import TEST_DRAW_BUTTON
 
-from settings.colors import BLACK, HALF_EMPTY
+from common_things.global_keyboard import GLOBAL_KEYBOARD
 
+from settings.colors import BLACK, HALF_EMPTY
 from settings.UI_setings.menus_settings.main_menu import MAIN_MENU_BUTTONS
+from settings.global_parameters import pause_available, pause_step
 
 
 class MainMenu(MenuUI):
@@ -15,9 +17,35 @@ class MainMenu(MenuUI):
         self._fade_surface.fill(HALF_EMPTY)
         self._fade_surface.convert_alpha()
 
+    def activate_warning(self):
+        self._exit_yes.make_active()
+        self._exit_yes.make_visible()
+        self._exit_no.make_active()
+        self._exit_no.make_visible()
+        self._exit_warning = 1
+
+    def deactivate_warning(self):
+        self._exit_yes.make_inactive()
+        self._exit_yes.make_invisible()
+        self._exit_no.make_inactive()
+        self._exit_no.make_invisible()
+        self._exit_warning = 0
+        self._surface.fill(BLACK)
+
     def update(self):
         for button in self._elements:
             button.update()
+
+        if GLOBAL_KEYBOARD.ENTER and self._exit_warning:
+            self._exit_yes.activate_click()
+
+        if GLOBAL_KEYBOARD.ESC and pause_available() and not self._exit_warning:
+            pause_step()
+            self.activate_warning()
+
+        elif GLOBAL_KEYBOARD.ESC and pause_available() and self._exit_warning:
+            pause_step()
+            self.deactivate_warning()
 
         if self.click():
             xy = self.GLOBAL_MOUSE.pos
@@ -29,22 +57,13 @@ class MainMenu(MenuUI):
 
                 self._exit.click(xy=xy)
                 if self._exit.clicked:
-                    self._exit_yes.make_active()
-                    self._exit_yes.make_visible()
-                    self._exit_no.make_active()
-                    self._exit_no.make_visible()
-                    self._exit_warning = 1
+                    self.activate_warning()
             else:
                 if self._exit_yes.click(xy):
                     return
 
                 else:
-                    self._exit_yes.make_inactive()
-                    self._exit_yes.make_invisible()
-                    self._exit_no.make_inactive()
-                    self._exit_no.make_invisible()
-                    self._exit_warning = 0
-                    self._surface.fill(BLACK)
+                    self.deactivate_warning()
 
     def draw(self, dx=0, dy=0):
         self._draw(dx, dy)

@@ -239,6 +239,9 @@ class Button(Rectangle):
 
             return 1
 
+    def activate_click(self, *args, **kwargs):
+        self.click(self._center, *args, **kwargs)
+
     def change_picture(self, active=None):
         if active == 1:
             self._current_button_pic = self._r_active_button

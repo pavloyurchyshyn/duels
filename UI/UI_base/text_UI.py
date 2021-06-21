@@ -146,6 +146,10 @@ class Text:
         return surface
 
     @property
+    def text(self):
+        return self._text
+
+    @property
     def r_text(self):
         return self._r_text_font
 

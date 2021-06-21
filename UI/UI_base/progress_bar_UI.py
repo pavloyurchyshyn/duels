@@ -63,7 +63,8 @@ class Progress_Bar:
 
         return endpos
 
-    def update(self, current_stage=None, text=None, stages_num=None, text_pos=None, bar_pos=None, bar_color=None):
+    def update(self, current_stage: int = None, text=None, stages_num: int = None, text_pos=None, bar_pos=None,
+               bar_color=None):
         if text_pos:
             self.text_position = text_pos
 
@@ -77,7 +78,7 @@ class Progress_Bar:
             self.stages_num = stages_num
 
         if current_stage is None:
-            self._current_stage += 1
+            self._current_stage = int(self._current_stage + 1)
         else:
             self._current_stage = current_stage
 
@@ -100,7 +101,7 @@ class Progress_Bar:
                   width=1)
 
         # BAR
-        if self._current_stage > 0:
+        if self._current_stage:
             draw.line(surface=self.screen,
                       color=self.bar_color,
                       start_pos=self.bar_position,

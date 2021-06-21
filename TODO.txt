@@ -1,3 +1,5 @@
 Think about Redis
 
 Split stages to classes
+
+add messages like bad ip value
