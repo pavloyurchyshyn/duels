@@ -1,5 +1,9 @@
 from settings.init_pygame import *  # do not remove its ok
 
+import datetime
+import os
+
+
 from pygame.time import Clock
 from pygame import event as EVENT
 from pygame import MOUSEBUTTONDOWN
@@ -7,13 +11,15 @@ from pygame import display, draw, Surface, constants
 
 from settings.colors import WHITE
 from settings.global_parameters import GLOBAL_SETTINGS
-from settings.common_settings import DEFAULT_FONT, VERSION
+from settings.common_settings import VERSION, FPS
 from settings.window_settings import MAIN_SCREEN, MAIN_SCREEN_RECT, SCREEN_H, SCREEN_W, MAIN_SCREEN_DEF_COLOR  # main screen of all game
 from settings.game_stages import ROUND_S, CURRENT_STAGE, START_ROUND_S
 
+from common_things.font_loader import DEFAULT_FONT
 from common_things.global_clock import GLOBAL_CLOCK, ROUND_CLOCK
 from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.global_keyboard import GLOBAL_KEYBOARD
+from common_things.loggers import logger
 
 from game_body import GameBody
 
@@ -32,6 +38,7 @@ surface.fill((0, 0, 0, 50))
 
 surface.convert_alpha()
 
+
 if __name__ == "__main__":
     for y in range(0, SCREEN_H, 50):
         for x in range(0, SCREEN_W, 50):
@@ -47,11 +54,11 @@ if __name__ == "__main__":
     while 1:
         events = EVENT.get()
 
-        dt = clock.tick() / 1000  # milliseconds to seconds
+        dt = clock.tick(FPS) / 1000  # milliseconds to seconds
 
         # update time
         G_Clock.update(dt)
-        if GLOBAL_SETTINGS[CURRENT_STAGE] == ROUND_S:
+        if GLOBAL_SETTINGS[CURRENT_STAGE] == ROUND_S:  # solo game or leave it for animation?
             R_Clock.update(dt)
 
         # update mouse and keyboard

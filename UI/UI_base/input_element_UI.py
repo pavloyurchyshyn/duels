@@ -4,6 +4,8 @@ from obj_properties.rect_form import Rectangle
 from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.global_keyboard import GLOBAL_KEYBOARD
 from common_things.global_clock import GLOBAL_CLOCK
+from common_things.font_loader import DEFAULT_FONT_SIZE
+
 
 from settings.window_settings import MAIN_SCREEN
 from settings.colors import YELLOW, WHITE, GREY
@@ -11,7 +13,7 @@ from settings.global_parameters import GLOBAL_SETTINGS
 from pygame import draw, Surface
 from pygame.constants import SRCALPHA
 
-from settings.common_settings import DEFAULT_FONT_SIZE
+
 from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE, DEFAULT_BUTTON_Y_SIZE, DEFAULT_BORDER_WIDTH
 
 

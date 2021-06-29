@@ -1,6 +1,6 @@
 # from obj_properties.physical_objects import PhysicalObj, SimplePhysicalCircleObj
 from obj_properties.circle_form import Circle
-from settings.player_settings import *
+from settings.players_settings.player_settings import *
 
 from pygame.constants import *
 from pygame import mouse, key, transform

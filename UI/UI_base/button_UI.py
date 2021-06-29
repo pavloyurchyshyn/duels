@@ -7,13 +7,14 @@ from pygame import draw
 
 from UI.UI_base.text_UI import Text
 from common_things.global_clock import GLOBAL_CLOCK
+from common_things.font_loader import DEFAULT_FONT_SIZE
 
 from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE, \
     DEFAULT_BUTTON_Y_SIZE, DEFAULT_CLICK_DELAY, DEFAULT_BORDER_WIDTH, CLICK_ANIMATION_DURATION
 from settings.colors import simple_colors
 from settings.global_parameters import GLOBAL_SETTINGS
-from settings.common_settings import DEFAULT_FONT_SIZE
 from settings.window_settings import MAIN_SCREEN
+
 
 
 class Button(Rectangle):

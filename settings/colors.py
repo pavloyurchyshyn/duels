@@ -43,3 +43,17 @@ COLORS_DICT = {
 simple_colors = COLORS_DICT
 
 BLOOD_COLOR = (75, 0, 0)
+
+PLAYERS_COLORS = {
+    'blue': {'body': (181, 244, 253, 255),
+             'face': (112, 170, 241)},
+
+    'red': {'body': (237, 121, 126, 255),
+            'face': (185, 65, 70, 255)},
+
+    'purple': {'body': (157, 98, 230, 255),
+               'face': (125, 45, 223, 255)},
+
+    'green': {'body': (62, 210, 111, 255),
+              'face': (27, 114, 55, 255)}
+}

@@ -34,7 +34,7 @@ class ArenaCell:
         'left': {'x': 0, 'y': 0, 'size_x': BORDER_SIZE, 'size_y': CELL_SIZE},
     }
 
-    def __init__(self, data=[], opened=True, dead_cell=False):
+    def __init__(self, data: dict = {}, opened=True, dead_cell=False):
         self._size = ArenaCell.CELL_SIZE
 
         self._data = data

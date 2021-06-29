@@ -1,6 +1,8 @@
 from settings.window_settings import MAIN_SCREEN, HALF_SCREEN_H, SCREEN_W
 from settings.colors import simple_colors, EMPTY
-from settings.common_settings import DEFAULT_FONT
+
+from common_things.font_loader import DEFAULT_FONT_SIZE
+
 from pygame import draw
 from pygame import Rect
 

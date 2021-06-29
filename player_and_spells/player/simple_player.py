@@ -1,17 +1,11 @@
-from settings.player_settings import *
+from settings.players_settings.player_settings import *
 from UI.message import Messages
-from pygame.constants import *
-from pygame import mouse, key, transform, Surface
-from pygame.draw import circle, line, polygon
+from pygame import mouse, transform
 from visual_effects.animation import Animation
 
-import time
-
-from math import atan2, cos, sin, degrees, dist
+from math import atan2, degrees
 
 from settings.common_settings import GLOBAL_SETTINGS, MAIN_SCREEN
-
-import random
 
 
 class SimplePlayer:

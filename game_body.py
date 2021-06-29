@@ -5,10 +5,10 @@ from settings.UI_setings.menus_settings.round_pause import PAUSE_MAIN_SCREEN_COP
 
 from settings.game_stages import CURRENT_STAGE, MAIN_MENU_S, MAIN_MENU_SETTINGS_S, \
     START_ROUND_S, ROUND_PAUSE_S, ROUND_S, \
-    MULTIPLAYER_MENU_S, \
+    MULTIPLAYER_MENU_S, MULTIPLAYER_CLIENT_DISCONNECT_S, \
     MULTIPLAYER_CLIENT_ROUND_PAUSE_S, MULTIPLAYER_CLIENT_ROUND_S, \
     MULTIPLAYER_CLIENT_S, MULTIPLAYER_HOST_S, HOST_SERVER, \
-    EXIT_S
+    EXIT_S, MULTIPLAYER_CLIENT_CONNECT_ROUND_S
 
 from UI.UI_menus.main_menu import MAIN_MENU_UI
 from UI.UI_menus.main_menu_settings import MAIN_MENU_SETTINGS_UI
@@ -17,6 +17,7 @@ from UI.UI_menus.multiplayer import MULTIPLAYER_UI
 from UI.UI_buttons.round_pause import ROUND_PAUSE_BUTTON
 
 from world_arena.world import GLOBAL_WORLD
+from world_arena.base.arena_cell import ArenaCell
 from player_and_spells.player.commands_player import Player
 
 from common_things.global_keyboard import GLOBAL_KEYBOARD
@@ -24,7 +25,8 @@ from common_things.global_clock import ROUND_CLOCK
 from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.sound_loader import GLOBAL_MUSIC_PLAYER
 
-from network.server_main_part import SERVER_CONTROLLER
+from network.network import Network
+from network.server_controller import SERVER_CONTROLLER
 
 from pygame.constants import K_F4, K_LALT
 import sys
@@ -45,8 +47,10 @@ class GameBody:
 
             MULTIPLAYER_MENU_S: self.MULTIPLAYER_MENU,
             HOST_SERVER: self.HOST_SERVER,  # run if to create server
+            MULTIPLAYER_CLIENT_CONNECT_ROUND_S: self.MULTIPLAYER_CLIENT_CONNECT,
             MULTIPLAYER_CLIENT_ROUND_S: self.MULTIPLAYER_CLIENT_ROUND,
             MULTIPLAYER_CLIENT_ROUND_PAUSE_S: self.MULTIPLAYER_CLIENT_ROUND_PAUSE,
+            MULTIPLAYER_CLIENT_DISCONNECT_S: self.MULTIPLAYER_CLIENT_DISCONNECT,
 
             EXIT_S: self.EXIT,
 
@@ -68,6 +72,10 @@ class GameBody:
         self._music_player.play_back_music()
 
         self._server_controller = None
+        self._network = None
+        self._multiplayer_cell = None
+        self._multiplayer_player = None
+        self._other_multiplayer_players = None
 
     def game_loop(self):
         """
@@ -150,18 +158,53 @@ class GameBody:
         SERVER_CONTROLLER.run_server()
         if GLOBAL_KEYBOARD.ESC and pause_available():
             pause_step()
-            self._g_settings[CURRENT_STAGE] = MAIN_MENU_S
+            self._g_settings[CURRENT_STAGE] = MULTIPLAYER_CLIENT_DISCONNECT_S
 
-        self._g_settings[CURRENT_STAGE] = MULTIPLAYER_CLIENT_ROUND_S
+        self._g_settings[CURRENT_STAGE] = MULTIPLAYER_CLIENT_CONNECT_ROUND_S
+
+    def MULTIPLAYER_CLIENT_CONNECT(self):
+        self._network = Network()
+        self._network.connect()
+
+        if self._network.connected:
+            self._g_settings[CURRENT_STAGE] = MULTIPLAYER_CLIENT_ROUND_S
+            data = {}
+            self._multiplayer_cell = ArenaCell(data)
+
+            self._multiplayer_player = Player(100, 100)
+            self._multiplayer_player.update({}, (0, 0, 0), (0, 0))
+
+            self._other_multiplayer_players = {}
+
+        else:
+            self._g_settings[CURRENT_STAGE] = MULTIPLAYER_MENU_S
 
     def MULTIPLAYER_CLIENT_ROUND(self):
+        self._keyboard.update()
+
+        self._multiplayer_cell.draw()
+
+        self._multiplayer_player.update(commands=self._keyboard.commands,
+                                        mouse=self._mouse.pressed,
+                                        mouse_pos=self._mouse.pos)
+        self._multiplayer_player.draw()
+
         if GLOBAL_KEYBOARD.ESC and pause_available():
             pause_step()
-            self._g_settings[CURRENT_STAGE] = MAIN_MENU_S
+            self._g_settings[CURRENT_STAGE] = MULTIPLAYER_CLIENT_DISCONNECT_S
             SERVER_CONTROLLER.stop_server()
 
     def MULTIPLAYER_CLIENT_ROUND_PAUSE(self):
         pass
+
+    def MULTIPLAYER_CLIENT_DISCONNECT(self):
+        self._other_multiplayer_players = None
+        self._multiplayer_player = None
+        self._multiplayer_cell = None
+        self._server_controller = None
+        self._network = None
+
+        self._g_settings[CURRENT_STAGE] = MAIN_MENU_S
 
     def EXIT(self):
         self._close_game()

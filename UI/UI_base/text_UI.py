@@ -1,4 +1,4 @@
-from settings.common_settings import DEFAULT_FONT_SIZE
+from common_things.font_loader import DEFAULT_FONT_SIZE
 from common_things.global_clock import GLOBAL_CLOCK
 from pygame import font, Surface
 from pygame.transform import rotate, scale
@@ -18,7 +18,7 @@ class Text:
                  font_t='Arial',
                  antial=1,
                  angle=0):
-
+        text = str(text)
         self._text = text.replace('\t', '    ')
         self._text_font = font_t
 

@@ -3,7 +3,8 @@ from UI.UI_base.menu_UI import MenuUI
 from settings.colors import BLACK, HALF_EMPTY_L, WHITE
 from settings.window_settings import HALF_SCREEN_W, SCREEN_H
 from settings.UI_setings.menus_settings.multiplayer import MULTIPLAYER_BUTTONS, SERVER_PASSWORD, IP_VALUE,\
-    P_NUM, PLAYERS_NUMBER, SERVER_ADDRESS_TEXT, SERVER_ADDRESS, NICKNAME_INPUT, NICKNAME_TEXT, PASSWORD_INPUT_CLIENT, PASSWORD_TEXT_CLIENT
+    P_NUM, PLAYERS_NUMBER, SERVER_ADDRESS_TEXT, SERVER_ADDRESS, NICKNAME_INPUT, NICKNAME_TEXT,\
+    PASSWORD_INPUT_CLIENT, PASSWORD_TEXT_CLIENT, PASSWORD_TEXT_HOST
 from pygame.draw import line as DrawLine
 
 
@@ -39,6 +40,7 @@ class Multiplayer(MenuUI):
         self._server_pswrd.draw(dx, dy)
         IP_VALUE.draw(dx, dy)
         P_NUM.draw(dx, dy)
+        PASSWORD_TEXT_HOST.draw(dx, dy)
         PLAYERS_NUMBER.draw(dx, dy)
         SERVER_ADDRESS_TEXT.draw(dx, dy)
         SERVER_ADDRESS.draw(dx, dy)

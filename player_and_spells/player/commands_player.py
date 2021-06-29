@@ -1,6 +1,7 @@
 # from obj_properties.physical_objects import PhysicalObj, SimplePhysicalCircleObj
 from obj_properties.circle_form import Circle
-from settings.player_settings import *
+from settings.players_settings.player_settings import *
+from settings.players_settings.player_pic_and_anim import get_sprite_and_animations
 
 from pygame.constants import *
 from pygame import key, transform
@@ -13,15 +14,13 @@ from settings.colors import BLOOD_COLOR
 from settings.window_settings import MAIN_SCREEN
 from settings.default_keys import INTERACT_C, \
     UP_C, LEFT_C, RIGHT_C, DOWN_C,\
-    SPELL_1_C, SPELL_2_C,\
-    SPRINT_C, GRAB_C, DROP_C, RELOAD_C,\
+    SPELL_1_C, SPRINT_C, GRAB_C, DROP_C, RELOAD_C,\
     WEAPON_1_C, WEAPON_2_C, WEAPON_3_C, SELF_DAMAGE
 
 # global things
 from UI.camera import GLOBAL_CAMERA
 from settings.global_parameters import GLOBAL_SETTINGS
 from common_things.global_clock import ROUND_CLOCK
-import time
 
 
 class Player(Circle):  # , PhysicalObj):
@@ -35,16 +34,22 @@ class Player(Circle):  # , PhysicalObj):
     BLOOD_COLOR = BLOOD_COLOR
 
     def __init__(self, x, y,
-                 size=PLAYER_SIZE, mass=PLAYER_MASS,
-                 n_a=PLAYER_GLIDE_K, **kwargs):
+                 size=PLAYER_SIZE,
+                 mass=PLAYER_MASS,
+                 n_a=PLAYER_GLIDE_K,
+                 **kwargs):
         super().__init__(x, y, size)
         # PhysicalObj.__init__(self, mass)
 
         self.hands_radius = PLAYER_HANDS_SIZE + PLAYER_SIZE
 
         self._angle = 0
+        pictures = get_sprite_and_animations(kwargs.get('player_color', 'blue'))
+        self.image = pictures['body']
+        self.face_anim = Animation(self._center,
+                                   idle_frames=pictures['idle_animation'],
+                                   **pictures['other_animation'])
 
-        self.image = PLAYER_PIC
         # =======================
         self._full_hp = kwargs.get('hp', Player.PLAYER_HP)
         self._hp = self._full_hp
@@ -76,7 +81,6 @@ class Player(Circle):  # , PhysicalObj):
 
         self.particles = []
 
-        self.face_anim = Animation(self._center, idle_frames=IDLE_ANIMATION, **OTHER_ANIMATIONS)
 
         self._time = 0.000000001
         self._d_time = 0.00000001

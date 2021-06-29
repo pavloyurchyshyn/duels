@@ -12,6 +12,9 @@ class Clock:
         return self._d_time
 
     def update(self, d_time):
+        """
+        d_time in milliseconds
+        """
         self._d_time = d_time
         self._time += d_time
 
