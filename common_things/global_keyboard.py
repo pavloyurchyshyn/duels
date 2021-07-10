@@ -1,6 +1,6 @@
 from pygame import key as KEY
 from pygame import constants, locals
-from settings.default_keys import DEFAULT_GAME_KEYS, KEYS_CONFIG_FILE
+from settings.default_keys import DEFAULT_GAME_KEYS, KEYS_CONFIG_FILE, TEST_MESSAGE
 from common_things.save_and_load_json_config import load_json_config, save_json_config
 import os
 
@@ -133,6 +133,10 @@ class Keyboard:
     @property
     def BACKSPACE(self):
         return self._pressed[constants.K_BACKSPACE]
+
+    @property
+    def test_message(self):
+        return TEST_MESSAGE in self._only_commands
 
 
 class KeyUsingError(Exception):

@@ -72,6 +72,7 @@ class MainMenu(MenuUI):
             self._exit_no.draw()
             self._exit_yes.draw()
 
+
     def _update(self):
         pass
 

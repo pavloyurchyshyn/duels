@@ -1,4 +1,3 @@
-from pygame import image, error, transform
 from sys import exit
 
 import os

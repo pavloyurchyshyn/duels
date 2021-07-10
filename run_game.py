@@ -13,13 +13,13 @@ from settings.colors import WHITE
 from settings.global_parameters import GLOBAL_SETTINGS
 from settings.common_settings import VERSION, FPS
 from settings.window_settings import MAIN_SCREEN, MAIN_SCREEN_RECT, SCREEN_H, SCREEN_W, MAIN_SCREEN_DEF_COLOR  # main screen of all game
-from settings.game_stages import ROUND_S, CURRENT_STAGE, START_ROUND_S
+from settings.game_stages import ROUND_S, CURRENT_STAGE, START_ROUND_S, MULTIPLAYER_CLIENT_ROUND_S, MULTIPLAYER_CLIENT_ROUND_PAUSE_S
 
 from common_things.font_loader import DEFAULT_FONT
 from common_things.global_clock import GLOBAL_CLOCK, ROUND_CLOCK
 from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.global_keyboard import GLOBAL_KEYBOARD
-from common_things.loggers import logger
+from common_things.loggers import LOGGER
 
 from game_body import GameBody
 
@@ -54,11 +54,11 @@ if __name__ == "__main__":
     while 1:
         events = EVENT.get()
 
-        dt = clock.tick(FPS) / 1000  # milliseconds to seconds
+        dt = clock.tick() / 1000  # milliseconds to seconds
 
         # update time
         G_Clock.update(dt)
-        if GLOBAL_SETTINGS[CURRENT_STAGE] == ROUND_S:  # solo game or leave it for animation?
+        if GLOBAL_SETTINGS[CURRENT_STAGE] in {ROUND_S, MULTIPLAYER_CLIENT_ROUND_S, MULTIPLAYER_CLIENT_ROUND_PAUSE_S}:  # solo game or leave it for animation?
             R_Clock.update(dt)
 
         # update mouse and keyboard
@@ -81,10 +81,6 @@ if __name__ == "__main__":
 
         update_fps()
         G_Mouse.draw()
-
-        # for y in range(0, SCREEN_H, 50):
-        #     for x in range(0, SCREEN_W, 50):
-        #         draw.circle(MAIN_SCREEN, (255, 255, 155), (x, y), 2)
 
         display.update(MAIN_SCREEN_RECT)
         # display.update()

@@ -62,11 +62,11 @@ class World(Rectangle):
 
         self._CURRENT_CELL = None
 
-    def build_cell(self, cell_coordinates=None):
+    def build_cell(self, cell_coordinates=None, draw_grid=True):
         if cell_coordinates:
             self._current_arena_cell_coordinates = cell_coordinates
 
-        self._CURRENT_CELL = ArenaCell(**self._cells_dict[self._current_arena_cell_coordinates])
+        self._CURRENT_CELL = ArenaCell(**self._cells_dict[self._current_arena_cell_coordinates], draw_grid=True)
 
     def build_cells_dict(self):
         y = 0

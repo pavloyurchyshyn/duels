@@ -10,17 +10,20 @@ from pygame.draw import circle, line
 from UI.UI_base.animation import Animation
 from math import atan2, cos, sin, degrees, dist
 
+from settings.global_parameters import GLOBAL_SETTINGS
 from settings.colors import BLOOD_COLOR
 from settings.window_settings import MAIN_SCREEN
 from settings.default_keys import INTERACT_C, \
-    UP_C, LEFT_C, RIGHT_C, DOWN_C,\
-    SPELL_1_C, SPRINT_C, GRAB_C, DROP_C, RELOAD_C,\
+    UP_C, LEFT_C, RIGHT_C, DOWN_C, \
+    SPELL_1_C, SPRINT_C, GRAB_C, DROP_C, RELOAD_C, \
     WEAPON_1_C, WEAPON_2_C, WEAPON_3_C, SELF_DAMAGE
 
 # global things
 from UI.camera import GLOBAL_CAMERA
-from settings.global_parameters import GLOBAL_SETTINGS
+
 from common_things.global_clock import ROUND_CLOCK
+from common_things.save_and_load_json_config import get_parameter_from_json_config, change_parameter_in_json_config
+from settings.common_settings import COMMON_GAME_SETTINGS_JSON_PATH as CGSJP
 
 
 class Player(Circle):  # , PhysicalObj):
@@ -37,14 +40,16 @@ class Player(Circle):  # , PhysicalObj):
                  size=PLAYER_SIZE,
                  mass=PLAYER_MASS,
                  n_a=PLAYER_GLIDE_K,
+                 player_color=None,
                  **kwargs):
         super().__init__(x, y, size)
         # PhysicalObj.__init__(self, mass)
 
         self.hands_radius = PLAYER_HANDS_SIZE + PLAYER_SIZE
-
         self._angle = 0
-        pictures = get_sprite_and_animations(kwargs.get('player_color', 'blue'))
+        self.color = player_color if player_color else get_parameter_from_json_config('player_skin', CGSJP, def_value='blue')
+        pictures = get_sprite_and_animations(self.color,
+                                             size=(self._size * 2, self._size * 2))
         self.image = pictures['body']
         self.face_anim = Animation(self._center,
                                    idle_frames=pictures['idle_animation'],
@@ -80,7 +85,6 @@ class Player(Circle):  # , PhysicalObj):
         self.hands_force = Player.PLAYER_PUSH_FORCE
 
         self.particles = []
-
 
         self._time = 0.000000001
         self._d_time = 0.00000001
@@ -160,6 +164,7 @@ class Player(Circle):  # , PhysicalObj):
         self.face_anim.update(time_d, self._center, self._angle)
 
         self.__update_inventory(time_d)
+
         self.camera.update(self.position)
 
         # self.spell.update(d_time=time_d)
@@ -231,7 +236,6 @@ class Player(Circle):  # , PhysicalObj):
         if x_step != 0 or y_step != 0:
             x_step *= sprint_k
             y_step *= sprint_k
-
 
             x, y = self._center
             x_add = 0 if x_step == 0 else (x_step / abs(x_step)) * self._size
@@ -343,7 +347,7 @@ class Player(Circle):  # , PhysicalObj):
     @hp.setter
     def hp(self, value):
         self._hp = value
-        self.hp_bar.update(text=self._hp, current_stage=self._hp, stages_num=self._full_hp)
+        # self.hp_bar.update(text=self._hp, current_stage=self._hp, stages_num=self._full_hp)
 
     @property
     def angle(self):
@@ -355,7 +359,7 @@ class Player(Circle):  # , PhysicalObj):
 
     def damage(self, damage):
         self._hp -= damage
-        self.hp_bar.update(text=self._hp, current_stage=self._hp, stages_num=self._full_hp)
+        # self.hp_bar.update(text=self._hp, current_stage=self._hp, stages_num=self._full_hp)
 
     @property
     def alive(self):
@@ -364,4 +368,3 @@ class Player(Circle):  # , PhysicalObj):
     @property
     def dead(self):
         return self._hp <= 0
-

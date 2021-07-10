@@ -4,6 +4,10 @@ import json
 
 from settings.network_settings import NETWORK_DATA, anon_host, DEFAULT_PORT
 from settings.network_settings import IP, NICKNAME, PASSWORD, PORT
+from common_things.loggers import LOGGER
+
+from common_things.save_and_load_json_config import get_parameter_from_json_config, change_parameter_in_json_config
+from settings.common_settings import COMMON_GAME_SETTINGS_JSON_PATH as CGSJP
 
 
 class Network:
@@ -27,30 +31,26 @@ class Network:
         self.credentials.clear()
         self.credentials[NICKNAME] = self.nickname
         self.credentials[PASSWORD] = self.password
-
-    def confirm_password(self):
-        self.send(data=self.password)
+        self.credentials['player_color'] = get_parameter_from_json_config('player_skin', CGSJP, def_value='blue')
 
     def connect(self):
         self.client.close()
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.update_network_data()
+
         try:
             self.client.connect(self.addr)
-            self.client.send(str(self.credentials).replace("\'", "\"").encode())
+            self.client.send(self.json_to_str(self.credentials))
             response = self.client.recv(2048).decode()
-            # print(response)
             if 'Connected' in response:
                 self.connected = True
                 return response
             else:
-                self.client.close()
-                self.connected = False
-                raise Exception(f'Failed to connect: {anon_host(self.addr)}')
+                raise Exception(f'{response}')
         except Exception as e:
             self.client.close()
             self.connected = False
-            raise Exception(f'Failed to connect: {anon_host(self.addr)} \n\t {e}')
+            return e
 
     def disconnect(self):
         try:
@@ -60,13 +60,47 @@ class Network:
         finally:
             self.connected = False
 
+    @staticmethod
+    def str_to_json(string):
+        # print(string)
+        try:
+            if string:
+                return json.loads(string)
+            else:
+                return {}
+        except Exception as e:
+            LOGGER.error(f'Failed to convert {string} to json: {e}')
+            # print(string)
+            return {}
+
+    @staticmethod
+    def json_to_str(json_):
+        return json.dumps(json_).encode()
+
     def send(self, data):
         try:
-            self.client.send(data.encode())
-            return self.client.recv(2048).decode()
+            self.client.send(data)
         except socket.error as e:
-            print(data)
-            print(e)
+            LOGGER.error(f"Failed to send data {e}")
+
+    def receive(self):
+        # try:
+        return self.client.recv(2048).decode()
+        # except Exception as e:
+        #     LOGGER.error(e)
+
+    def get_data(self):
+        # try:
+        data = self.receive()
+        # print(data)
+        return self.str_to_json(data)
+        # except Exception as e:
+        #     LOGGER.error(f"Failed to get data {e}")
+
+    def update(self, data):
+        self.send(self.json_to_str(data))
+
+        return self.get_data()
 
     def __del__(self):
         self.disconnect()

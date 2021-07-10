@@ -57,7 +57,7 @@ def paste_pass():
 
 
 def enter_pass():
-    NETWORK_DATA['password'] = PASSWORD_INPUT_CLIENT.text
+    NETWORK_DATA['password'] = PASSWORD_INPUT_CLIENT.text if PASSWORD_INPUT_CLIENT.text else '.'
 
 
 PASSWORD_TEXT_CLIENT = Text(x=HALF_SCREEN_W + DEFAULT_BUTTON_HALF_X_SIZE // 2,
@@ -106,7 +106,7 @@ SERVER_ADDRESS = Text(x=HALF_SCREEN_W + DEFAULT_BUTTON_HALF_X_SIZE + DEFAULT_BUT
 
 # ==== HOST PART ============
 def password_change():
-    NETWORK_DATA[PASSWORD] = SERVER_PASSWORD.text
+    NETWORK_DATA[PASSWORD] = SERVER_PASSWORD.text if SERVER_PASSWORD.text else '.'
 
 
 SERVER_PASSWORD = InputElement(x=250, y=100, default_text='Enter password', on_change_action=password_change)

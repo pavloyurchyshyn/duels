@@ -1,5 +1,6 @@
 Think about Redis
-
+Split all objects for simple object and draw object
 Split stages to classes
 
 add messages like bad ip value
+

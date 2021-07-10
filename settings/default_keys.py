@@ -1,4 +1,4 @@
-from pygame.constants import *
+# from pygame.constants import *
 import os
 from settings.common_settings import SETTINGS_PATH
 
@@ -26,24 +26,24 @@ SELF_DAMAGE = 'self_damage'
 TEST_MESSAGE = 'test_message'
 
 DEFAULT_GAME_KEYS = {
-    UP_C: K_w,
-    LEFT_C: K_a,
-    RIGHT_C: K_d,
-    DOWN_C: K_s,
+    UP_C: 119,
+    LEFT_C: 97,
+    RIGHT_C: 100,
+    DOWN_C: 115,
 
-    RELOAD_C: K_r,
+    RELOAD_C: 114,
 
-    WEAPON_1_C: K_1,
-    WEAPON_2_C: K_2,
-    WEAPON_3_C: K_3,
+    WEAPON_1_C: 49,
+    WEAPON_2_C: 50,
+    WEAPON_3_C: 51,
 
-    SPELL_1_C: K_q,
+    SPELL_1_C: 113,
 
-    GRAB_C: K_f,
-    DROP_C: K_g,
-    INTERACT_C: K_e,
+    GRAB_C: 102,
+    DROP_C: 103,
+    INTERACT_C: 101,
 
-    SPRINT_C: K_LSHIFT,
-    SELF_DAMAGE: K_p,
-    TEST_MESSAGE: K_o,
+    SPRINT_C: 1073742049,
+    SELF_DAMAGE: 112,
+    TEST_MESSAGE: 111,
 }

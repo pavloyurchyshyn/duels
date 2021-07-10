@@ -4,7 +4,7 @@ from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.global_keyboard import GLOBAL_KEYBOARD
 
 from settings.UI_setings.menus_settings.main_menu_settings import MAIN_MENU_SETTINGS_BUTTONS, back_to_menu, \
-    MUSIC_VOLUME_VALUE, VOLUME_PROGRESS_BAR, MUTE_MUSIC
+    MUSIC_VOLUME_VALUE, VOLUME_PROGRESS_BAR, MUTE_MUSIC, PLAYER_PIC, COLORS_INPUTS_LIST
 
 from settings.global_parameters import pause_available, pause_step
 
@@ -18,6 +18,9 @@ class MainMenuSettings(MenuUI):
         self._mus_value = MUSIC_VOLUME_VALUE
 
     def update(self):
+        for inp_el in COLORS_INPUTS_LIST:
+            inp_el.update()
+
         for button in self._buttons:
             button.update()
 
@@ -34,11 +37,16 @@ class MainMenuSettings(MenuUI):
 
             MUTE_MUSIC.click(xy=xy)
 
+        PLAYER_PIC.update()
+
     def draw(self, dx=0, dy=0):
         self._draw(dx, dy)
         self._mus_value.draw(dx, dy)
         VOLUME_PROGRESS_BAR.draw(dx, dy)
         MUTE_MUSIC.draw(dx, dy)
+        PLAYER_PIC.draw()
+        for element in COLORS_INPUTS_LIST:
+            element.draw()
 
     def _update(self):
         pass

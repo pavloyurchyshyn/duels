@@ -1,5 +1,8 @@
 from pygame import image, error, transform, Color
+from common_things.loggers import LOGGER
 from sys import exit
+
+from common_things.wrappers import time_control_wrapper
 
 try:
     # maybe another pictures will load
@@ -18,6 +21,7 @@ def load_image(path, size: (int, int) = None, a=90, redraw_color=None):
             pic = recolor_picture(pic, redraw_color)
 
         if size:
+            size = (int(size[0]), int(size[1]))
             pic = transform.smoothscale(pic, size).convert_alpha()
 
         pic = transform.rotate(pic, a).convert_alpha()
@@ -28,6 +32,7 @@ def load_image(path, size: (int, int) = None, a=90, redraw_color=None):
         # exit()
 
 
+# @time_control_wrapper
 def load_animation(pic_list, timings_list, size=None, anim_dict=None, redraw_color=None) -> dict:
     anim_dict = anim_dict if type(anim_dict) is dict else {}
 
@@ -38,6 +43,7 @@ def load_animation(pic_list, timings_list, size=None, anim_dict=None, redraw_col
     return anim_dict
 
 
+# @time_control_wrapper
 def recolor_picture(picture, color):
     w, h = picture.get_size()
     t = Color((0, 0, 0, 0))

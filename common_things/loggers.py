@@ -10,5 +10,5 @@ if not os.path.exists(LOGS_FOLDER):
 
 start = datetime.datetime.today().strftime("%Y-%m-%d-%H.%M.%S")
 logging.basicConfig(filename=LOG_FILE_PATTERN.format(start), level=0)
-logger = logging.getLogger(__name__)
-logger.info(f'Game started {start}')
+LOGGER = logging.getLogger(__name__)
+# logger.info(f'Game started {start}')

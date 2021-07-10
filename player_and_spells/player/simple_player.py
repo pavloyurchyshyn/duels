@@ -1,58 +1,79 @@
 from settings.players_settings.player_settings import *
-from UI.message import Messages
-from pygame import mouse, transform
-from visual_effects.animation import Animation
+from settings.players_settings.player_pic_and_anim import get_sprite_and_animations
+from obj_properties.circle_form import Circle
+from pygame import mouse, transform, draw
+from UI.UI_base.animation import Animation
 
-from math import atan2, degrees
+from math import atan2, degrees, sin, cos, dist
 
-from settings.common_settings import GLOBAL_SETTINGS, MAIN_SCREEN
+from settings.global_parameters import GLOBAL_SETTINGS
+from settings.window_settings import MAIN_SCREEN
+
+from UI.camera import GLOBAL_CAMERA
+from common_things.global_clock import GLOBAL_CLOCK
+
+from common_things.save_and_load_json_config import get_parameter_from_json_config, change_parameter_in_json_config
+from settings.common_settings import COMMON_GAME_SETTINGS_JSON_PATH as CGSJP
 
 
-class SimplePlayer:
+class SimplePlayer(Circle):
     MAIN_SCREEN = MAIN_SCREEN
 
-    def __init__(self, x=0, y=0, scaled=False, dummy=True, **kwargs):
+    PLAYER_HP = PLAYER_HP
+
+    def __init__(self, x, y,
+                 size=PLAYER_SIZE,
+                 player_skin=None,
+                 follow_mouse=False,
+                 **kwargs):
+        super().__init__(x, y, size)
+
         self._angle = 0
-        self.center = x, y
+        self.color = player_skin if player_skin else get_parameter_from_json_config('player_skin', CGSJP, def_value='blue')
+        pictures = get_sprite_and_animations(self.color, size=(self._size * 2, self._size * 2))
+        self.image = pictures['body']
+        self.face_anim = Animation(self._center,
+                                   idle_frames=pictures['idle_animation'],
+                                   **pictures['other_animation'])
 
-        self.image = PLAYER_PIC if not scaled else SCALED_PLAYER_PIC
+        self.turn_off_camera = kwargs.get('turn_off_camera', False)
+        # =======================
+        # self._full_hp = kwargs.get('hp', Player.PLAYER_HP)
+        # self._hp = self._full_hp
 
-        self._full_hp = PLAYER_HP
-        self._hp = self._full_hp
+        self.camera = kwargs.get('camera', GLOBAL_CAMERA)
 
         self.global_settings = GLOBAL_SETTINGS
 
-        # =======================================
-        self.cursor(mouse.get_pos())
+        self.cursor((0, 0))
 
-        self.messages = Messages((x + 50, y))
+        self._time = 0.000000001
+        self._d_time = 0.00000001
+        self.follow_mouse = follow_mouse
 
-        idle = IDLE_ANIMATION if not scaled else SCALED_IDLE_ANIMATION
-        self.face_anim = Animation(self.center, idle_frames=idle, **OTHER_ANIMATIONS)
+        self.arena = None
 
-        self.dummy = dummy
-        self._t_delay = 0
-        self._time = 0
+    def update(self):
+        time_d = GLOBAL_CLOCK.d_time
 
-    def update(self, d_time, angle=None):
-        self._time += d_time
-        self._t_delay = d_time
+        self._d_time = time_d
+        self._time += time_d
 
-        if angle is not None:
-            self._angle = angle
+        if self.follow_mouse:
+            self.cursor(mouse.get_pos())
 
-        if not self.dummy:
-            m_pos = mouse.get_pos()
-
-            self.cursor(m_pos)
-
-        self.messages.update(d_time, position=self.center)
-
-        self.face_anim.update(d_time, self.center, self._angle)
+        self.face_anim.update(time_d, self._center, self._angle)
 
     def cursor(self, m_pos: tuple):
         x1, y1 = m_pos
-        xc, yc = self.center
+        xc, yc = self._center
+
+        if not self.turn_off_camera:
+            xc += self.camera.camera[0]
+            yc += self.camera.camera[1]
+        else:
+            xc += 0
+            yc += 0
 
         d_x = 0.00001 if x1 - xc == 0 else x1 - xc
         d_y = 0.00001 if y1 - yc == 0 else y1 - yc
@@ -61,23 +82,40 @@ class SimplePlayer:
 
         self._angle = angle
 
-    def draw(self, dx=0, dy=0) -> None:
-        x0, y0 = self.center
-        # circle(SimplePlayer.MAIN_SCREEN, (255, 255, 255), mouse.get_pos(), 3)  # draw mouse pos
+    def update_color(self, body_color=None, face_color=None):
+        pictures = get_sprite_and_animations((body_color, face_color), size=(self._size, self._size))
+        self.image = pictures['body']
+        self.face_anim = Animation(self._center,
+                                   idle_frames=pictures['idle_animation'],
+                                   **pictures['other_animation'])
+
+    def draw(self) -> None:
+        # self._messages.draw()
+        if self.turn_off_camera:
+            dx = dy = 0
+        else:
+            dx, dy = self.camera.camera
+
+        x0, y0 = self._center
+
         img_copy = transform.rotate(self.image, -degrees(self._angle))
 
-        SimplePlayer.MAIN_SCREEN.blit(img_copy, (dx + x0 - img_copy.get_width() // 2, dy + y0 - img_copy.get_height() // 2))
+        SimplePlayer.MAIN_SCREEN.blit(img_copy, (x0 - img_copy.get_width() // 2 + dx, y0 - img_copy.get_height() // 2 + dy))
 
-        self.face_anim.draw(0, 0)
+        if self.global_settings['test_draw']:
+            for dot in self._dots:
+                draw.circle(SimplePlayer.MAIN_SCREEN, (0, 255, 255), (dot[0] + dx, dot[1] + dy), 1)
+
+        self.face_anim.draw(dx, dy)
+        # self.hp_bar.draw()
 
     @property
     def position(self):
-        return self.center
+        return self._center
 
     @position.setter
     def position(self, pos):
-        self.center = pos
-        # self.face_anim.position = pos
+        self._change_position(pos)
 
     @property
     def full_hp(self):
@@ -94,6 +132,7 @@ class SimplePlayer:
     @hp.setter
     def hp(self, value):
         self._hp = value
+        # self.hp_bar.update(text=self._hp, current_stage=self._hp, stages_num=self._full_hp)
 
     @property
     def angle(self):
@@ -103,8 +142,14 @@ class SimplePlayer:
     def angle(self, value):
         self._angle = value
 
-    def set_anim(self, anim):
-        self.face_anim.set_anim(anim)
+    def damage(self, damage):
+        self._hp -= damage
+        # self.hp_bar.update(text=self._hp, current_stage=self._hp, stages_num=self._full_hp)
 
-    def set_image(self, image):
-        self.image = image
+    @property
+    def alive(self):
+        return self._hp > 0
+
+    @property
+    def dead(self):
+        return self._hp <= 0

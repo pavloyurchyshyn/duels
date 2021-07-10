@@ -19,11 +19,13 @@ from UI.UI_buttons.round_pause import ROUND_PAUSE_BUTTON
 from world_arena.world import GLOBAL_WORLD
 from world_arena.base.arena_cell import ArenaCell
 from player_and_spells.player.commands_player import Player
+from player_and_spells.player.simple_player import SimplePlayer
 
 from common_things.global_keyboard import GLOBAL_KEYBOARD
 from common_things.global_clock import ROUND_CLOCK
 from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.sound_loader import GLOBAL_MUSIC_PLAYER
+from common_things.loggers import LOGGER
 
 from network.network import Network
 from network.server_controller import SERVER_CONTROLLER
@@ -65,17 +67,19 @@ class GameBody:
         self._WORLD = GLOBAL_WORLD
 
         self._CURRENT_CELL = None
-        self._PLAYER = Player(500, 500)
+        self._PLAYER = None
         self._round_clock = ROUND_CLOCK
 
         self._music_player = GLOBAL_MUSIC_PLAYER
         self._music_player.play_back_music()
 
         self._server_controller = None
-        self._network = None
+        self._network: Network = None
+        self._network_address_key = None
         self._multiplayer_cell = None
-        self._multiplayer_player = None
-        self._other_multiplayer_players = None
+        self._multiplayer_player: Player = None
+        self._other_multiplayer_players: dict = None
+        self._static_client_data = {}
 
     def game_loop(self):
         """
@@ -123,10 +127,11 @@ class GameBody:
             ROUND_PAUSE_BUTTON.click(xy)
 
     def PREPARE_TO_ROUND(self):
+        self._PLAYER = Player(500, 500)
         self._round_clock.reload()
         self._g_settings[CURRENT_STAGE] = ROUND_S
         self._WORLD.build_cell()
-        self._CURRENT_CELL = self._WORLD.GET_CURRENT_CELL()
+        self._CURRENT_CELL = ArenaCell({}, draw_grid=True)
         self._PLAYER.update_cell(self._CURRENT_CELL)
 
     def MAIN_MENU(self) -> None:
@@ -164,30 +169,83 @@ class GameBody:
 
     def MULTIPLAYER_CLIENT_CONNECT(self):
         self._network = Network()
-        self._network.connect()
+        res = self._network.connect()
 
         if self._network.connected:
+            self._network_address_key = res.split('Key')[1]
             self._g_settings[CURRENT_STAGE] = MULTIPLAYER_CLIENT_ROUND_S
             data = {}
-            self._multiplayer_cell = ArenaCell(data)
+            self._multiplayer_cell = ArenaCell(data, draw_grid=True)
 
-            self._multiplayer_player = Player(100, 100)
+            self._multiplayer_player = Player(100, 100, main_player=True)
             self._multiplayer_player.update({}, (0, 0, 0), (0, 0))
 
-            self._other_multiplayer_players = {}
+            self._static_client_data['player_color'] = self._multiplayer_player.color
 
+            self._other_multiplayer_players = {}
         else:
+            MULTIPLAYER_UI.network_messager.add_message(str(res))
             self._g_settings[CURRENT_STAGE] = MULTIPLAYER_MENU_S
 
     def MULTIPLAYER_CLIENT_ROUND(self):
         self._keyboard.update()
+        data_to_send = {
+            'keyboard': tuple(self._keyboard.commands),
+            'mouse_data': self._mouse.network_data,
+            'position': self._multiplayer_player.position,
+            'angle': self._multiplayer_player.angle
+        }
+        data_to_send.update(self._static_client_data)
 
+        LOGGER.info(f'Player_info: {data_to_send}')
+        data = self._network.update(data=data_to_send)
+        data_to_send.clear()
+
+        LOGGER.info(f'Got data: {data}')
+        for key, value in data.items():
+            value = self._network.str_to_json(value)
+            keyboard = value.get('keyboard', {})
+            mouse_data = value.get('mouse_data', ((0, 0, 0), (0, 0)))
+            position = value.get('position')
+            angle = value.get('angle')
+            if key == self._network_address_key:
+                if position:
+                    self._multiplayer_player.position = position
+                if angle:
+                    self._multiplayer_player.angle = angle
+
+                self._multiplayer_player.update(commands=keyboard, mouse=mouse_data[0],
+                                                mouse_pos=mouse_data[1])
+
+            elif key in self._other_multiplayer_players:
+                player = self._other_multiplayer_players[key]
+                if position:
+                    player.position = position
+                if angle:
+                    player.angle = angle
+
+                player.update()
+
+            else:
+                player = SimplePlayer(x=200, y=200, main_player=False, player_skin=value.get('player_color'))
+                self._other_multiplayer_players[key] = player
+                if position:
+                    player.position = position
+                if angle:
+                    player.angle = angle
+
+                player.update()
+
+        # TODO: LOGIC for update
         self._multiplayer_cell.draw()
 
         self._multiplayer_player.update(commands=self._keyboard.commands,
                                         mouse=self._mouse.pressed,
                                         mouse_pos=self._mouse.pos)
         self._multiplayer_player.draw()
+
+        for player in self._other_multiplayer_players.values():
+            player.draw()
 
         if GLOBAL_KEYBOARD.ESC and pause_available():
             pause_step()
@@ -203,6 +261,7 @@ class GameBody:
         self._multiplayer_cell = None
         self._server_controller = None
         self._network = None
+        self._network_address_key = None
 
         self._g_settings[CURRENT_STAGE] = MAIN_MENU_S
 

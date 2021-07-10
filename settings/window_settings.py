@@ -1,18 +1,14 @@
 from pygame import display, Surface, SRCALPHA
 from pygame.locals import *
-import ctypes
-
-user32 = ctypes.windll.user32
-screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
-SCREEN_W, SCREEN_H = screensize
-HALF_SCREEN_W, HALF_SCREEN_H = SCREEN_W//2, SCREEN_H//2
+from settings.screen_size import *
 
 # SCREEN_W, SCREEN_H = display.get_window_size()
 
-flags = FULLSCREEN | DOUBLEBUF | HWACCEL
+#flags = FULLSCREEN | DOUBLEBUF | HWACCEL
+flags = 0
 MAIN_SCREEN_DEF_COLOR = (0, 0, 0)
 
-MAIN_SCREEN = display.set_mode((SCREEN_W, SCREEN_H), flags, 32)
+MAIN_SCREEN = display.set_mode((SCREEN_W -50, SCREEN_H-50), flags, 32)
 MAIN_SCREEN.set_alpha(None)  # main screen of all game
 MAIN_SCREEN_RECT = MAIN_SCREEN.get_rect()
 

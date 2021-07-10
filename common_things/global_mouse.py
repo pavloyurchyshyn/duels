@@ -41,6 +41,10 @@ class Mouse:
         return self._pressed[0]
 
     @property
+    def network_data(self):
+        return self._pressed, self._pos
+
+    @property
     def data(self):
         return self._pressed, self._scroll_top, self._scroll_bot, self._pos, self._rel
 
