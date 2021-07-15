@@ -21,6 +21,8 @@ class Network:
         self.connected = False
         self.credentials = {}
 
+        self._network_address_key = get_parameter_from_json_config('network_address_key', CGSJP, def_value=None)
+
     def update_network_data(self):
         self.server = NETWORK_DATA[IP]
         self.port = NETWORK_DATA[PORT]
@@ -32,6 +34,7 @@ class Network:
         self.credentials[NICKNAME] = self.nickname
         self.credentials[PASSWORD] = self.password
         self.credentials['player_color'] = get_parameter_from_json_config('player_skin', CGSJP, def_value='blue')
+        self.credentials['network_address_key'] = get_parameter_from_json_config('network_address_key', CGSJP, def_value=self._network_address_key)
 
     def connect(self):
         self.client.close()
@@ -41,16 +44,19 @@ class Network:
         try:
             self.client.connect(self.addr)
             self.client.send(self.json_to_str(self.credentials))
-            response = self.client.recv(2048).decode()
-            if 'Connected' in response:
+            response = self.str_to_json(self.client.recv(2048).decode())
+            if response.get('connected'):
                 self.connected = True
+                change_parameter_in_json_config(response.get('network_address_key'), 'network_address_key', CGSJP)
+                self._network_address_key = response.get('network_address_key')
                 return response
             else:
-                raise Exception(f'{response}')
+                self.disconnect()
+                return response
+
         except Exception as e:
-            self.client.close()
-            self.connected = False
-            return e
+            self.disconnect()
+            return {'connected': False, 'server_msg': f'{e}'}
 
     def disconnect(self):
         try:

@@ -1,7 +1,7 @@
 from settings.common_settings import COMMON_GAME_SETTINGS_JSON_PATH
 from common_things.save_and_load_json_config import get_parameter_from_json_config
 import socket
-DEFAULT_PORT = 8000
+DEFAULT_PORT = 8001
 
 CONNECTED_MESSAGE = 'Connected {}'
 BAD_PASSWORD = 'Bad password {}'

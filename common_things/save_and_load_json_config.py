@@ -1,7 +1,9 @@
 import json
 from os.path import exists
+from common_things.wrappers import memory_keeper
 
 
+@memory_keeper
 def load_json_config(path: str) -> dict:
     if not exists(path):
         return {}

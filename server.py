@@ -3,6 +3,7 @@ import socket
 from _thread import *
 import sys
 import os
+
 import signal
 import logging
 import datetime
@@ -87,12 +88,14 @@ class Server:
             conn, addr = self.socket.accept()
             LOGGER.info(f'Accepted: {conn, anon_host(addr)}')
 
-            if self.players_connected >= self.players_number and False:  # ------->
-                conn.send('Failed to connect. Connection limit.'.encode())
+            response_data = {'connected': False}
+
+            if self.players_connected >= self.players_number:  # ------->
+                response_data['server_msg'] = "Failed to connect. Server is full."
+                conn.send(self.json_to_str(response_data))
                 conn.close()
                 LOGGER.info(
                     f'Connection limit {self.players_connected}/{self.players_number}. Disconnected {anon_host(addr)}')
-
             else:
                 recv = conn.recv(2048).decode()
                 credentials = self.str_to_json(recv)
@@ -109,9 +112,25 @@ class Server:
                         nickname = f'{nickname}({same_nick_count})'
 
                     self.players_names[nickname] = addr
-                    conn.send(f'Connected to {anon_host(self.address)}. Key{addr}'.encode())
-                    # LOGGER.info(
-                    #     f'Connected. {anon_host(addr)}. Player #{self.players_connected}. Nickname {nickname}')
+                    # if response_data['network_address_key'] in self.players_data:
+                    #     response_data['connected'] = True
+                    #     response_data['position'] = (500, 500)
+                    #     response_data['server_msg'] = 'Successfully connected.'
+                    #     conn.send(self.json_to_str(response_data))
+                    #     LOGGER.info(f'Reconnected. {anon_host(addr)}.'
+                    #                 f' Player #{self.players_connected}.'
+                    #                 f' Nickname {nickname}.'
+                    #                 f' Color: {credentials.get("player_color")}')
+                    #     self.players_common_data[str(addr)] = {'player_color': credentials.get("player_color"),
+                    #                                            NICKNAME: nickname
+                    #                                            }
+                    # else:
+                    response_data['connected'] = True
+                    response_data['position'] = (500, 500)
+                    response_data['network_address_key'] = str(addr)
+                    response_data['server_msg'] = 'Successfully connected.'
+                    conn.send(self.json_to_str(response_data))
+
                     self.players_connections[addr] = conn
                     self.players_objects[addr] = PlayerObject(100, 100)
                     self.players_data[str(addr)] = credentials
@@ -119,12 +138,14 @@ class Server:
                                                            NICKNAME: nickname
                                                            }
 
-                    LOGGER.info(
-                        f'Connected. {anon_host(addr)}. Player #{self.players_connected}. Nickname {nickname}. Color: {credentials.get("player_color")}')
-                    # print(
-                    #     f'Connected. {anon_host(addr)}. Player #{self.players_connected}. Nickname {nickname}. Color: {credentials.get("player_color")}')
+                    LOGGER.info(f'Connected. {anon_host(addr)}.'
+                                f' Player #{self.players_connected}.'
+                                f' Nickname {nickname}.'
+                                f' Color: {credentials.get("player_color")}')
                 else:
-                    conn.send(f'Disconnected from {anon_host(self.address)}, bad password'.encode())
+                    response_data['server_msg'] = 'Failed to connect, bad password.'
+
+                    conn.send(self.json_to_str(response_data))
 
                     LOGGER.info(f'Failed to connect. {anon_host(addr)}. Nickname {credentials[NICKNAME]}')
                     LOGGER.info(f'Bad password! {credentials[PASSWORD]} != {self.password}')
@@ -134,14 +155,14 @@ class Server:
         try:
             return json.loads(string)
         except Exception as e:
-            print('aaa', string)
+            LOGGER.error(f"String to json {string}: \n\t{e}")
             raise Exception(e)
 
     @staticmethod
     def json_to_str(json_):
-        return str(json_).replace("\'", "\"").encode()
+        return json.dumps(json_).encode()
 
-    def disconnect_player(self, addr, del_player=True):
+    def disconnect_player(self, addr, del_player=False):
         LOGGER.info(f'Disconnecting player {addr}')
         try:
             self.players_connections[addr].close()
@@ -153,9 +174,9 @@ class Server:
         if del_player:
             self.players_connections.pop(addr)
             LOGGER.info(f'Player {addr} deleted.')
-        self.players_number -= 1
+            self.players_connected -= 1
 
-        LOGGER.info(f'Players number: {self.players_number}')
+        LOGGER.info(f'Players number: {self.players_connected}')
 
     def stop_server(self):
         try:
@@ -265,7 +286,6 @@ class ServerGame:
 
 
 if __name__ == '__main__':
-
     try:
         Server()
     except Exception as e:

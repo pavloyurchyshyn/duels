@@ -7,6 +7,7 @@ from common_things.common_lists import BULLETS_LIST, WALLS_SET, \
     ITEMS_LIST, PLAYERS_LIST, UNITS_LIST, PARTICLE_LIST, DOORS_LIST, BREAKABLE_WALLS
 from UI.camera import GLOBAL_CAMERA
 from pygame import Surface, SRCALPHA
+from multiprocessing import Process
 
 
 class ArenaCell:

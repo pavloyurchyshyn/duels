@@ -1,6 +1,6 @@
 from settings.window_settings import MAIN_SCREEN, HALF_SCREEN_H, SCREEN_W
 from settings.colors import simple_colors, EMPTY
-
+from settings.screen_size import X_SCALE, Y_SCALE
 from common_things.font_loader import DEFAULT_FONT_SIZE
 
 from pygame import draw
@@ -9,16 +9,18 @@ from pygame import Rect
 
 class Progress_Bar:
     MAIN_SCREEN = MAIN_SCREEN
-    BAR_X_SIZE = 1200
-    BAR_Y_SIZE = 10
+    BAR_X_SIZE = int(1200 * X_SCALE)
+    BAR_Y_SIZE = int(10 * Y_SCALE)
 
     def __init__(self, screen=None, stage=0, stages_num=1,
                  text=None, text_color=(255, 255, 255),
                  bar_pos: (int, int) = None,
                  bar_inner_color=(255, 255, 255),
-                 bar_x_size: int = BAR_X_SIZE,
-                 bar_y_size: int = BAR_Y_SIZE,
+                 bar_x_size: int = None,
+                 bar_y_size: int = None,
                  text_pos: (int, int) = None):
+        bar_x_size = int(bar_x_size * X_SCALE) if bar_x_size else self.BAR_X_SIZE
+        bar_y_size = int(bar_y_size * Y_SCALE) if bar_y_size else self.BAR_Y_SIZE
 
         self._current_stage = stage
         self.stages_num = stages_num

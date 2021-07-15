@@ -4,23 +4,23 @@ from UI.UI_buttons.test_draw import TEST_DRAW_BUTTON
 from common_things.global_keyboard import GLOBAL_KEYBOARD
 
 from settings.colors import HALF_EMPTY_L
-from settings.UI_setings.menus_settings.round_pause import ROUND_PAUSE_BUTTONS, \
+from settings.UI_setings.menus_settings.mul_round_pause import MUL_ROUND_PAUSE_BUTTONS, \
     PAUSE_MAIN_SCREEN_COPY, PAUSE_SCREEN
 from settings.global_parameters import GLOBAL_SETTINGS
-from settings.game_stages import CURRENT_STAGE, ROUND_S, MAIN_MENU_S
-from settings.window_settings import MAIN_SCREEN
+from settings.game_stages import CURRENT_STAGE, ROUND_S, MAIN_MENU_S, MULTIPLAYER_CLIENT_DISCONNECT_S
 
-class RoundPause(MenuUI):
+
+class MulRoundPause(MenuUI):
     Pause_back_color = (0, 0, 0, 100)
 
     def __init__(self):
-        super().__init__(buttons=ROUND_PAUSE_BUTTONS, buttons_objects=[TEST_DRAW_BUTTON, ],
+        super().__init__(buttons=MUL_ROUND_PAUSE_BUTTONS, buttons_objects=[TEST_DRAW_BUTTON, ],
                          background_color=self.Pause_back_color, transparent=1)
         self.create_buttons()
         self._exit_warning = False
 
-        self._fade_surface = self.get_surface(transparent=True)
-        self._fade_surface.fill((0, 0, 0, 150))
+        self._fade_surface = self.get_surface(transparent=True, color=(0, 0, 0, 150))
+        # self._fade_surface.fill((0, 0, 0, 150))
         self._fade_surface.convert_alpha()
 
     def activate_exit_buttons(self):
@@ -55,7 +55,7 @@ class RoundPause(MenuUI):
         self.draw_round()
 
     def draw_round(self, fill=1):
-        self._surface.blit(PAUSE_MAIN_SCREEN_COPY, (0, 0))
+        # self._surface.blit(PAUSE_MAIN_SCREEN_COPY, (0, 0))
         if fill:
             self.surface.blit(self._fade_surface, (0, 0))
 
@@ -80,13 +80,11 @@ class RoundPause(MenuUI):
             else:
                 if self._exit_yes.click(xy):
                     self.deactivate_exit_buttons()
-                    GLOBAL_SETTINGS[CURRENT_STAGE] = MAIN_MENU_S
+                    GLOBAL_SETTINGS[CURRENT_STAGE] = MULTIPLAYER_CLIENT_DISCONNECT_S
                     return
 
                 else:
                     self.deactivate_exit_buttons()
-    def update_main_screen(self):
-        PAUSE_MAIN_SCREEN_COPY = MAIN_SCREEN.copy()
 
     def draw(self, dx=0, dy=0):
         self._draw(dx, dy)
@@ -95,4 +93,4 @@ class RoundPause(MenuUI):
             self._exit_yes.draw()
 
 
-ROUND_PAUSE_UI = RoundPause()
+MUL_ROUND_PAUSE_UI = MulRoundPause()

@@ -10,11 +10,11 @@ from common_things.font_loader import DEFAULT_FONT_SIZE
 from settings.window_settings import MAIN_SCREEN
 from settings.colors import YELLOW, WHITE, GREY
 from settings.global_parameters import GLOBAL_SETTINGS
+from settings.screen_size import X_SCALE, Y_SCALE
+from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE, DEFAULT_BUTTON_Y_SIZE, DEFAULT_BORDER_WIDTH
+
 from pygame import draw, Surface
 from pygame.constants import SRCALPHA
-
-
-from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE, DEFAULT_BUTTON_Y_SIZE, DEFAULT_BORDER_WIDTH
 
 
 class InputElement(Rectangle):
@@ -22,7 +22,7 @@ class InputElement(Rectangle):
     DEF_X_SIZE = DEFAULT_BUTTON_X_SIZE
     DEF_Y_SIZE = DEFAULT_BUTTON_Y_SIZE
 
-    def __init__(self, x, y, size_x=DEF_X_SIZE, size_y=DEF_Y_SIZE,
+    def __init__(self, x, y, size_x=None, size_y=None,
                  surface=None,
                  text='',
                  default_text='',
@@ -42,6 +42,10 @@ class InputElement(Rectangle):
 
                  on_change_action=None,
                  ):
+        x = int(x)
+        y = int(y)
+        size_x = int(size_x*X_SCALE) if size_x else self.DEF_X_SIZE
+        size_y = int(size_y*Y_SCALE) if size_y else self.DEF_Y_SIZE
         super().__init__(x, y, size_x, size_y)
         self._mouse = GLOBAL_MOUSE
         self._key = GLOBAL_KEYBOARD

@@ -2,7 +2,7 @@ import socket
 import logging
 import subprocess
 import os
-from settings.common_settings import SERVER_FOLDER
+from settings.common_settings import ROOT_OF_GAME
 from settings.network_settings import NETWORK_DATA, DEFAULT_PORT
 
 
@@ -18,7 +18,7 @@ class ServerController:
     def run_server(self):
         self.update_parameters()
         arguments = self.get_arguments()
-        arguments = ['python', os.path.join(SERVER_FOLDER, 'server.py'), *arguments]
+        arguments = ['python', os.path.join(ROOT_OF_GAME, 'server.py'), *arguments]
         logging.info('Server started.')
         logging.info(f'Arguments.{arguments}')
         self._server_process = subprocess.Popen(arguments)

@@ -6,18 +6,28 @@ from pygame import Surface
 from pygame.draw import lines
 from settings.window_settings import MAIN_SCREEN
 from common_things.global_clock import GLOBAL_CLOCK
+from settings.screen_size import X_SCALE, Y_SCALE
 
 
 class Messager(Rectangle):
     MESSAGE_TIME = 5  # seconds
 
     def __init__(self, x, y,
-                 size_x=DEFAULT_BUTTON_X_SIZE, size_y=DEFAULT_BUTTON_Y_SIZE,
-                 message_width=DEFAULT_BUTTON_X_SIZE,
-                 message_height=DEFAULT_BUTTON_Y_SIZE,
+                 size_x=None, size_y=None,
+                 message_width=None,
+                 message_height=None,
                  background_color=(0, 0, 0, 50),  # r, g, b, t
                  transparent=1,
+                 draw_border=True,
+                 draw_surface_every_time=True
                  ):
+        x = int(x)
+        y = int(y)
+        size_x = int(size_x * X_SCALE) if size_x else DEFAULT_BUTTON_X_SIZE
+        size_y = int(size_y * Y_SCALE) if size_y else DEFAULT_BUTTON_Y_SIZE
+        message_width = int(message_width * X_SCALE) if message_width else DEFAULT_BUTTON_X_SIZE
+        message_height = int(message_height * Y_SCALE) if message_height else DEFAULT_BUTTON_Y_SIZE
+
         super().__init__(x, y, size_x, size_y)
         # --------- BACKGROUND ------------------
         self._background_t = transparent
@@ -29,8 +39,13 @@ class Messager(Rectangle):
         self.messages_height = message_height
         self.messages_surf = self.get_surface(size=(self.messages_width, self.messages_height))
 
+        self.border = draw_border
+        self.print_surface_every_time = draw_surface_every_time
+
         self._messages = []
         self._time = self._d_time = GLOBAL_CLOCK.d_time
+
+        self.fake_update = False
 
     def update(self):
         self._d_time = GLOBAL_CLOCK.d_time
@@ -41,6 +56,13 @@ class Messager(Rectangle):
             if message['endtime'] < self._time:
                 del self._messages[self._messages.index(message)]
                 _d = 1
+
+        if _d or self.fake_update:
+            self.fake_update = 0
+            self.surface.fill(self._background_color)
+            if self._messages:
+                for message in self._messages:
+                    self.surface.blit(message['img'], (10, message['y']))
 
     def get_messages_height(self, idx=None):
         y = 0
@@ -67,6 +89,7 @@ class Messager(Rectangle):
         }
 
         self._messages.insert(0, new_message)
+        self.fake_update = 1
 
     def get_surface(self, transparent=0, color=None, size=None):
         color = color if color else self._background_color
@@ -85,11 +108,8 @@ class Messager(Rectangle):
         return surface
 
     def draw(self, dx=0, dy=0):
-        if self._messages:
-            self.surface.fill(self._background_color)
-            for message in self._messages:
-                self.surface.blit(message['img'], (10, message['y']))
+        if self._messages or self.print_surface_every_time:
+            MAIN_SCREEN.blit(self.surface, (self.x0 + dx, self.y0 + dy))
 
-        MAIN_SCREEN.blit(self.surface, (self.x0 + dx, self.y0 + dy))
-
-        lines(MAIN_SCREEN, (255, 255, 255), True, self._dots[1:], 5)
+        if self.border:
+            lines(MAIN_SCREEN, (255, 255, 255), True, self._dots[1:], 5)

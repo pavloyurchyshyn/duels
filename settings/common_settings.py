@@ -2,12 +2,16 @@ import os
 
 VERSION = '0.0.1'
 
-FPS = 64
+FPS = 65
 
 ROOT_OF_GAME = os.path.abspath(os.getcwd())
 
 LOGS_FOLDER = os.path.join(ROOT_OF_GAME, 'logs')
 SETTINGS_PATH = os.path.join(ROOT_OF_GAME, 'settings')
+
+if not os.path.exists(SETTINGS_PATH):
+    os.mkdir(SETTINGS_PATH)
+
 SOUNDS_FOLDER = os.path.join(ROOT_OF_GAME, 'sounds')
 SERVER_FOLDER = os.path.join(ROOT_OF_GAME, 'network')
 

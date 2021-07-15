@@ -68,13 +68,6 @@ class MenuUI(Rectangle):
         self._draw(dx, dy)
 
     def _draw(self, dx=0, dy=0):
-        # if self._background_color:
-        #     flags = 0
-        #     if self._background_t:
-        #         flags = SRCALPHA
-        #
-        #     self._surface.fill(self._background_color, special_flags=flags)
-
         self._screen.blit(self._surface, (self._x_pic + dx, self._y_pic + dy))
         if self._picture:
             self._screen.blit(self._picture, (self.x0 + dx, self.y0 + dy))
@@ -85,7 +78,7 @@ class MenuUI(Rectangle):
     def create_buttons(self):
         for button in self._buttons_values:
             if 'screen' in self._buttons_values:
-                screen = self._buttons_values.pop('screen')
+                screen = button.pop('screen')
             else:
                 screen = self._surface
 
@@ -151,4 +144,3 @@ class MenuUI(Rectangle):
         :return:
         """
         return element.y0
-

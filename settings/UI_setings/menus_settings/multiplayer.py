@@ -4,6 +4,7 @@ from settings.game_stages import CURRENT_STAGE, MAIN_MENU_S, HOST_SERVER, MULTIP
 from settings.UI_setings.button_settings import DEFAULT_BUTTON_HALF_X_SIZE, DEFAULT_BUTTON_Y_SIZE, DEFAULT_BUTTON_X_SIZE
 from settings.network_settings import DEFAULT_PORT, update_host_address, NETWORK_DATA, anon_host, IP, PASSWORD
 from settings.common_settings import PLAYER_NICKNAME_KEY, COMMON_GAME_SETTINGS_JSON_PATH
+from settings.screen_size import X_SCALE, Y_SCALE
 
 from UI.UI_base.input_element_UI import InputElement
 from UI.UI_base.button_UI import Button
@@ -61,13 +62,13 @@ def enter_pass():
 
 
 PASSWORD_TEXT_CLIENT = Text(x=HALF_SCREEN_W + DEFAULT_BUTTON_HALF_X_SIZE // 2,
-                            y=300, text='Server password:', screen=MAIN_SCREEN)
+                            y=300*Y_SCALE, text='Server password:', screen=MAIN_SCREEN)
 
-PASSWORD_TEXT_HOST = Text(x=50,
-                          y=110, text='Server password:', screen=MAIN_SCREEN)
+PASSWORD_TEXT_HOST = Text(x=SCREEN_W * 0.02632,
+                          y=SCREEN_H * 0.1018, text='Server password:', screen=MAIN_SCREEN)
 
-PASSWORD_INPUT_CLIENT = InputElement(x=HALF_SCREEN_W + DEFAULT_BUTTON_X_SIZE + 150,
-                                     y=290,
+PASSWORD_INPUT_CLIENT = InputElement(x=HALF_SCREEN_W + DEFAULT_BUTTON_X_SIZE + 300//2,
+                                     y=int(SCREEN_H * 0.2685),
                                      size_x=300,
                                      text='',
                                      on_change_action=enter_pass,
@@ -84,12 +85,12 @@ def nick_change():
 
 
 NICKNAME_TEXT = Text(x=HALF_SCREEN_W + DEFAULT_BUTTON_HALF_X_SIZE // 2,
-                     y=110,
+                     y=110*Y_SCALE,
                      screen=MAIN_SCREEN,
                      text='Nickname:')
 
-NICKNAME_INPUT = InputElement(x=HALF_SCREEN_W + DEFAULT_BUTTON_X_SIZE + 50,
-                              y=100,
+NICKNAME_INPUT = InputElement(x=HALF_SCREEN_W + DEFAULT_BUTTON_X_SIZE + int(50*Y_SCALE),
+                              y=int(SCREEN_H * 0.09259),
                               size_x=200,
                               text=get_parameter_from_json_config(key=PLAYER_NICKNAME_KEY,
                                                                   path=COMMON_GAME_SETTINGS_JSON_PATH,
@@ -98,10 +99,10 @@ NICKNAME_INPUT = InputElement(x=HALF_SCREEN_W + DEFAULT_BUTTON_X_SIZE + 50,
                               default_text='Enter nickname')
 
 SERVER_ADDRESS_TEXT = Text(x=HALF_SCREEN_W + DEFAULT_BUTTON_HALF_X_SIZE // 2,
-                           y=200, text='Server address:', screen=MAIN_SCREEN)
+                           y=SCREEN_H * 0.18518, text='Server address:', screen=MAIN_SCREEN)
 
 SERVER_ADDRESS = Text(x=HALF_SCREEN_W + DEFAULT_BUTTON_HALF_X_SIZE + DEFAULT_BUTTON_X_SIZE,
-                      y=200, text='l.o.c.a.l.h.o.s.t', screen=MAIN_SCREEN)
+                      y=SCREEN_H * 0.18518, text='l.o.c.a.l.h.o.s.t', screen=MAIN_SCREEN)
 
 
 # ==== HOST PART ============
@@ -109,7 +110,7 @@ def password_change():
     NETWORK_DATA[PASSWORD] = SERVER_PASSWORD.text if SERVER_PASSWORD.text else '.'
 
 
-SERVER_PASSWORD = InputElement(x=250, y=100, default_text='Enter password', on_change_action=password_change)
+SERVER_PASSWORD = InputElement(x=250*X_SCALE, y=100*Y_SCALE, default_text='Enter password', on_change_action=password_change)
 
 
 def copy_pass():
@@ -144,17 +145,17 @@ def minus_player():
 
 
 PLAYERS_NUMBER = Text(text=NETWORK_DATA['players_number'],
-                      x=355,
-                      y=300,
+                      x=355*X_SCALE,
+                      y=300*Y_SCALE,
                       size=35,
                       screen=MAIN_SCREEN)
 
-IP_VALUE = Button(x=50, y=200, size_x=250,
+IP_VALUE = Button(x=50*X_SCALE, y=200*Y_SCALE, size_x=250,
                   text=f'Your Address: {anon_host(socket.gethostbyname(socket.gethostname()))}',
                   screen=MAIN_SCREEN,
                   border_width=0, transparent=1)
 
-P_NUM = Button(x=50, y=300,
+P_NUM = Button(x=50*X_SCALE, y=300*Y_SCALE,
                size_x=250,
                text=f'Players number:',
                screen=MAIN_SCREEN,
@@ -165,8 +166,8 @@ MULTIPLAYER_BUTTONS = {
     # ========================== Host Part ========================
     '_update_ip': {
         'kwargs': {
-            'x': 310,
-            'y': 200,
+            'x': 310*X_SCALE,
+            'y': 200*Y_SCALE,
             'on_click_action': reload_ip,
             'text': 'Reload IP',
         }
@@ -174,8 +175,8 @@ MULTIPLAYER_BUTTONS = {
 
     '_add_player': {
         'kwargs': {
-            'x': 400,
-            'y': 300,
+            'x': 400*X_SCALE,
+            'y': 300*Y_SCALE,
             'size_x': 40,
             'size_y': 40,
             'text': '+',
@@ -184,8 +185,8 @@ MULTIPLAYER_BUTTONS = {
     },
     '_minus_player': {
         'kwargs': {
-            'x': 300,
-            'y': 300,
+            'x': 300*X_SCALE,
+            'y': 300*Y_SCALE,
             'size_x': 40,
             'size_y': 40,
             'text': '-',
@@ -195,8 +196,8 @@ MULTIPLAYER_BUTTONS = {
 
     '_copy_ip': {
         'kwargs': {
-            'x': 470,
-            'y': 200,
+            'x': 470*X_SCALE,
+            'y': 200*Y_SCALE,
             'on_click_action': copy_ip,
             'text': 'Copy IP',
         }
@@ -204,8 +205,8 @@ MULTIPLAYER_BUTTONS = {
 
     '_copy_pswd': {
         'kwargs': {
-            'x': 410,
-            'y': 100,
+            'x': 410*X_SCALE,
+            'y': 100*Y_SCALE,
             'on_click_action': copy_pass,
             'text': 'Copy pswrd', }
     },
@@ -215,8 +216,8 @@ MULTIPLAYER_BUTTONS = {
         'kwargs': {
             'size_x': 40,
             'size_y': 40,
-            'x': SCREEN_W - 55,
-            'y': 10,
+            'x': SCREEN_W - 55*X_SCALE,
+            'y': 10*Y_SCALE,
             'text': 'X',
             'on_click_action': back_to_menu,
         }
@@ -246,7 +247,7 @@ MULTIPLAYER_BUTTONS = {
     '_paste_address': {
         'kwargs': {
             'x': HALF_SCREEN_W + DEFAULT_BUTTON_HALF_X_SIZE + 300,
-            'y': 190,
+            'y': 190*Y_SCALE,
             # 'size_x': 200,
             'text': 'Paste',
             'on_click_action': paste_host_address,
@@ -257,7 +258,7 @@ MULTIPLAYER_BUTTONS = {
     '_paste_pswd': {
         'kwargs': {
             'x': HALF_SCREEN_W + DEFAULT_BUTTON_HALF_X_SIZE + DEFAULT_BUTTON_X_SIZE * 4,
-            'y': 290,
+            'y': 290*Y_SCALE,
             'on_click_action': paste_pass,
             'text': 'Paste pswrd', }
     },

@@ -2,8 +2,8 @@ from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.global_clock import GLOBAL_CLOCK
 
 from obj_properties.rect_form import Rectangle
-from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE, \
-    DEFAULT_BUTTON_Y_SIZE, DEFAULT_CLICK_DELAY
+from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE1, \
+    DEFAULT_BUTTON_Y_SIZE1, DEFAULT_CLICK_DELAY
 from settings.global_parameters import GLOBAL_SETTINGS
 
 from pygame import Surface, SRCALPHA, draw
@@ -12,8 +12,8 @@ from UI.UI_base.text_UI import Text
 
 
 class MoveableUI(Rectangle):
-    BUTTON_X_SIZE = DEFAULT_BUTTON_X_SIZE
-    BUTTON_Y_SIZE = DEFAULT_BUTTON_Y_SIZE
+    BUTTON_X_SIZE = DEFAULT_BUTTON_X_SIZE1
+    BUTTON_Y_SIZE = DEFAULT_BUTTON_Y_SIZE1
     MOUSE = GLOBAL_MOUSE
     CLOCK = GLOBAL_CLOCK
     MOVE_TIME = 0.15

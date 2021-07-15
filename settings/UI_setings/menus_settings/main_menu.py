@@ -1,6 +1,6 @@
 from settings.global_parameters import GLOBAL_SETTINGS
 from settings.colors import WHITE, GREY_GREEN, GREY_RED
-from settings.window_settings import HALF_SCREEN_W, HALF_SCREEN_H, MAIN_SCREEN
+from settings.screen_size import HALF_SCREEN_W, HALF_SCREEN_H, SCREEN_H, SCREEN_W, X_SCALE, Y_SCALE
 from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE
 from settings.game_stages import MAIN_MENU_SETTINGS_S, CURRENT_STAGE, START_ROUND_S, TEST_DRAW_S, MULTIPLAYER_MENU_S, EXIT_S
 
@@ -30,7 +30,7 @@ def close_game():
 
 MAIN_MENU_BUTTONS = {
     'start': {
-        'args': (HALF_SCREEN_W - DEFAULT_BUTTON_X_SIZE // 2, 500),
+        'args': (HALF_SCREEN_W - DEFAULT_BUTTON_X_SIZE // 2, 500*Y_SCALE),
         'kwargs': {
             'active': 1,
             'text': 'START',
@@ -41,7 +41,7 @@ MAIN_MENU_BUTTONS = {
     'multiplayer': {
         'kwargs': {
             'x': HALF_SCREEN_W - DEFAULT_BUTTON_X_SIZE // 2,
-            'y': 600,
+            'y': int(SCREEN_H * 0.555),
             'text': 'Multiplayer',
             # 'active': False,
             'on_click_action': multiplayer,
@@ -53,7 +53,7 @@ MAIN_MENU_BUTTONS = {
         'args': (),
         'kwargs': {
             'x': HALF_SCREEN_W - DEFAULT_BUTTON_X_SIZE // 2,
-            'y': 700,
+            'y': int(SCREEN_H * 0.648),
             'text': 'Settings',
             'on_click_action': settings,
         }
@@ -62,7 +62,7 @@ MAIN_MENU_BUTTONS = {
         'args': (),
         'kwargs': {
             'x': HALF_SCREEN_W - DEFAULT_BUTTON_X_SIZE // 2,
-            'y': 800,
+            'y': int(SCREEN_H * 0.74),
             'text': 'EXIT',
         }
     },

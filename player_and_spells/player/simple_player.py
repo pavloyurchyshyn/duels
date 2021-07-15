@@ -1,40 +1,56 @@
 from settings.players_settings.player_settings import *
-from settings.players_settings.player_pic_and_anim import get_sprite_and_animations
+
 from obj_properties.circle_form import Circle
 from pygame import mouse, transform, draw
 from UI.UI_base.animation import Animation
 
-from math import atan2, degrees, sin, cos, dist
+from math import atan2, degrees, sin, cos, dist, radians
 
 from settings.global_parameters import GLOBAL_SETTINGS
 from settings.window_settings import MAIN_SCREEN
 
 from UI.camera import GLOBAL_CAMERA
-from common_things.global_clock import GLOBAL_CLOCK
 
+from common_things.global_clock import GLOBAL_CLOCK
 from common_things.save_and_load_json_config import get_parameter_from_json_config, change_parameter_in_json_config
+from common_things.img_loader import load_image, recolor_picture
+
 from settings.common_settings import COMMON_GAME_SETTINGS_JSON_PATH as CGSJP
+from player_and_spells.player.player_images import NORMAL_PLAYER_IMGS, PlayerImages
+from settings.default_keys import INTERACT_C, \
+    UP_C, LEFT_C, RIGHT_C, DOWN_C, \
+    SPELL_1_C, SPRINT_C, GRAB_C, DROP_C, RELOAD_C, \
+    WEAPON_1_C, WEAPON_2_C, WEAPON_3_C, SELF_DAMAGE
 
 
 class SimplePlayer(Circle):
     MAIN_SCREEN = MAIN_SCREEN
-
     PLAYER_HP = PLAYER_HP
+    CIRCLE_ROT_SPEED = 0.01
 
     def __init__(self, x, y,
                  size=PLAYER_SIZE,
                  player_skin=None,
                  follow_mouse=False,
+                 under_circle_color=None,
                  **kwargs):
+        size = int(size)
         super().__init__(x, y, size)
 
         self._angle = 0
-        self.color = player_skin if player_skin else get_parameter_from_json_config('player_skin', CGSJP, def_value='blue')
-        pictures = get_sprite_and_animations(self.color, size=(self._size * 2, self._size * 2))
+        self.color = player_skin if player_skin else get_parameter_from_json_config('player_skin', CGSJP,
+                                                                                    def_value='blue')
+
+        self.imager = NORMAL_PLAYER_IMGS if size == PLAYER_SIZE else PlayerImages(size=size)
+
+        pictures = self.imager.new_skin(self.color)
         self.image = pictures['body']
         self.face_anim = Animation(self._center,
                                    idle_frames=pictures['idle_animation'],
                                    **pictures['other_animation'])
+
+        self.under_player_circle = self.imager.get_circle() if under_circle_color else None
+        self.under_player_circle_angle = 0
 
         self.turn_off_camera = kwargs.get('turn_off_camera', False)
         # =======================
@@ -53,14 +69,22 @@ class SimplePlayer(Circle):
 
         self.arena = None
 
-    def update(self):
+    def update(self, commands=()):
         time_d = GLOBAL_CLOCK.d_time
 
         self._d_time = time_d
         self._time += time_d
 
+        if SPELL_1_C in commands:
+            self.face_anim.change_animation('rage')
+
         if self.follow_mouse:
             self.cursor(mouse.get_pos())
+
+        if self.under_player_circle:
+            self.under_player_circle_angle += self.CIRCLE_ROT_SPEED
+            if self.under_player_circle_angle > 360:
+                self.under_player_circle_angle = 0
 
         self.face_anim.update(time_d, self._center, self._angle)
 
@@ -83,7 +107,7 @@ class SimplePlayer(Circle):
         self._angle = angle
 
     def update_color(self, body_color=None, face_color=None):
-        pictures = get_sprite_and_animations((body_color, face_color), size=(self._size, self._size))
+        pictures = self.imager.new_skin((body_color, face_color))
         self.image = pictures['body']
         self.face_anim = Animation(self._center,
                                    idle_frames=pictures['idle_animation'],
@@ -98,9 +122,16 @@ class SimplePlayer(Circle):
 
         x0, y0 = self._center
 
+        if self.under_player_circle:
+            circle_copy = transform.rotate(self.under_player_circle, -degrees(self.under_player_circle_angle))
+            SimplePlayer.MAIN_SCREEN.blit(circle_copy,
+                                          (x0 - circle_copy.get_width() // 2 + dx,
+                                           y0 - circle_copy.get_height() // 2 + dy))
+
         img_copy = transform.rotate(self.image, -degrees(self._angle))
 
-        SimplePlayer.MAIN_SCREEN.blit(img_copy, (x0 - img_copy.get_width() // 2 + dx, y0 - img_copy.get_height() // 2 + dy))
+        SimplePlayer.MAIN_SCREEN.blit(img_copy,
+                                      (x0 - img_copy.get_width() // 2 + dx, y0 - img_copy.get_height() // 2 + dy))
 
         if self.global_settings['test_draw']:
             for dot in self._dots:
@@ -108,6 +139,9 @@ class SimplePlayer(Circle):
 
         self.face_anim.draw(dx, dy)
         # self.hp_bar.draw()
+
+    def run_action(self, action):
+        pass
 
     @property
     def position(self):

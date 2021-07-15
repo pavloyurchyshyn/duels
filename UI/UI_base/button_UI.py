@@ -14,7 +14,7 @@ from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE, \
 from settings.colors import simple_colors
 from settings.global_parameters import GLOBAL_SETTINGS
 from settings.window_settings import MAIN_SCREEN
-
+from settings.window_settings import Y_SCALE, X_SCALE
 
 
 class Button(Rectangle):
@@ -65,9 +65,11 @@ class Button(Rectangle):
                  click_delay=1,
                  time_b_click=None,
                  **kwargs):
+        x = int(x)
+        y = int(y)
+        size_x = int(size_x * X_SCALE) if size_x else Button.BUTTON_X_SIZE
+        size_y = int(size_y * Y_SCALE) if size_y else Button.BUTTON_Y_SIZE
 
-        size_x = size_x if size_x else Button.BUTTON_X_SIZE
-        size_y = size_y if size_y else Button.BUTTON_Y_SIZE
         super().__init__(x=x, y=y, size_x=size_x, size_y=size_y)
         self.x = x
         self.y = y
@@ -86,7 +88,7 @@ class Button(Rectangle):
         self._non_active_text_text = non_active_text if non_active_text else text
         self._original_text_size = text_size if text_size else DEFAULT_FONT_SIZE
         self._text_size = self._original_text_size
-        self._text_x, self._text_y = text_x, text_y
+        self._text_x, self._text_y = int(text_x*X_SCALE) if text_x else text_x, int(text_y*Y_SCALE) if text_y else text_y
 
         self._active_text_color = text_color
         self._inactive_text_color = text_non_active_color
@@ -260,6 +262,7 @@ class Button(Rectangle):
                 self._screen.blit(self._picture, (self._pic_x + dx, self._pic_y + dy))
 
             self._screen.blit(self._current_button_pic, (self.x0 + dx, self.y0 + dy))
+
             if self.CLOCK.time < self._animation_finish_time:
                 self._screen.blit(self._clicked_border, (self.x0 + dx, self.y0 + dy))
 

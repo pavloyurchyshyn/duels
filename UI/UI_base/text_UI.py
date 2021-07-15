@@ -3,6 +3,7 @@ from common_things.global_clock import GLOBAL_CLOCK
 from pygame import font, Surface
 from pygame.transform import rotate, scale, smoothscale
 from settings.colors import WHITE
+from settings.screen_size import X_SCALE, Y_SCALE
 
 
 class Text:
@@ -18,6 +19,10 @@ class Text:
                  font_t='Arial',
                  antial=1,
                  angle=0):
+        # x = int(x * X_SCALE) if x else None
+        # y = int(y * Y_SCALE) if x else None
+        x = int(x) if x else None
+        y = int(y) if y else None
         text = str(text)
         self._text = text.replace('\t', '    ')
         self._text_font = font_t
@@ -131,7 +136,7 @@ class Text:
         x_size = self._screen_x_size if self._r_text_img_original.get_width() > self._screen_x_size else self._r_text_img_original.get_width()
         y_size = self._screen_y_size if self._r_text_img_original.get_height() > self._screen_y_size else self._r_text_img_original.get_height()
 
-        self._r_text_img = smoothscale(self._r_text_img_original.copy(), (x_size, y_size))
+        self._r_text_img = smoothscale(self._r_text_img_original.copy(), (int(x_size*X_SCALE), int(y_size*Y_SCALE)))
 
         self._r_text_img = rotate(self._r_text_img, self._angle)  # .convert()
         self._size = self._r_text_img.get_size()

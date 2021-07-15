@@ -1,7 +1,6 @@
 # from obj_properties.physical_objects import PhysicalObj, SimplePhysicalCircleObj
 from obj_properties.circle_form import Circle
 from settings.players_settings.player_settings import *
-from settings.players_settings.player_pic_and_anim import get_sprite_and_animations
 
 from pygame.constants import *
 from pygame import key, transform
@@ -17,13 +16,14 @@ from settings.default_keys import INTERACT_C, \
     UP_C, LEFT_C, RIGHT_C, DOWN_C, \
     SPELL_1_C, SPRINT_C, GRAB_C, DROP_C, RELOAD_C, \
     WEAPON_1_C, WEAPON_2_C, WEAPON_3_C, SELF_DAMAGE
+from settings.common_settings import COMMON_GAME_SETTINGS_JSON_PATH as CGSJP
 
 # global things
 from UI.camera import GLOBAL_CAMERA
 
 from common_things.global_clock import ROUND_CLOCK
 from common_things.save_and_load_json_config import get_parameter_from_json_config, change_parameter_in_json_config
-from settings.common_settings import COMMON_GAME_SETTINGS_JSON_PATH as CGSJP
+from player_and_spells.player.player_images import NORMAL_PLAYER_IMGS
 
 
 class Player(Circle):  # , PhysicalObj):
@@ -47,9 +47,10 @@ class Player(Circle):  # , PhysicalObj):
 
         self.hands_radius = PLAYER_HANDS_SIZE + PLAYER_SIZE
         self._angle = 0
-        self.color = player_color if player_color else get_parameter_from_json_config('player_skin', CGSJP, def_value='blue')
-        pictures = get_sprite_and_animations(self.color,
-                                             size=(self._size * 2, self._size * 2))
+        self.color = player_color if player_color else get_parameter_from_json_config('player_skin', CGSJP,
+                                                                                      def_value='blue')
+        pictures = NORMAL_PLAYER_IMGS.new_skin(
+            self.color)  # get_sprite_and_animations(self.color, size=(self._size * 2, self._size * 2))
         self.image = pictures['body']
         self.face_anim = Animation(self._center,
                                    idle_frames=pictures['idle_animation'],
@@ -267,9 +268,6 @@ class Player(Circle):  # , PhysicalObj):
         img_copy = transform.rotate(self.image, -degrees(self._angle))
 
         Player.MAIN_SCREEN.blit(img_copy, (x0 - img_copy.get_width() // 2 + dx, y0 - img_copy.get_height() // 2 + dy))
-
-        # if self.hands:
-        #     self.hands.draw(window, dx, dy)
 
         if self.global_settings['test_draw']:
             for dot in self._dots:

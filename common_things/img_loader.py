@@ -13,12 +13,9 @@ except:
     ERROR_PICTURE = None
 
 
-def load_image(path, size: (int, int) = None, a=90, redraw_color=None):
+def load_image(path, size: (int, int) = None, a=90):
     try:
         pic = image.load(path).convert_alpha()
-
-        if redraw_color:
-            pic = recolor_picture(pic, redraw_color)
 
         if size:
             size = (int(size[0]), int(size[1]))
@@ -33,21 +30,35 @@ def load_image(path, size: (int, int) = None, a=90, redraw_color=None):
 
 
 # @time_control_wrapper
-def load_animation(pic_list, timings_list, size=None, anim_dict=None, redraw_color=None) -> dict:
+def load_animation(pic_list, timings_list, size=None, anim_dict=None) -> dict:
     anim_dict = anim_dict if type(anim_dict) is dict else {}
 
     for i, path in enumerate(pic_list):
-        anim_dict[i] = {'frame': load_image(path, size, redraw_color=redraw_color),
+        anim_dict[i] = {'frame': load_image(path, size),
                         'cd': timings_list[i]}
 
     return anim_dict
+
+
+def _normalize_color(color) -> int:
+    if color > 255:
+        return 255
+    elif color < 0:
+        return 0
+    else:
+        return color
+
+
+def normalize_color(color) -> tuple:
+    return tuple(map(_normalize_color, color))
 
 
 # @time_control_wrapper
 def recolor_picture(picture, color):
     w, h = picture.get_size()
     t = Color((0, 0, 0, 0))
-    new_c = Color(color)
+
+    new_c = Color(normalize_color(color))
 
     for x in range(w):
         for y in range(h):

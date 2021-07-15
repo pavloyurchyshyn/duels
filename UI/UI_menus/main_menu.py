@@ -69,9 +69,9 @@ class MainMenu(MenuUI):
         self._draw(dx, dy)
         if self._exit_warning:
             self.surface.blit(self._fade_surface, (0, 0))
+
             self._exit_no.draw()
             self._exit_yes.draw()
-
 
     def _update(self):
         pass

@@ -9,14 +9,14 @@ from UI.UI_base.text_UI import Text
 from common_things.global_clock import GLOBAL_CLOCK
 from common_things.global_mouse import GLOBAL_MOUSE
 
-from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE, \
-    DEFAULT_BUTTON_Y_SIZE, DEFAULT_CLICK_DELAY
+from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE1, \
+    DEFAULT_BUTTON_Y_SIZE1, DEFAULT_CLICK_DELAY
 from settings.colors import simple_colors
 
 
 class Scroll(Rectangle):
-    BUTTON_X_SIZE = DEFAULT_BUTTON_X_SIZE
-    BUTTON_Y_SIZE = DEFAULT_BUTTON_Y_SIZE
+    BUTTON_X_SIZE = DEFAULT_BUTTON_X_SIZE1
+    BUTTON_Y_SIZE = DEFAULT_BUTTON_Y_SIZE1
     CLICK_DELAY = DEFAULT_CLICK_DELAY
     CLOCK = GLOBAL_CLOCK
     MOUSE = GLOBAL_MOUSE
