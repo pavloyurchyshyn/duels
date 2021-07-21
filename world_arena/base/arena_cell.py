@@ -3,11 +3,11 @@ from settings.arena_settings import STANDARD_ARENA_CELL_SIZE, STANDARD_ARENA_BOR
     ELEMENT_SIZE, SUB_CELL_SIZE
 from settings.colors import DARK_GREEN
 from settings.window_settings import MAIN_SCREEN
+# from settings.screen_size import GAME_SCALE
 from common_things.common_lists import BULLETS_LIST, WALLS_SET, \
     ITEMS_LIST, PLAYERS_LIST, UNITS_LIST, PARTICLE_LIST, DOORS_LIST, BREAKABLE_WALLS
 from UI.camera import GLOBAL_CAMERA
 from pygame import Surface, SRCALPHA
-from multiprocessing import Process
 
 
 class ArenaCell:
@@ -100,6 +100,7 @@ class ArenaCell:
         sub_cells = {}
         for x in range(0, self._size, ArenaCell.SUB_CELL_SIZE):
             for y in range(0, self._size, ArenaCell.SUB_CELL_SIZE):
+
                 # x0, y0
                 #   +-------------------+
                 #   |                   |

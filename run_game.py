@@ -33,7 +33,7 @@ from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.global_keyboard import GLOBAL_KEYBOARD
 from common_things.loggers import LOGGER
 
-from settings.screen_size import SCREEN_H, SCREEN_W
+from settings.screen_size import SCREEN_H, SCREEN_W, Y_SCALE, X_SCALE
 
 from game_body import GameBody
 
@@ -72,12 +72,11 @@ if __name__ == "__main__":
     while 1:
         events = EVENT.get()
 
-        dt = clock.tick() / 1000  # milliseconds to seconds
+        dt = clock.tick(FPS) / 1000  # milliseconds to seconds
 
         # update time
         G_Clock.update(dt)
-        if GLOBAL_SETTINGS[CURRENT_STAGE] in {ROUND_S, MULTIPLAYER_CLIENT_ROUND_S,
-                                              MULTIPLAYER_CLIENT_ROUND_PAUSE_S}:  # solo game or leave it for animation?
+        if GLOBAL_SETTINGS[CURRENT_STAGE] in {ROUND_S}:  # solo game or leave it for animation?
             R_Clock.update(dt)
 
         # update mouse and keyboard

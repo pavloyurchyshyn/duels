@@ -1,6 +1,7 @@
 import json
 from os.path import exists
 from common_things.wrappers import memory_keeper
+from settings.common_settings import COMMON_GAME_SETTINGS_JSON_PATH
 
 
 @memory_keeper
@@ -25,3 +26,11 @@ def get_parameter_from_json_config(key, path, def_value=None):
 def save_json_config(data: dict, path: str) -> None:
     with open(path, 'w') as k_conf:
         json.dump(data, k_conf)
+
+
+def save_param_to_cgs(key, value):
+    change_parameter_in_json_config(key, value, COMMON_GAME_SETTINGS_JSON_PATH)
+
+
+def get_param_from_cgs(key, def_value=None):
+    return get_parameter_from_json_config(key=key, def_value=def_value, path=COMMON_GAME_SETTINGS_JSON_PATH)

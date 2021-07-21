@@ -69,6 +69,8 @@ class Button(Rectangle):
         y = int(y)
         size_x = int(size_x * X_SCALE) if size_x else Button.BUTTON_X_SIZE
         size_y = int(size_y * Y_SCALE) if size_y else Button.BUTTON_Y_SIZE
+        pic_x = int(pic_x * X_SCALE)
+        pic_y = int(pic_y * Y_SCALE)
 
         super().__init__(x=x, y=y, size_x=size_x, size_y=size_y)
         self.x = x

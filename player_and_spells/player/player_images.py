@@ -1,7 +1,7 @@
 from settings.players_settings.player_pic_and_anim import PLAYER_SIZE, IDLE_IMAGES, IDLE_TIMES, \
     RAGE_IMAGES, RAGE_TIMES, ANIM_IDLE_K, ANIM_RAGE_K, BODY_IMAGE, CIRCLE_IMAGE
 from settings.colors import PLAYERS_COLORS, COLORS_DICT
-from settings.screen_size import X_SCALE, Y_SCALE
+from settings.screen_size import GAME_SCALE
 
 from common_things.img_loader import recolor_picture, load_image, load_animation
 from common_things.wrappers import time_control_wrapper
@@ -12,7 +12,7 @@ from pygame import draw, Surface
 class PlayerImages:
     def __init__(self, size=None):
         self.size = size if size else PLAYER_SIZE
-        self.size = int(self.size * ((X_SCALE + Y_SCALE)/2))
+        self.size = int(self.size * GAME_SCALE)
         self.pic_size = (self.size, self.size)
 
         self.raw_body = load_image(BODY_IMAGE, size=self.pic_size)

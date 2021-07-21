@@ -6,7 +6,6 @@ from math import atan2, cos, sin, degrees, dist
 
 from settings.global_parameters import GLOBAL_SETTINGS
 
-
 from settings.default_keys import INTERACT_C, \
     UP_C, LEFT_C, RIGHT_C, DOWN_C, \
     SPELL_1_C, SPRINT_C, GRAB_C, DROP_C, RELOAD_C, \
@@ -211,10 +210,10 @@ class PlayerObject(Circle):  # , PhysicalObj):
             #     return
             # self._push_another_items()
             self._change_position((new_x, new_y))
-            self._make_dots_with_angle(self._angle)
+            # self._make_dots_with_angle(self._angle)
 
-        else:
-            self._make_dots_with_angle(self._angle)
+        # else:
+        # self._make_dots_with_angle(self._angle)
 
     def _grab_item(self, m_pos):
         dot = m_pos if dist(self._center, m_pos) <= self.hands_radius else self.hands_endpoint
@@ -248,7 +247,8 @@ class PlayerObject(Circle):  # , PhysicalObj):
 
     @position.setter
     def position(self, pos):
-        self._change_position(pos)
+        if pos:
+            self._change_position(pos)
 
     @property
     def backpack(self):
@@ -288,7 +288,8 @@ class PlayerObject(Circle):  # , PhysicalObj):
 
     @angle.setter
     def angle(self, value):
-        self._angle = value
+        if value:
+            self._angle = value
 
     def damage(self, damage):
         self._hp -= damage

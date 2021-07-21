@@ -1,7 +1,7 @@
 # from obj_properties.physical_objects import PhysicalObj, SimplePhysicalCircleObj
 from obj_properties.circle_form import Circle
 from settings.players_settings.player_settings import *
-
+from settings.screen_size import Y_SCALE, X_SCALE
 from pygame.constants import *
 from pygame import key, transform
 from pygame.draw import circle, line
@@ -166,7 +166,7 @@ class Player(Circle):  # , PhysicalObj):
 
         self.__update_inventory(time_d)
 
-        self.camera.update(self.position)
+        self.camera.update(self._center)
 
         # self.spell.update(d_time=time_d)
         # self._blood_drops.update(time_d, *self._center)
@@ -307,12 +307,18 @@ class Player(Circle):  # , PhysicalObj):
         self.arena = current_cell
 
     @property
-    def position(self):
+    def camera_pos(self):
         return self._center
+
+    @property
+    def position(self):
+        return self._center[0] / X_SCALE, self._center[1] / Y_SCALE
 
     @position.setter
     def position(self, pos):
-        self._change_position(pos)
+        if pos:
+            x, y = int(pos[0] * X_SCALE), int(pos[1] * Y_SCALE)
+            self._change_position((x, y))
 
     @property
     def backpack(self):
@@ -344,7 +350,8 @@ class Player(Circle):  # , PhysicalObj):
 
     @hp.setter
     def hp(self, value):
-        self._hp = value
+        if value:
+            self._hp = value
         # self.hp_bar.update(text=self._hp, current_stage=self._hp, stages_num=self._full_hp)
 
     @property
@@ -353,7 +360,8 @@ class Player(Circle):  # , PhysicalObj):
 
     @angle.setter
     def angle(self, value):
-        self._angle = value
+        if value:
+            self._angle = value
 
     def damage(self, damage):
         self._hp -= damage

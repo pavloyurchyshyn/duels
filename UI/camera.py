@@ -1,4 +1,4 @@
-from settings.screen_size import SCREEN_H, SCREEN_W, HALF_SCREEN_W, HALF_SCREEN_H
+from settings.screen_size import SCREEN_H, SCREEN_W, HALF_SCREEN_W, HALF_SCREEN_H, GAME_SCALE
 from settings.arena_settings import ELEMENT_SIZE, STANDARD_ARENA_CELL_SIZE
 
 

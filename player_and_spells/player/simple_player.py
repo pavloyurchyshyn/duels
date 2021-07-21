@@ -1,5 +1,5 @@
 from settings.players_settings.player_settings import *
-
+from settings.screen_size import X_SCALE, Y_SCALE
 from obj_properties.circle_form import Circle
 from pygame import mouse, transform, draw
 from UI.UI_base.animation import Animation
@@ -149,7 +149,10 @@ class SimplePlayer(Circle):
 
     @position.setter
     def position(self, pos):
-        self._change_position(pos)
+        if pos:
+            x, y = int(pos[0] * X_SCALE), int(pos[1] * Y_SCALE)
+            self._change_position((x, y))
+            # self._change_position(pos)
 
     @property
     def full_hp(self):
@@ -174,7 +177,8 @@ class SimplePlayer(Circle):
 
     @angle.setter
     def angle(self, value):
-        self._angle = value
+        if value:
+            self._angle = value
 
     def damage(self, damage):
         self._hp -= damage

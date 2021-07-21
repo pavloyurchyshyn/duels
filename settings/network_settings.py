@@ -6,11 +6,23 @@ DEFAULT_PORT = 8001
 CONNECTED_MESSAGE = 'Connected {}'
 BAD_PASSWORD = 'Bad password {}'
 
+
+# CONSTANTS
 IP = 'ip'
 PORT = 'port'
 NICKNAME = 'nickname'
 PASSWORD = 'password'
 PLAYERS_NUMBER = 'players_number'
+CHANGE_CONNECTION = 'change_conn'
+DELETE_PLAYERS = 'dlt_players'
+DELETE_PLAYER = 'dlt_player'
+SERVER_ACTION = 'server_actions'
+PLAYERS_DATA = 'players_data'
+SERVER_TIME = 'server_time'
+# PLAYERS ACTIONS
+
+
+
 NETWORK_DATA = {
     IP: socket.gethostbyname(socket.gethostname()),
     PORT: DEFAULT_PORT,

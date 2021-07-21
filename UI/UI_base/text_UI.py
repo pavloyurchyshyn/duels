@@ -18,7 +18,8 @@ class Text:
                  animation=False,
                  font_t='Arial',
                  antial=1,
-                 angle=0):
+                 angle=0,
+                 draw=True):
         # x = int(x * X_SCALE) if x else None
         # y = int(y * Y_SCALE) if x else None
         x = int(x) if x else None
@@ -49,7 +50,8 @@ class Text:
         self.set_x(x)
         self.set_y(y)
 
-        self.draw()
+        if draw:
+            self.draw()
 
     def set_x(self, x=None):
         if x is None:

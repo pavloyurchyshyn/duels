@@ -37,7 +37,7 @@ class MusicPlayer:
         self.save_settings()
 
     def update(self):
-        if not Music.get_busy():
+        if not Music.get_busy() and not self._muted:
             self.add_second_song()
             self.play_back_music()
 
@@ -115,6 +115,9 @@ class MusicPlayer:
         self.resume_back_music()
         self.save_settings()
 
+    @property
+    def current_song(self):
+        return self._current_song
     @staticmethod
     def load_sound(path):
         return Sound(os.path.join(SOUNDS_FOLDER, path))
