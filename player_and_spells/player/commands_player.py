@@ -1,7 +1,6 @@
 # from obj_properties.physical_objects import PhysicalObj, SimplePhysicalCircleObj
 from obj_properties.circle_form import Circle
-from settings.players_settings.player_settings import *
-from settings.screen_size import Y_SCALE, X_SCALE
+
 from pygame.constants import *
 from pygame import key, transform
 from pygame.draw import circle, line
@@ -9,6 +8,8 @@ from pygame.draw import circle, line
 from UI.UI_base.animation import Animation
 from math import atan2, cos, sin, degrees, dist
 
+from settings.players_settings.player_settings import *
+from settings.screen_size import Y_SCALE, X_SCALE
 from settings.global_parameters import GLOBAL_SETTINGS
 from settings.colors import BLOOD_COLOR
 from settings.window_settings import MAIN_SCREEN

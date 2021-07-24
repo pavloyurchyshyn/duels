@@ -29,6 +29,7 @@ from common_things.global_keyboard import GLOBAL_KEYBOARD
 from common_things.global_clock import ROUND_CLOCK
 from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.sound_loader import GLOBAL_MUSIC_PLAYER
+from common_things.global_messager import GLOBAL_MESSAGER
 from common_things.loggers import LOGGER
 from common_things.save_and_load_json_config import save_param_to_cgs, get_param_from_cgs
 from network.network import Network
@@ -85,7 +86,7 @@ class GameBody:
         self._other_multiplayer_players: dict = {}
         self._network_last_data = {}
         self._static_client_data = {}
-        self._global_messager = Messager(200, 20, draw_border=False, draw_surface_every_time=False)
+        self._global_messager = GLOBAL_MESSAGER
 
     def game_loop(self):
         """
@@ -236,9 +237,9 @@ class GameBody:
                     self._multiplayer_player.position = p_data.get('position')
                     self._multiplayer_player.angle = p_data.get('angle')
                     mouse_data, mouse_pos = p_data.get('mouse_data', ((0, 0, 0), (0, 0)))
-                    # commands = p_data.get('keyboard', ())
+                    commands = p_data.get('keyboard', ())
                 else:
-                    # commands = ()
+                    commands = ()
                     mouse_data, mouse_pos = (0, 0, 0), (0, 0)
 
                 self._multiplayer_player.update((), mouse=mouse_data, mouse_pos=GLOBAL_MOUSE.pos)

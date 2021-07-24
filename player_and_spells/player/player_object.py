@@ -64,8 +64,10 @@ class PlayerObject(Circle):  # , PhysicalObj):
         self._d_time = 0.00000001
 
         self.arena = None
+        self.action = []
 
     def update(self, commands, mouse_buttons, mouse_pos):
+        self.action.clear()
         time_d = ROUND_CLOCK.d_time
         self._d_time = time_d
 
@@ -80,6 +82,7 @@ class PlayerObject(Circle):  # , PhysicalObj):
 
         if self.hands and self.hands not in self.inventory.values():
             if DROP_C in commands:
+                self.action.append(DROP_C)
                 self.hands = None
 
             else:

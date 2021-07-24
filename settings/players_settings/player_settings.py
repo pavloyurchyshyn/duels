@@ -1,14 +1,12 @@
-from sys import exit
 from settings.screen_size import GAME_SCALE
-
-import os
+from settings.default_keys import WEAPON_1_C, WEAPON_2_C, WEAPON_3_C
 
 PLAYER_HP_BAR_COLOR = (55, 155, 55)
 
-PLAYER_SIZE = int(30*GAME_SCALE)
-PLAYER_HANDS_SIZE = int(35*GAME_SCALE)
-PLAYER_PUSH_FORCE = int(20000*GAME_SCALE)
-PLAYER_SPEED = int(550*GAME_SCALE)
+PLAYER_SIZE = int(30 * GAME_SCALE)
+PLAYER_HANDS_SIZE = int(35 * GAME_SCALE)
+PLAYER_PUSH_FORCE = int(20000 * GAME_SCALE)
+PLAYER_SPEED = int(550 * GAME_SCALE)
 PLAYER_SPRINT_SPEED = 1.5
 
 PLAYER_STAMINA = 125
@@ -22,3 +20,5 @@ PLAYER_HP = 100
 PLAYER_RAYS_NUM = 60
 PLAYER_VISION_RANGE = 300
 
+# players actions
+PLAYER_ACTION = 'action'  # dict of actions
