@@ -6,6 +6,7 @@ from pygame import key, transform
 from pygame.draw import circle, line
 
 from UI.UI_base.animation import Animation
+from UI.UI_base.text_UI import Text
 from math import atan2, cos, sin, degrees, dist
 
 from settings.players_settings.player_settings import *
@@ -93,6 +94,8 @@ class Player(Circle):  # , PhysicalObj):
 
         self.arena = None
 
+        self.hp_text = Text(int(self._hp), MAIN_SCREEN, x=self._center[0], y=self._center[1] + self._size)
+
     def update(self, commands, mouse, mouse_pos):
         time_d = ROUND_CLOCK.d_time
         self._d_time = time_d
@@ -171,6 +174,7 @@ class Player(Circle):  # , PhysicalObj):
 
         # self.spell.update(d_time=time_d)
         # self._blood_drops.update(time_d, *self._center)
+        self.hp_text.change_pos(self._center[0], self._center[1] + self._size)
 
     def _interact(self, m_pos):
         pos = m_pos if dist(self._center, m_pos) <= self.hands_radius else self.hands_endpoint
@@ -272,7 +276,7 @@ class Player(Circle):  # , PhysicalObj):
 
         if self.global_settings['test_draw']:
             for dot in self._dots:
-                circle(Player.MAIN_SCREEN, (0, 255, 255), (dot[0] + dx, dot[1] + dy), 1)
+                circle(Player.MAIN_SCREEN, (255, 0, 0), (dot[0] + dx, dot[1] + dy), 3)
 
         for weapon in self.inventory.values():
             if weapon:
@@ -280,6 +284,7 @@ class Player(Circle):  # , PhysicalObj):
 
         self.face_anim.draw(dx, dy)
         # self.hp_bar.draw()
+        self.hp_text.draw(dx, dy)
 
     def _grab_item(self, m_pos):
         dot = m_pos if dist(self._center, m_pos) <= self.hands_radius else self.hands_endpoint
@@ -351,9 +356,21 @@ class Player(Circle):  # , PhysicalObj):
 
     @hp.setter
     def hp(self, value):
-        if value:
+        if value is not None:
+            if self._hp < value:
+                pass
+                # TODO heal animation
+            elif self._hp > 0.0:
+                self.face_anim.change_animation('idle')
+
             self._hp = value
+            self.hp_text.change_text(int(value))
+
         # self.hp_bar.update(text=self._hp, current_stage=self._hp, stages_num=self._full_hp)
+
+    def revise(self):
+        self._hp = self._full_hp
+        self.face_anim.change_animation('idle')
 
     @property
     def angle(self):
@@ -365,13 +382,19 @@ class Player(Circle):  # , PhysicalObj):
             self._angle = value
 
     def damage(self, damage):
-        self._hp -= damage
+        if damage:
+            self._hp -= damage
+            self.hp_text.change_text(int(self._hp))
+            if self._hp <= 0.0:
+                self.face_anim.change_animation('dying')
+            else:
+                self.face_anim.change_animation('rage')
         # self.hp_bar.update(text=self._hp, current_stage=self._hp, stages_num=self._full_hp)
 
     @property
     def alive(self):
-        return self._hp > 0
+        return self._hp > 0.0
 
     @property
     def dead(self):
-        return self._hp <= 0
+        return self._hp <= 0.0

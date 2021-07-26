@@ -4,3 +4,4 @@ __pycache__
 .idea/
 logs/
 common_game_settings.json
+keyboard_settings.json

@@ -30,7 +30,7 @@ def load_image(path, size: (int, int) = None, a=90):
 
 
 # @time_control_wrapper
-def load_animation(pic_list, timings_list, size=None, anim_dict=None) -> dict:
+def load_animation(pic_list, timings_list, size: (int, int) = None, anim_dict=None) -> dict:
     anim_dict = anim_dict if type(anim_dict) is dict else {}
 
     for i, path in enumerate(pic_list):

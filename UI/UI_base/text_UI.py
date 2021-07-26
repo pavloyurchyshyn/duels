@@ -17,6 +17,7 @@ class Text:
                  shadow=False,
                  animation=False,
                  font_t='Arial',
+                 font_size=None,
                  antial=1,
                  angle=0,
                  draw=True):
@@ -25,6 +26,7 @@ class Text:
         x = int(x) if x else None
         y = int(y) if y else None
         text = str(text)
+        self.font_size = font_size if font_size else DEFAULT_FONT_SIZE
         self._text = text.replace('\t', '    ')
         self._text_font = font_t
 
@@ -38,7 +40,7 @@ class Text:
 
         self._d_time, self._time = Text.CLOCK()
 
-        self._size = size if size is not None else DEFAULT_FONT_SIZE
+        self._size = size
 
         self._angle = angle
 
@@ -102,7 +104,7 @@ class Text:
         pass
 
     def change_text(self, text):
-        self._text = text
+        self._text = str(text)
         self.render_text()
         self.draw()
 
@@ -121,6 +123,7 @@ class Text:
 
     def draw(self, dx=0, dy=0):
         if '\n' in self._text:
+            # TODO refactor this logic
             self._size = [0, 0]
             for i, text in enumerate(self._text.split('\n')):
                 t_surf = self._r_text_font.render(text, self._antialias, self._color)
@@ -145,10 +148,10 @@ class Text:
 
     def _render_font(self):
         try:
-            self._r_text_font = font.SysFont(self._text_font, int(self._size))
+            self._r_text_font = font.SysFont(self._text_font, int(self.font_size))
 
         except:
-            self._r_text_font = font.SysFont('Arial', int(self._size))
+            self._r_text_font = font.SysFont('Arial', int(self.font_size))
 
     @staticmethod
     def get_surface(size_x, size_y):

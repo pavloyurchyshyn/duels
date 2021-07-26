@@ -10,12 +10,10 @@ from settings.global_parameters import GLOBAL_SETTINGS
 from settings.window_settings import MAIN_SCREEN
 
 from UI.camera import GLOBAL_CAMERA
-
+from UI.UI_base.text_UI import Text
 from common_things.global_clock import GLOBAL_CLOCK
-from common_things.save_and_load_json_config import get_parameter_from_json_config, change_parameter_in_json_config
-from common_things.img_loader import load_image, recolor_picture
+from common_things.save_and_load_json_config import get_param_from_cgs
 
-from settings.common_settings import COMMON_GAME_SETTINGS_JSON_PATH as CGSJP
 from player_and_spells.player.player_images import NORMAL_PLAYER_IMGS, PlayerImages
 from settings.default_keys import INTERACT_C, \
     UP_C, LEFT_C, RIGHT_C, DOWN_C, \
@@ -37,9 +35,11 @@ class SimplePlayer(Circle):
         size = int(size)
         super().__init__(x, y, size)
 
+        self._full_hp = kwargs.get('hp', SimplePlayer.PLAYER_HP)
+        self._hp = self._full_hp
+
         self._angle = 0
-        self.color = player_skin if player_skin else get_parameter_from_json_config('player_skin', CGSJP,
-                                                                                    def_value='blue')
+        self.color = player_skin if player_skin else get_param_from_cgs('player_skin', def_value='blue')
 
         self.imager = NORMAL_PLAYER_IMGS if size == PLAYER_SIZE else PlayerImages(size=size)
 
@@ -68,6 +68,7 @@ class SimplePlayer(Circle):
         self.follow_mouse = follow_mouse
 
         self.arena = None
+        self.hp_text = Text(int(self._hp), MAIN_SCREEN, x=self._center[0], y=self._center[1] + self._size)
 
     def update(self, commands=()):
         time_d = GLOBAL_CLOCK.d_time
@@ -87,6 +88,7 @@ class SimplePlayer(Circle):
                 self.under_player_circle_angle = 0
 
         self.face_anim.update(time_d, self._center, self._angle)
+        self.hp_text.change_pos(self._center[0], self._center[1] + self._size)
 
     def cursor(self, m_pos: tuple):
         x1, y1 = m_pos
@@ -135,10 +137,11 @@ class SimplePlayer(Circle):
 
         if self.global_settings['test_draw']:
             for dot in self._dots:
-                draw.circle(SimplePlayer.MAIN_SCREEN, (0, 255, 255), (dot[0] + dx, dot[1] + dy), 1)
+                draw.circle(SimplePlayer.MAIN_SCREEN, (255, 0, 0), (dot[0] + dx, dot[1] + dy), 3)
 
         self.face_anim.draw(dx, dy)
         # self.hp_bar.draw()
+        self.hp_text.draw(dx, dy)
 
     def run_action(self, action):
         pass
@@ -168,8 +171,20 @@ class SimplePlayer(Circle):
 
     @hp.setter
     def hp(self, value):
-        self._hp = value
+        if value is not None:
+            if self._hp < value:
+                pass
+                # TODO heal animation
+            elif self._hp > 0.0:
+                self.face_anim.change_animation('idle')
+
+            self._hp = value
+            self.hp_text.change_text(int(value))
         # self.hp_bar.update(text=self._hp, current_stage=self._hp, stages_num=self._full_hp)
+
+    def revise(self):
+        self._hp = self._full_hp
+        self.face_anim.change_animation('idle')
 
     @property
     def angle(self):
@@ -181,13 +196,19 @@ class SimplePlayer(Circle):
             self._angle = value
 
     def damage(self, damage):
-        self._hp -= damage
+        if damage:
+            self._hp -= damage
+            self.hp_text.change_text(int(self._hp))
+            if self._hp <= 0.0:
+                self.face_anim.change_animation('dying')
+            else:
+                self.face_anim.change_animation('rage')
         # self.hp_bar.update(text=self._hp, current_stage=self._hp, stages_num=self._full_hp)
 
     @property
     def alive(self):
-        return self._hp > 0
+        return self._hp > 0.0
 
     @property
     def dead(self):
-        return self._hp <= 0
+        return self._hp <= 0.0

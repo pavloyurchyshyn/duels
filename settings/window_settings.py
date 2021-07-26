@@ -1,8 +1,6 @@
 from pygame import display, Surface, SRCALPHA
-from pygame.locals import *
 from settings.screen_size import *
 
-# SCREEN_W, SCREEN_H = display.get_window_size()
 flags = 0  # DOUBLEBUF | HWACCEL | FULLSCREEN
 MAIN_SCREEN_DEF_COLOR = (0, 0, 0)
 

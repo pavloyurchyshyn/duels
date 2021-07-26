@@ -10,6 +10,7 @@ from settings.global_parameters import GLOBAL_SETTINGS
 from settings.game_stages import CURRENT_STAGE, ROUND_S, MAIN_MENU_S
 from settings.window_settings import MAIN_SCREEN
 
+
 class RoundPause(MenuUI):
     Pause_back_color = (0, 0, 0, 100)
 
@@ -85,8 +86,9 @@ class RoundPause(MenuUI):
 
                 else:
                     self.deactivate_exit_buttons()
-    def update_main_screen(self):
-        PAUSE_MAIN_SCREEN_COPY = MAIN_SCREEN.copy()
+
+    # def update_main_screen(self):
+    #     PAUSE_MAIN_SCREEN_COPY = MAIN_SCREEN.copy()
 
     def draw(self, dx=0, dy=0):
         self._draw(dx, dy)

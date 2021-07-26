@@ -1,4 +1,4 @@
-# from pygame.constants import *
+
 import os
 from settings.common_settings import SETTINGS_PATH
 

@@ -1,7 +1,7 @@
 from obj_properties.rect_form import Rectangle
 from settings.arena_settings import STANDARD_ARENA_CELL_SIZE, STANDARD_ARENA_BORDER_SIZE, \
     ELEMENT_SIZE, SUB_CELL_SIZE
-from settings.colors import DARK_GREEN
+from settings.colors import DARK_GREEN, GREY_DARK
 from settings.window_settings import MAIN_SCREEN
 # from settings.screen_size import GAME_SCALE
 from common_things.common_lists import BULLETS_LIST, WALLS_SET, \
@@ -47,7 +47,7 @@ class ArenaCell:
         self.__create_borders()
 
         self._PICTURE = self.get_surface(self._size, self._size)  # MAIN SURFACE OF CELL
-        self._PICTURE.fill(DARK_GREEN)
+        self._PICTURE.fill(GREY_DARK)
 
         self._opened = opened
         self._dead_cell = dead_cell  # if dead -> can`t be opened
@@ -144,15 +144,15 @@ class ArenaCell:
         from pygame import draw
         x_size, y_size = self._PICTURE.get_size()
 
-        for x in range(0, x_size, SUB_CELL_SIZE):
-            draw.line(self._PICTURE, (0, 0, 255), (x, 0), (x, y_size))
-        for y in range(0, y_size, SUB_CELL_SIZE):
-            draw.line(self._PICTURE, (0, 0, 255), (0, y), (x_size, y))
+        # for x in range(0, x_size, SUB_CELL_SIZE):
+        #     draw.line(self._PICTURE, (0, 0, 255), (x, 0), (x, y_size))
+        # for y in range(0, y_size, SUB_CELL_SIZE):
+        #     draw.line(self._PICTURE, (0, 0, 255), (0, y), (x_size, y))
 
         for x in range(0, x_size, ELEMENT_SIZE):
-            draw.line(self._PICTURE, (255, 255, 255), (x, 0), (x, y_size))
+            draw.line(self._PICTURE, (115, 115, 115), (x, 0), (x, y_size))
         for y in range(0, y_size, ELEMENT_SIZE):
-            draw.line(self._PICTURE, (255, 255, 255), (0, y), (x_size, y))
+            draw.line(self._PICTURE, (115, 115, 115), (0, y), (x_size, y))
 
     @property
     def picture(self):

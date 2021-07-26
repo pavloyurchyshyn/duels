@@ -67,7 +67,7 @@ class Animation:
             return
 
         if animation not in self.animations:
-            return
+            raise Exception(f'Bad animation key {animation}')
 
         self.current_anim = animation
         self.frame = 0

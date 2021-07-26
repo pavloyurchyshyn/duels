@@ -23,7 +23,7 @@ from settings.colors import WHITE
 from settings.global_parameters import GLOBAL_SETTINGS
 from settings.common_settings import VERSION, FPS
 from settings.window_settings import MAIN_SCREEN, MAIN_SCREEN_RECT, SCREEN_H, SCREEN_W, \
-    MAIN_SCREEN_DEF_COLOR, MAIN_T_SCREEN # main screen of all game
+    MAIN_SCREEN_DEF_COLOR, MAIN_T_SCREEN  # main screen of all game
 from settings.game_stages import ROUND_S, CURRENT_STAGE, START_ROUND_S, MULTIPLAYER_CLIENT_ROUND_S, \
     MULTIPLAYER_CLIENT_ROUND_PAUSE_S
 
@@ -36,6 +36,7 @@ from common_things.loggers import LOGGER
 from settings.screen_size import SCREEN_H, SCREEN_W, Y_SCALE, X_SCALE
 
 from game_body import GameBody
+from time import time
 
 display.set_caption(f'Boss Fight V{VERSION}')
 
@@ -52,7 +53,7 @@ surface.fill((0, 0, 0, 50))
 
 surface.convert_alpha()
 
-i = 0
+
 display.update(MAIN_SCREEN_RECT)
 
 
@@ -61,19 +62,20 @@ def update_scree():
 
 
 if __name__ == "__main__":
-
     G_Clock = GLOBAL_CLOCK
     R_Clock = ROUND_CLOCK
     G_Mouse = GLOBAL_MOUSE
     G_Keyboard = GLOBAL_KEYBOARD
 
     GAME_BODY = GameBody()
-
+    start = time()
     while 1:
         events = EVENT.get()
+        finish = time()
 
-        dt = clock.tick(FPS) / 1000  # milliseconds to seconds
-
+        clock.tick(FPS)
+        dt = finish - start
+        start = finish
         # update time
         G_Clock.update(dt)
         if GLOBAL_SETTINGS[CURRENT_STAGE] in {ROUND_S}:  # solo game or leave it for animation?
@@ -93,7 +95,7 @@ if __name__ == "__main__":
 
         GAME_BODY.game_loop()
 
-        draw.circle(MAIN_SCREEN, (255, 0, 0), (SCREEN_W//2, SCREEN_H//2), 5)
+        draw.circle(MAIN_SCREEN, (255, 0, 0), (SCREEN_W // 2, SCREEN_H // 2), 5)
 
         update_fps()
         G_Mouse.draw()

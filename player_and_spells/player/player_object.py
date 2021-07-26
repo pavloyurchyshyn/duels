@@ -22,12 +22,17 @@ class PlayerObject(Circle):  # , PhysicalObj):
     PLAYER_PUSH_FORCE = PLAYER_PUSH_FORCE
 
     def __init__(self, x, y,
+                 team=None,
                  size=PLAYER_SIZE,
                  mass=PLAYER_MASS,
                  n_a=PLAYER_GLIDE_K,
                  **kwargs):
         super().__init__(x, y, size)
         # PhysicalObj.__init__(self, mass)
+
+        self.spawn_position = kwargs.get('spawn_position', (x, y))
+
+        self.team = team
 
         self.hands_radius = PLAYER_HANDS_SIZE + PLAYER_SIZE
 
@@ -65,22 +70,22 @@ class PlayerObject(Circle):  # , PhysicalObj):
 
         self.arena = None
         self.action = []
+        self._damaged = 0
 
-    def update(self, commands, mouse_buttons, mouse_pos):
+    def update(self, commands=(), mouse_buttons=(0, 0, 0), mouse_pos=None):
         self.action.clear()
         time_d = ROUND_CLOCK.d_time
         self._d_time = time_d
 
         self._time += time_d
 
-        m_pos = mouse_pos
         self.step(commands)
 
-        self.cursor(m_pos)
+        self.cursor(mouse_pos)
 
         self.__get_from_inventory(commands)
 
-        if self.hands and self.hands not in self.inventory.values():
+        if self.hands and self.hands not in self._inventory.values():
             if DROP_C in commands:
                 self.action.append(DROP_C)
                 self.hands = None
@@ -110,13 +115,13 @@ class PlayerObject(Circle):  # , PhysicalObj):
                     self.hands = None
 
         if GRAB_C in commands:
-            self._grab_item(m_pos)
+            self._grab_item(mouse_pos)
 
         if SPELL_1_C in commands:
             self.use_Q_spell()
 
         elif mouse_buttons[0]:
-            if self.hands and self.hands in self.inventory.values():
+            if self.hands and self.hands in self._inventory.values():
                 if self.hands.range:
                     self.hands.shoot(*self.hands_endpoint, self._angle)
 
@@ -124,35 +129,35 @@ class PlayerObject(Circle):  # , PhysicalObj):
             self.damage(5)
 
         if RELOAD_C in commands:
-            if self.hands and self.hands in self.inventory.values():
+            if self.hands and self.hands in self._inventory.values():
                 if self.hands.range:
                     self.hands.reload()
 
         if INTERACT_C in commands:
-            self._interact(m_pos)
+            self._interact(mouse_pos)
 
         self.__update_inventory(time_d)
 
         # self.spell.update(d_time=time_d)
-        # self._blood_drops.update(time_d, *self._center)
 
     def _interact(self, m_pos):
-        pos = m_pos if dist(self._center, m_pos) <= self.hands_radius else self.hands_endpoint
+        if m_pos:
+            pos = m_pos if dist(self._center, m_pos) <= self.hands_radius else self.hands_endpoint
 
         # self.arena.interact(interact_pos=pos)
 
     def __get_from_inventory(self, keys):
         for i, k in enumerate((WEAPON_1_C, WEAPON_2_C, WEAPON_3_C)):
             if k in keys:
-                if self.hands and self.hands in self.inventory.values():
+                if self.hands and self.hands in self._inventory.values():
                     if self.hands != self._inventory[i + 1] and self.hands.range:
                         self.hands.stop_reload()
 
-                self.hands = self.inventory[i + 1]
+                self.hands = self._inventory[i + 1]
                 break
 
     def __update_inventory(self, time_d):
-        for weapon, dot in zip(self.inventory.values(), [self._dots[5], self._dots[7], self._dots[9]]):
+        for weapon, dot in zip(self._inventory.values(), [self._dots[5], self._dots[7], self._dots[9]]):
             if weapon:
                 if weapon == self.hands:
                     weapon.update(*self.hands_endpoint, self._angle, time_d=time_d)
@@ -164,22 +169,23 @@ class PlayerObject(Circle):  # , PhysicalObj):
         pass
 
     def cursor(self, m_pos: tuple):
-        x1, y1 = m_pos
-        xc, yc = self._center
-        # xc += self.camera.camera[0]
-        # yc += self.camera.camera[1]
+        if m_pos:
+            x1, y1 = m_pos
+            xc, yc = self._center
+            # xc += self.camera.camera[0]
+            # yc += self.camera.camera[1]
 
-        d_x = 0.00001 if x1 - xc == 0 else x1 - xc
-        d_y = 0.00001 if y1 - yc == 0 else y1 - yc
+            d_x = 0.00001 if x1 - xc == 0 else x1 - xc
+            d_y = 0.00001 if y1 - yc == 0 else y1 - yc
 
-        angle = atan2(d_y, d_x)
+            angle = atan2(d_y, d_x)
 
-        x2 = self._center[0] + cos(angle) * self.hands_radius
-        y2 = self._center[1] + sin(angle) * self.hands_radius
+            x2 = self._center[0] + cos(angle) * self.hands_radius
+            y2 = self._center[1] + sin(angle) * self.hands_radius
 
-        self.hands_endpoint = [x2, y2]
+            self.hands_endpoint = [x2, y2]
 
-        self._angle = angle
+            self._angle = angle
 
     def step(self, commands):
         sprint_k = 1
@@ -219,7 +225,8 @@ class PlayerObject(Circle):  # , PhysicalObj):
         # self._make_dots_with_angle(self._angle)
 
     def _grab_item(self, m_pos):
-        dot = m_pos if dist(self._center, m_pos) <= self.hands_radius else self.hands_endpoint
+        if m_pos:
+            dot = m_pos if dist(self._center, m_pos) <= self.hands_radius else self.hands_endpoint
 
         # for item in self.item_con.items:
         #     if item in self.inventory.values():
@@ -241,9 +248,6 @@ class PlayerObject(Circle):  # , PhysicalObj):
         #             self.hands = item
         #             break
 
-    def update_cell(self, current_cell):
-        self.arena = current_cell
-
     @property
     def position(self):
         return self._center
@@ -252,22 +256,6 @@ class PlayerObject(Circle):  # , PhysicalObj):
     def position(self, pos):
         if pos:
             self._change_position(pos)
-
-    @property
-    def backpack(self):
-        return self._backpack
-
-    @backpack.setter
-    def backpack(self, item):
-        self._backpack.append(item)
-
-    @property
-    def inventory(self):
-        return self._inventory
-
-    @inventory.setter
-    def inventory(self, inventory):
-        self._inventory = inventory
 
     @property
     def full_hp(self):
@@ -296,6 +284,13 @@ class PlayerObject(Circle):  # , PhysicalObj):
 
     def damage(self, damage):
         self._hp -= damage
+        self._damaged += damage
+
+    @property
+    def damaged(self):
+        d = self._damaged
+        self._damaged = 0
+        return d
 
     @property
     def alive(self):

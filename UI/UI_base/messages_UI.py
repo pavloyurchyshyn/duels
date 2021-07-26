@@ -19,7 +19,8 @@ class Messager(Rectangle):
                  background_color=(0, 0, 0, 50),  # r, g, b, t
                  transparent=1,
                  draw_border=True,
-                 draw_surface_every_time=True
+                 draw_surface_every_time=True,
+                 message_time=None,
                  ):
         x = int(x)
         y = int(y)
@@ -46,6 +47,7 @@ class Messager(Rectangle):
         self._time = self._d_time = GLOBAL_CLOCK.d_time
 
         self.fake_update = False
+        self.message_time = message_time if message_time else self.MESSAGE_TIME
 
     def update(self):
         self._d_time = GLOBAL_CLOCK.d_time
@@ -75,7 +77,7 @@ class Messager(Rectangle):
 
     def add_message(self, text, msg_time=None):
         text = Text(f"{text}", screen=self.surface)
-        msg_time = msg_time if msg_time else self.MESSAGE_TIME
+        msg_time = msg_time if msg_time else self.message_time
 
         for message in self._messages:
             message['y'] += text.size[1]

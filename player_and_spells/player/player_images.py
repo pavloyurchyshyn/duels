@@ -1,12 +1,11 @@
-from settings.players_settings.player_pic_and_anim import PLAYER_SIZE, IDLE_IMAGES, IDLE_TIMES, \
-    RAGE_IMAGES, RAGE_TIMES, ANIM_IDLE_K, ANIM_RAGE_K, BODY_IMAGE, CIRCLE_IMAGE
-from settings.colors import PLAYERS_COLORS, COLORS_DICT
+from settings.players_settings.player_pic_and_anim import *
+from settings.colors import PLAYERS_COLORS
 from settings.screen_size import GAME_SCALE
 
 from common_things.img_loader import recolor_picture, load_image, load_animation
-from common_things.wrappers import time_control_wrapper
+# from common_things.wrappers import time_control_wrapper
 
-from pygame import draw, Surface
+# from pygame import draw, Surface
 
 
 class PlayerImages:
@@ -18,9 +17,13 @@ class PlayerImages:
         self.raw_body = load_image(BODY_IMAGE, size=self.pic_size)
         self.raw_animations = {
             ANIM_IDLE_K: load_animation(IDLE_IMAGES, IDLE_TIMES, size=self.pic_size),
-            ANIM_RAGE_K: load_animation(RAGE_IMAGES, RAGE_TIMES, size=self.pic_size)
+            ANIM_RAGE_K: load_animation(RAGE_IMAGES, RAGE_TIMES, size=self.pic_size),
+            ANIM_DEAD_K: load_animation(DEAD_IMAGES, DEAD_TIMES, size=self.pic_size),
+            ANIM_DYING_K: load_animation(DYING_IMAGES, DYING_TIMES, size=self.pic_size)
         }
         self.raw_animations[ANIM_RAGE_K]['end'] = ANIM_IDLE_K
+        self.raw_animations[ANIM_DYING_K]['end'] = ANIM_DEAD_K
+        self.raw_animations[ANIM_DEAD_K]['end'] = ANIM_DEAD_K
         self.under_player_circle = load_image(CIRCLE_IMAGE, size=(self.size + 4, self.size + 4))
 
     def new_skin(self, color: str or tuple or dict = 'blue'):
@@ -35,7 +38,9 @@ class PlayerImages:
             'body': recolor_picture(self.raw_body.copy(), body_color),
             'idle_animation': self.recolor_animation(ANIM_IDLE_K, face_color),
             'other_animation': {
-                ANIM_RAGE_K: self.recolor_animation(ANIM_RAGE_K, face_color)
+                ANIM_RAGE_K: self.recolor_animation(ANIM_RAGE_K, face_color),
+                ANIM_DEAD_K: self.recolor_animation(ANIM_DEAD_K, face_color),
+                ANIM_DYING_K: self.recolor_animation(ANIM_DYING_K, face_color)
             }
         }
 

@@ -1,4 +1,5 @@
 from network.network import Network
+from network.server_controller import SERVER_CONTROLLER
 
 from player_and_spells.player.commands_player import Player
 from player_and_spells.player.simple_player import SimplePlayer
@@ -9,21 +10,19 @@ from common_things.global_keyboard import GLOBAL_KEYBOARD
 from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.global_clock import ROUND_CLOCK
 
-from network.server_controller import SERVER_CONTROLLER
-
-from settings.screen_size import X_SCALE, Y_SCALE, GAME_SCALE
-from settings.network_settings import CHANGE_CONNECTION, DELETE_PLAYERS, SERVER_ACTION, DELETE_PLAYER, PLAYERS_DATA, SERVER_TIME
+from settings.screen_size import X_SCALE, Y_SCALE, GAME_SCALE, HALF_SCREEN_W, HALF_SCREEN_H
+from settings.network_settings import DELETE_PLAYERS, SERVER_ACTION, DELETE_PLAYER, PLAYERS_DATA, \
+    SERVER_TIME, DAMAGED
 from settings.global_parameters import GLOBAL_SETTINGS, pause_step, pause_available
-from settings.game_stages import CURRENT_STAGE, MAIN_MENU_S, MAIN_MENU_SETTINGS_S, \
-    START_ROUND_S, ROUND_PAUSE_S, ROUND_S, \
+from settings.game_stages import CURRENT_STAGE, MAIN_MENU_S, \
     MULTIPLAYER_MENU_S, MULTIPLAYER_CLIENT_DISCONNECT_S, \
-    MULTIPLAYER_CLIENT_ROUND_PAUSE_S, MULTIPLAYER_CLIENT_ROUND_S, \
-    MULTIPLAYER_CLIENT_S, MULTIPLAYER_HOST_S, HOST_SERVER, \
-    EXIT_S, MULTIPLAYER_CLIENT_CONNECT_ROUND_S
+    MULTIPLAYER_CLIENT_ROUND_PAUSE_S, MULTIPLAYER_CLIENT_ROUND_S
+from settings.window_settings import MAIN_SCREEN
 
 from UI.UI_menus.multiplayer import MULTIPLAYER_UI
 from world_arena.base.arena_cell import ArenaCell
-
+from UI.UI_base.text_UI import Text
+from UI.UI_base.messages_UI import Messager
 
 class MultiplayerStage:
     def __init__(self):
@@ -42,6 +41,55 @@ class MultiplayerStage:
         self._global_messager = GLOBAL_MESSAGER
         self._g_settings = GLOBAL_SETTINGS
 
+        self._team_scores_Text = Text('0:0', MAIN_SCREEN, x=HALF_SCREEN_W, y=10 * Y_SCALE, font_size=50 * GAME_SCALE)
+        self._current_round_Text = Text('0/0 ROUND', MAIN_SCREEN, x=HALF_SCREEN_W // 2, y=10 * Y_SCALE,
+                                        font_size=50 * GAME_SCALE)
+
+        self._round_timer_Text = Text('00:00', MAIN_SCREEN,
+                                      x=int(HALF_SCREEN_W * 1.5), y=10 * Y_SCALE,
+                                      font_size=50 * GAME_SCALE)
+
+        self._waiting_Text = Text('Waiting for players', MAIN_SCREEN, x=HALF_SCREEN_W, y=100*Y_SCALE, font_size=50 * GAME_SCALE)
+        self._team_scores = [0, 0]
+        self._current_round = '0/0'
+
+        self.winner_message = Messager(x=HALF_SCREEN_W, y=HALF_SCREEN_H, draw_border=False,
+                                       draw_surface_every_time=False, message_time=5)
+
+    def MULTIPLAYER_CLIENT_CONNECT(self):
+        self._network = Network()
+        ressponse = self._network.connect()
+
+        if self._network.connected:
+            LOGGER.info(f'Successfully connected')
+            LOGGER.info(f'Server response: {ressponse}')
+            self._global_messager.add_message(ressponse.get('server_msg'))
+            self._network_address_key = str(ressponse.get('network_address_key'))
+
+            if 'teams_scores' in ressponse:
+                self.update_score(ressponse['teams_scores'])
+
+            if 'current_round' in ressponse:
+                self.update_round(ressponse['current_round'])
+
+            self._g_settings[CURRENT_STAGE] = MULTIPLAYER_CLIENT_ROUND_S
+            data = {}
+            self._multiplayer_cell = ArenaCell(data, draw_grid=True)
+
+            x, y = ressponse.get('position', (100, 100))
+            self._multiplayer_player = Player(x=int(x * X_SCALE), y=int(y * Y_SCALE))
+            self._multiplayer_player.position = ressponse.get('position')
+            self._multiplayer_player.angle = ressponse.get('angle')
+            self._multiplayer_player.hp = ressponse.get('hp')
+            self._multiplayer_player.update({}, (0, 0, 0), (0, 0))
+
+            self._static_client_data['player_color'] = self._multiplayer_player.color
+
+            self._other_multiplayer_players.clear()
+        else:
+            MULTIPLAYER_UI.network_messager.add_message(ressponse.get('server_msg'))
+            self._g_settings[CURRENT_STAGE] = MULTIPLAYER_MENU_S
+
     def UPDATE(self, pause=False):
         data_to_send = {
             'keyboard': tuple(self._keyboard.commands),
@@ -51,21 +99,31 @@ class MultiplayerStage:
         }
         data_to_send.update(self._static_client_data)
 
-        # LOGGER.info(f'Player_info: {data_to_send}')
         try:
             if pause:
                 data = self._network.update(data=self._network_last_data.copy())
             else:
                 data = self._network.update(data=data_to_send)
-            self._network_last_data = data_to_send.copy()
+                self._network_last_data = data_to_send.copy()
             data_to_send.clear()
         except Exception as e:
-            LOGGER.error(e)
+            LOGGER.error(f"Failed to receive server response with error:\n\t {e}")
             self._g_settings[CURRENT_STAGE] = MULTIPLAYER_CLIENT_DISCONNECT_S
             self._global_messager.add_message('Server connection lost')
 
         else:
+            if 'disconnect' in data:
+                if data['disconnect']:
+                    self._g_settings[CURRENT_STAGE] = MULTIPLAYER_CLIENT_DISCONNECT_S
+
+            if 'teams_scores' in data:
+                self.update_score(data['teams_scores'])
+
+            if 'current_round' in data:
+                self.update_round(data['current_round'])
+
             ROUND_CLOCK.set_time(*data.pop(SERVER_TIME))
+            self._round_timer_Text.change_text(ROUND_CLOCK.timer_format)
 
             if SERVER_ACTION in data:
                 server_action = data.pop(SERVER_ACTION)
@@ -82,8 +140,14 @@ class MultiplayerStage:
                 players_data = data[PLAYERS_DATA]
                 if self._network_address_key in players_data:
                     p_data = players_data.pop(self._network_address_key)
+                    if p_data.get('revise', False):
+                        self._multiplayer_player.revise()
+
                     self._multiplayer_player.position = p_data.get('position')
                     self._multiplayer_player.angle = p_data.get('angle')
+                    self._multiplayer_player.damage(p_data.get(DAMAGED))
+                    self._multiplayer_player.hp = p_data.get('hp')
+
                     mouse_data, mouse_pos = p_data.get('mouse_data', ((0, 0, 0), (0, 0)))
                     commands = p_data.get('keyboard', ())
                 else:
@@ -96,10 +160,12 @@ class MultiplayerStage:
                 for addr, player in self._other_multiplayer_players.items():
                     if addr in players_data:
                         p_data = players_data.pop(addr)
-                        # value = self._network.str_to_json(value)
                         commands = p_data.get('keyboard', {})
                         player.position = p_data.get('position')
                         player.angle = p_data.get('angle')
+                        player.damage(p_data.get(DAMAGED))
+                        player.hp = p_data.get('hp')
+
                     else:
                         commands = ()
 
@@ -115,39 +181,29 @@ class MultiplayerStage:
 
                         player.position = value.get('position')
                         player.angle = value.get('angle')
+
+                        if value.get('revise', False):
+                            player.revise()
+
+                        player.hp = value.get('hp')
+
                         player.update(value.get('keyboard', {}))
                         player.draw()
                         # print(f'Created player for {addr}')
 
-            if GLOBAL_KEYBOARD.ESC and pause_available():
-                pause_step()
-                self._g_settings[CURRENT_STAGE] = MULTIPLAYER_CLIENT_ROUND_PAUSE_S
-                self._network_last_data['keyboard'] = {}
+            if data.get('waiting_players', False):
+                self._waiting_Text.draw()
 
-    def MULTIPLAYER_CLIENT_CONNECT(self):
-        self._network = Network()
-        res = self._network.connect()
+        if GLOBAL_KEYBOARD.ESC and pause_available():
+            pause_step()
+            self._g_settings[CURRENT_STAGE] = MULTIPLAYER_CLIENT_ROUND_PAUSE_S
+            self._network_last_data['keyboard'] = {}
 
-        if self._network.connected:
-            self._global_messager.add_message(res.get('server_msg'))
-            self._network_address_key = str(res.get('network_address_key'))
-            self._g_settings[CURRENT_STAGE] = MULTIPLAYER_CLIENT_ROUND_S
-            data = {}
-            self._multiplayer_cell = ArenaCell(data, draw_grid=True)
-
-            x, y = res.get('position', (100, 100))
-            self._multiplayer_player = Player(x=int(x * X_SCALE), y=int(y * Y_SCALE))
-            self._multiplayer_player.position = res.get('position')
-            self._multiplayer_player.angle = res.get('angle')
-            self._multiplayer_player.hp = res.get('hp')
-            self._multiplayer_player.update({}, (0, 0, 0), (0, 0))
-
-            self._static_client_data['player_color'] = self._multiplayer_player.color
-
-            self._other_multiplayer_players.clear()
-        else:
-            MULTIPLAYER_UI.network_messager.add_message(res.get('server_msg'))
-            self._g_settings[CURRENT_STAGE] = MULTIPLAYER_MENU_S
+        self._round_timer_Text.update()
+        self._team_scores_Text.draw()
+        self._current_round_Text.draw()
+        self._round_timer_Text.draw()
+        self.winner_message.draw()
 
     def MULTIPLAYER_CLIENT_DISCONNECT(self):
         self._other_multiplayer_players.clear()
@@ -160,3 +216,15 @@ class MultiplayerStage:
         self._g_settings[CURRENT_STAGE] = MAIN_MENU_S
         SERVER_CONTROLLER.stop_server()
 
+    def update_score(self, scores: tuple):
+        if scores != self._team_scores:
+            self._team_scores = scores
+            self._team_scores_Text.change_text(':'.join(map(str, scores)))
+
+    def update_round(self, round):
+        if self._current_round != round:
+            self._current_round = round
+            self._current_round_Text.change_text(f"{round} ROUND")
+
+
+GLOBAL_MUL_STAGE = MultiplayerStage()
