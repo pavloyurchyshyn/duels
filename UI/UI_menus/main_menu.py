@@ -17,14 +17,14 @@ class MainMenu(MenuUI):
         self._fade_surface.fill(HALF_EMPTY)
         self._fade_surface.convert_alpha()
 
-    def activate_warning(self):
+    def activate_exit_warning_message(self):
         self._exit_yes.make_active()
         self._exit_yes.make_visible()
         self._exit_no.make_active()
         self._exit_no.make_visible()
         self._exit_warning = 1
 
-    def deactivate_warning(self):
+    def deactivate_exit_warning_message(self):
         self._exit_yes.make_inactive()
         self._exit_yes.make_invisible()
         self._exit_no.make_inactive()
@@ -41,11 +41,11 @@ class MainMenu(MenuUI):
 
         if GLOBAL_KEYBOARD.ESC and pause_available() and not self._exit_warning:
             pause_step()
-            self.activate_warning()
+            self.activate_exit_warning_message()
 
         elif GLOBAL_KEYBOARD.ESC and pause_available() and self._exit_warning:
             pause_step()
-            self.deactivate_warning()
+            self.deactivate_exit_warning_message()
 
         if self.click():
             xy = self.GLOBAL_MOUSE.pos
@@ -57,13 +57,13 @@ class MainMenu(MenuUI):
 
                 self._exit.click(xy=xy)
                 if self._exit.clicked:
-                    self.activate_warning()
+                    self.activate_exit_warning_message()
             else:
                 if self._exit_yes.click(xy):
                     return
 
                 else:
-                    self.deactivate_warning()
+                    self.deactivate_exit_warning_message()
 
     def draw(self, dx=0, dy=0):
         self._draw(dx, dy)

@@ -3,6 +3,10 @@ from abc import abstractmethod
 
 class CollideInterface:
 
+    @abstractmethod
+    def _change_position(self, xy: list) -> None:
+        raise NotImplementedError
+
     # did point inside object
     @abstractmethod
     def collide_point(self, xy: list) -> bool:

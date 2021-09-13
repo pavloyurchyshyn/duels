@@ -2,17 +2,19 @@ from math import sin, cos, radians, dist
 from interfaces.collide_interfaces import CollideInterface
 from abc import abstractmethod
 
+
 class Circle(CollideInterface):
     """
     Circle object.
     """
-    def __init__(self, x: int, y: int, R: int) -> None:
-        self._original_size: int = R  # radius
-        self._size: int = R  # radius
+
+    def __init__(self, x: int, y: int, R: int, dots_angle: bool = False) -> None:
+        self._original_size: float = R  # radius
+        self._size: float = R  # radius
         self.h_size = R / 2
         self._center: list = [x, y]
         self._dots: list = []
-        self._make_dots()
+        self._make_dots = self.__make_dots_with_angle if dots_angle else self.__make_dots
 
         self._collide_able = 1
 
@@ -24,7 +26,7 @@ class Circle(CollideInterface):
         :return:
         """
         self._center = xy
-        self._make_dots()
+        # self._make_dots()
 
     @abstractmethod
     def make_original_size(self):
@@ -44,7 +46,7 @@ class Circle(CollideInterface):
             self._size = new_size
             self._change_position(self._center)
 
-    def _make_dots(self) -> None:
+    def __make_dots(self) -> None:
         """
         Rebuilding dots position.
 
@@ -95,13 +97,13 @@ class Circle(CollideInterface):
 
         return dist(xy, self._center) <= self._size
 
-    def collide(self, other):
+    def collide(self, other) -> bool:
         """
         Returns True if collide object
 
         :param other:
-        :return:
-        # """
+        :return: bool
+        """
         # if other.size > self.size:
         #     return other.collide(self)
         # else:
@@ -116,7 +118,8 @@ class Circle(CollideInterface):
     def get_pos(self):
         return self._center
 
-    def _make_dots_with_angle(self, a):
+    def __make_dots_with_angle(self, a=None):
+        a = self._angle if a is None else a
         self._dots.clear()
         x, y = self._center
         self._dots.append(self._center)

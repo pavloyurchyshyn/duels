@@ -1,15 +1,20 @@
 from abc import ABC, abstractmethod
-from common_things.global_clock import ROUND_CLOCK
 
-class AnyObjInt(ABC):
+
+class AnyObjInterface(ABC):
     def __init__(self):
-        self._clock = ROUND_CLOCK
-        self._time, self._d_time = self._clock()
-
-    @abstractmethod
-    def draw(self, d_time):
-        raise NotImplementedError
+        self.KEY = None
 
     @abstractmethod
     def update(self, *args, **kwargs):
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def alive(self):
+        raise NotImplementedError
+
+    @property
+    @abstractmethod
+    def dead(self):
         raise NotImplementedError

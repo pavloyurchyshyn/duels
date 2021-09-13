@@ -7,7 +7,7 @@ from settings.colors import HALF_EMPTY_L
 from settings.UI_setings.menus_settings.mul_round_pause import MUL_ROUND_PAUSE_BUTTONS, \
     PAUSE_MAIN_SCREEN_COPY, PAUSE_SCREEN
 from settings.global_parameters import GLOBAL_SETTINGS
-from settings.game_stages import CURRENT_STAGE, ROUND_S, MAIN_MENU_S, MULTIPLAYER_CLIENT_DISCONNECT_S
+from settings.game_stages_constants import CURRENT_STAGE, ROUND_STAGE, MAIN_MENU_STAGE, MULTIPLAYER_CLIENT_DISCONNECT_STAGE
 
 
 class MulRoundPause(MenuUI):
@@ -80,7 +80,7 @@ class MulRoundPause(MenuUI):
             else:
                 if self._exit_yes.click(xy):
                     self.deactivate_exit_buttons()
-                    GLOBAL_SETTINGS[CURRENT_STAGE] = MULTIPLAYER_CLIENT_DISCONNECT_S
+                    GLOBAL_SETTINGS[CURRENT_STAGE] = MULTIPLAYER_CLIENT_DISCONNECT_STAGE
                     return
 
                 else:

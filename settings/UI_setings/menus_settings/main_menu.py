@@ -1,36 +1,19 @@
-from settings.global_parameters import GLOBAL_SETTINGS
-from settings.colors import WHITE, GREY_GREEN, GREY_RED
+from settings.global_parameters import set_start_round_stage, set_main_menu_settings_stage, set_exit_stage, set_multiplayer_menu_stage
+
 from settings.screen_size import HALF_SCREEN_W, HALF_SCREEN_H, SCREEN_H, SCREEN_W, X_SCALE, Y_SCALE
 from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE
-from settings.game_stages import MAIN_MENU_SETTINGS_S, CURRENT_STAGE, START_ROUND_S, TEST_DRAW_S, MULTIPLAYER_MENU_S, EXIT_S
 
 from common_things.global_clock import ROUND_CLOCK
 
 
 def start_game():
-    GLOBAL_SETTINGS[CURRENT_STAGE] = START_ROUND_S
+    set_start_round_stage()
     ROUND_CLOCK.reload()
-
-
-def test_draw():
-    GLOBAL_SETTINGS[TEST_DRAW_S] = not GLOBAL_SETTINGS[TEST_DRAW_S]
-
-
-def settings():
-    GLOBAL_SETTINGS[CURRENT_STAGE] = MAIN_MENU_SETTINGS_S
-
-
-def multiplayer():
-    GLOBAL_SETTINGS[CURRENT_STAGE] = MULTIPLAYER_MENU_S
-
-
-def close_game():
-    GLOBAL_SETTINGS[CURRENT_STAGE] = EXIT_S
 
 
 MAIN_MENU_BUTTONS = {
     'start': {
-        'args': (HALF_SCREEN_W - DEFAULT_BUTTON_X_SIZE // 2, 500*Y_SCALE),
+        'args': (HALF_SCREEN_W - DEFAULT_BUTTON_X_SIZE // 2, 500 * Y_SCALE),
         'kwargs': {
             'active': 1,
             'text': 'START',
@@ -44,7 +27,7 @@ MAIN_MENU_BUTTONS = {
             'y': int(SCREEN_H * 0.555),
             'text': 'Multiplayer',
             # 'active': False,
-            'on_click_action': multiplayer,
+            'on_click_action': set_multiplayer_menu_stage,
 
         }
     },
@@ -55,7 +38,7 @@ MAIN_MENU_BUTTONS = {
             'x': HALF_SCREEN_W - DEFAULT_BUTTON_X_SIZE // 2,
             'y': int(SCREEN_H * 0.648),
             'text': 'Settings',
-            'on_click_action': settings,
+            'on_click_action': set_main_menu_settings_stage,
         }
     },
     '_exit': {
@@ -74,7 +57,7 @@ MAIN_MENU_BUTTONS = {
             'text': 'YES',
             'active': False,
             'visible': False,
-            'on_click_action': close_game,
+            'on_click_action': set_exit_stage,
             'non_visible_after_click': 1,
             'non_active_after_click': 1,
 

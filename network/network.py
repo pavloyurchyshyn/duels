@@ -1,13 +1,10 @@
 import socket
-import pickle
 import json
 
-from settings.network_settings import NETWORK_DATA, anon_host, DEFAULT_PORT
-from settings.network_settings import IP, NICKNAME, PASSWORD, PORT
+from settings.network_settings.network_settings import NETWORK_DATA, DEFAULT_PORT
+from settings.network_settings.network_constants import IP, NICKNAME, PASSWORD, PORT, NETWORK_ACCESS_KEY, PLAYER_SKIN
 from common_things.loggers import LOGGER
 
-from common_things.save_and_load_json_config import get_parameter_from_json_config, change_parameter_in_json_config
-from settings.common_settings import COMMON_GAME_SETTINGS_JSON_PATH
 from common_things.save_and_load_json_config import save_param_to_cgs, get_param_from_cgs
 
 
@@ -22,7 +19,7 @@ class Network:
         self.connected = False
         self.credentials = {}
 
-        self._network_address_key = get_param_from_cgs('network_address_key', def_value=None)
+        self._network_access_key = get_param_from_cgs(NETWORK_ACCESS_KEY, def_value=None)
 
     def update_network_data(self):
         self.server = NETWORK_DATA[IP]
@@ -34,8 +31,8 @@ class Network:
         self.credentials.clear()
         self.credentials[NICKNAME] = self.nickname
         self.credentials[PASSWORD] = self.password
-        self.credentials['player_color'] = get_param_from_cgs('player_skin', def_value='blue')
-        self.credentials['network_address_key'] = get_param_from_cgs('network_address_key', def_value=self._network_address_key)
+        self.credentials[PLAYER_SKIN] = get_param_from_cgs('player_skin', def_value='blue')
+        self.credentials[NETWORK_ACCESS_KEY] = get_param_from_cgs(NETWORK_ACCESS_KEY, def_value=self._network_access_key)
 
     def connect(self):
         self.client.close()
@@ -48,9 +45,8 @@ class Network:
             response = self.str_to_json(self.client.recv(2048).decode())
             if response.get('connected'):
                 self.connected = True
-                save_param_to_cgs(key='network_address_key', value=response.get('network_address_key'))
-                self._network_address_key = response.get('network_address_key')
-                # print(f'Changed network_address_key {response.get("network_address_key")}')
+                save_param_to_cgs(key=NETWORK_ACCESS_KEY, value=response.get(NETWORK_ACCESS_KEY))
+                self._network_access_key = response.get(NETWORK_ACCESS_KEY)
                 return response
             else:
                 self.disconnect()

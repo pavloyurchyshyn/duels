@@ -75,8 +75,8 @@ class Messager(Rectangle):
 
         return y
 
-    def add_message(self, text, msg_time=None):
-        text = Text(f"{text}", screen=self.surface)
+    def add_message(self, text, msg_time=None, color=(255, 255, 255), font_size=None):
+        text = Text(f"{text}", screen=self.surface, color=color, font_size=font_size)
         msg_time = msg_time if msg_time else self.message_time
 
         for message in self._messages:

@@ -35,7 +35,6 @@ class Clock:
     @property
     def timer_format(self):
         minute = str(abs(self._time) // 60).split('.')[0]
-
         sec = str(abs(self._time) % 60).split('.')[0]
 
         return f"{minute if abs(int(minute)) > 9 else f'0{minute}'}:{sec if abs(int(sec)) > 9 else f'0{sec}'}"

@@ -2,14 +2,14 @@ from settings.global_parameters import GLOBAL_SETTINGS
 from settings.colors import WHITE, GREY_GREEN, GREY_RED
 from settings.window_settings import HALF_SCREEN_W, HALF_SCREEN_H, MAIN_SCREEN
 from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE
-from settings.game_stages import CURRENT_STAGE, MULTIPLAYER_CLIENT_ROUND_S
+from settings.game_stages_constants import CURRENT_STAGE, MULTIPLAYER_CLIENT_ROUND_STAGE
 from settings.screen_size import X_SCALE, Y_SCALE
 PAUSE_MAIN_SCREEN_COPY = MAIN_SCREEN.copy()
 PAUSE_SCREEN = MAIN_SCREEN.copy()
 
 
 def continue_round():
-    GLOBAL_SETTINGS[CURRENT_STAGE] = MULTIPLAYER_CLIENT_ROUND_S
+    GLOBAL_SETTINGS[CURRENT_STAGE] = MULTIPLAYER_CLIENT_ROUND_STAGE
 
 
 MUL_ROUND_PAUSE_BUTTONS = {

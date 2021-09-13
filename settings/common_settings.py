@@ -20,4 +20,4 @@ COMMON_GAME_SETTINGS_JSON_PATH = os.path.join(SETTINGS_PATH, 'common_game_settin
 PLAYER_NICKNAME_KEY = 'player_nickname'
 
 # patterns
-LOG_FILE_PATTERN = os.path.join(LOGS_FOLDER, '{}.txt')
+LOG_FILE_PATTERN = os.path.join(LOGS_FOLDER, '{}_game.txt')

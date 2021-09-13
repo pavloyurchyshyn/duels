@@ -3,12 +3,9 @@ from settings.colors import PLAYERS_COLORS
 from settings.screen_size import GAME_SCALE
 
 from common_things.img_loader import recolor_picture, load_image, load_animation
-# from common_things.wrappers import time_control_wrapper
-
-# from pygame import draw, Surface
 
 
-class PlayerImages:
+class PlayerImagesManager:
     def __init__(self, size=None):
         self.size = size if size else PLAYER_SIZE
         self.size = int(self.size * GAME_SCALE)
@@ -26,13 +23,13 @@ class PlayerImages:
         self.raw_animations[ANIM_DEAD_K]['end'] = ANIM_DEAD_K
         self.under_player_circle = load_image(CIRCLE_IMAGE, size=(self.size + 4, self.size + 4))
 
-    def new_skin(self, color: str or tuple or dict = 'blue'):
-        if type(color) is str:
-            body_color, face_color = PLAYERS_COLORS.get(color, 'blue').values()
-        elif type(color) in (list, tuple):
-            body_color, face_color = color
-        elif type(color) is dict:
-            body_color, face_color = color['body'], color['face']
+    def get_new_skin(self, colors: str or tuple or dict = 'blue'):
+        if type(colors) is str:
+            body_color, face_color = PLAYERS_COLORS.get(colors, 'blue').values()
+        elif type(colors) in (list, tuple):
+            body_color, face_color = colors
+        elif type(colors) is dict:
+            body_color, face_color = colors['body'], colors['face']
 
         return {
             'body': recolor_picture(self.raw_body.copy(), body_color),
@@ -62,4 +59,4 @@ class PlayerImages:
         return recolor_picture(self.under_player_circle.copy(), color)
 
 
-NORMAL_PLAYER_IMGS = PlayerImages()
+NORMAL_PLAYER_IMGS = PlayerImagesManager()

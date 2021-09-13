@@ -1,40 +1,21 @@
 from settings.common_settings import COMMON_GAME_SETTINGS_JSON_PATH
+from settings.network_settings.network_constants import *
 from common_things.save_and_load_json_config import get_parameter_from_json_config
+from settings.players_settings.player_settings import PLAYER_SIZE
 import socket
 
 DEFAULT_PORT = 8002
 
-CONNECTED_MESSAGE = 'Connected {}'
-BAD_PASSWORD = 'Bad password {}'
+GAME_TICK_RATE = 64
 
-# CONSTANTS
-IP = 'ip'
-PORT = 'port'
-NICKNAME = 'nickname'
-PASSWORD = 'password'
-PLAYERS_NUMBER = 'players_number'
+DEFAULT_TIME_PER_ROUND = 60
+END_ROUND_TIME = -5  # seconds
+TIME_TO_START_ROUND = -10
+WAIT_FOR_PLAYERS_TIME = -120
 
-DELETE_PLAYERS = 'dlt_players'
-DELETE_PLAYER = 'dlt_player'
-SERVER_ACTION = 'server_actions'
-PLAYERS_DATA = 'players_data'
-SERVER_TIME = 'server_time'
+CONNECTION_TIMEOUT = 15
 
-PREPARING = 'preparing_to_round'
-PLAYER_LOADED = 'loaded'
-
-TEAM_SCORES = 'teams_scores'
-CURRENT_ROUND = 'current_round'
-ROUND_FINISHED = 'round_finished'
-ROUND_WINNER = 'round_winner'
-TEAM_GAME_WON = 'game_finished'
-GAME_WINNER = 'game_winner'
-
-# PLAYERS ACTIONS
-DAMAGED = 'damaged'
-DEAD = 'dead'
-
-DEFAULT_TIME_PER_ROUND = 3
+SERVER_FILE_NAME = 'server.py'
 
 NETWORK_DATA = {
     IP: socket.gethostbyname(socket.gethostname()),
@@ -64,3 +45,16 @@ def anon_host(host):
 
     host = f'{pre}{host}{post}'
     return f'{host}'
+
+
+SERVER_ARGUMENTS = {
+    f'--{PORT}': [DEFAULT_PORT, 'Server Port'],
+    f'--{PLAYERS_NUMBER}': [2, 'Number of players'],
+    f'--{PASSWORD}': ['.', 'Lobby password'],
+    f'--{ROUNDS}': [2, 'Needed round to win'],
+    f'--{TIME_PER_ROUND}': [DEFAULT_TIME_PER_ROUND, 'Time for round in minutes'],
+    f'--{GAME_MODE}': [CLASSIC_GAME_MODE, 'Mode of game.'],
+    f'--{PLAYER_SIZE_ARG}': [PLAYER_SIZE, 'Player_size'],
+    f'--{TEAM_NAMES}': ['red,blue', 'Coma separated teams names'],
+    f'--{ADMIN_AK}': ['None', 'Admin access key'],
+}

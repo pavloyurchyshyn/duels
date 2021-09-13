@@ -1,8 +1,8 @@
 from settings.global_parameters import GLOBAL_SETTINGS
 from settings.window_settings import SCREEN_W, MAIN_SCREEN, HALF_SCREEN_W, SCREEN_H
-from settings.game_stages import CURRENT_STAGE, MAIN_MENU_S, HOST_SERVER, MULTIPLAYER_CLIENT_CONNECT_ROUND_S
+from settings.game_stages_constants import CURRENT_STAGE, MAIN_MENU_STAGE, HOST_SERVER_STAGE, MULTIPLAYER_CLIENT_CONNECT_ROUND_STAGE
 from settings.UI_setings.button_settings import DEFAULT_BUTTON_HALF_X_SIZE, DEFAULT_BUTTON_Y_SIZE, DEFAULT_BUTTON_X_SIZE
-from settings.network_settings import DEFAULT_PORT, update_host_address, NETWORK_DATA, anon_host, IP, PASSWORD
+from settings.network_settings.network_settings import DEFAULT_PORT, update_host_address, NETWORK_DATA, anon_host, IP, PASSWORD
 from settings.common_settings import PLAYER_NICKNAME_KEY, COMMON_GAME_SETTINGS_JSON_PATH
 from settings.screen_size import X_SCALE, Y_SCALE
 
@@ -22,14 +22,14 @@ IP_REGULAR = r'(\d{1,3}\.){3}\d\d?\d?:(\d{4,5})'
 
 
 def back_to_menu():
-    GLOBAL_SETTINGS[CURRENT_STAGE] = MAIN_MENU_S
+    GLOBAL_SETTINGS[CURRENT_STAGE] = MAIN_MENU_STAGE
 
 
 # ===== CLIENT PART ================
 
 def connect_as_client():
     if NETWORK_DATA[IP]:
-        GLOBAL_SETTINGS[CURRENT_STAGE] = MULTIPLAYER_CLIENT_CONNECT_ROUND_S
+        GLOBAL_SETTINGS[CURRENT_STAGE] = MULTIPLAYER_CLIENT_CONNECT_ROUND_STAGE
     else:
         # TODO ERROR MESSAGE
         pass
@@ -124,7 +124,7 @@ def copy_ip():
 
 
 def run_server():
-    GLOBAL_SETTINGS[CURRENT_STAGE] = HOST_SERVER
+    GLOBAL_SETTINGS[CURRENT_STAGE] = HOST_SERVER_STAGE
 
 
 def reload_ip():

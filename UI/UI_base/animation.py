@@ -86,3 +86,35 @@ class Animation:
     @position.setter
     def position(self, value):
         self.x, self.y = value
+
+
+class RotateAnimation:
+    MAIN_SCREEN = MAIN_SCREEN
+
+    def __init__(self, position, image, rotating_speed=30, angle=0):
+        """
+        :param position: center position
+        :param image: image
+        :param rotating_speed: degrees 
+        """
+        self.image = image
+        self.x, self.y = position
+        self.rotating_speed = rotating_speed
+        self._angle = angle
+
+    def update(self, d_time, position=None, angle=None):
+        if angle is not None:
+            self._angle = angle
+
+        if position is not None:
+            self.x, self.y = position
+
+        if self.rotating_speed:
+            self._angle += self.rotating_speed * d_time
+
+    def draw(self, dx, dy):
+        img_copy = transform.rotate(self.image, self._angle)
+
+        Animation.MAIN_SCREEN.blit(img_copy,
+                                   (self.x - img_copy.get_width() // 2 + dx,
+                                    self.y - img_copy.get_height() // 2 + dy))

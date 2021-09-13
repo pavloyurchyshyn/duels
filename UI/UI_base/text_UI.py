@@ -20,13 +20,13 @@ class Text:
                  font_size=None,
                  antial=1,
                  angle=0,
-                 draw=True):
+                 auto_draw=True):
         # x = int(x * X_SCALE) if x else None
         # y = int(y * Y_SCALE) if x else None
         x = int(x) if x else None
         y = int(y) if y else None
         text = str(text)
-        self.font_size = font_size if font_size else DEFAULT_FONT_SIZE
+        self.font_size = font_size if font_size is not None else DEFAULT_FONT_SIZE
         self._text = text.replace('\t', '    ')
         self._text_font = font_t
 
@@ -51,8 +51,8 @@ class Text:
 
         self.set_x(x)
         self.set_y(y)
-
-        if draw:
+        self.auto_draw = auto_draw
+        if auto_draw:
             self.draw()
 
     def set_x(self, x=None):
@@ -106,12 +106,14 @@ class Text:
     def change_text(self, text):
         self._text = str(text)
         self.render_text()
-        self.draw()
+        if self.auto_draw:
+            self.draw()
 
     def add_text(self, text):
         self._text = ' '.join((self._text, text))
         self.render_text()
-        self.draw()
+        if self.auto_draw:
+            self.draw()
 
     def change_pos(self, x, y):
         """
@@ -120,6 +122,8 @@ class Text:
         :return:
         """
         self._x, self._y = int(x), int(y)
+        if self.auto_draw:
+            self.draw()
 
     def draw(self, dx=0, dy=0):
         if '\n' in self._text:

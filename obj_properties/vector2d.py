@@ -17,6 +17,9 @@ class Vector_2d:
         self._x: float = x
         self._y: float = y
 
+    def set(self, x, y):
+        self._x, self._y = x, y
+
     def __iadd__(self, other_vector):
         """
         Add values of another vector to this vector.
@@ -124,7 +127,7 @@ class Vector_2d:
         return self._x, self._y
 
     @property
-    def n_vector(self) -> tuple:
+    def negative_vector(self) -> tuple:
         """
         Negative vector values
         :return:

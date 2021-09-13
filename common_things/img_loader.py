@@ -1,6 +1,7 @@
 from pygame import image, error, transform, Color
 from common_things.loggers import LOGGER
 from sys import exit
+import os
 
 from common_things.wrappers import time_control_wrapper
 
@@ -13,15 +14,21 @@ except:
     ERROR_PICTURE = None
 
 
-def load_image(path, size: (int, int) = None, a=90):
+def load_image(path: str, size: (int, int) = None, angle=90, smooth_scale = True):
     try:
+        if not path.startswith('sprites'):
+            path = os.path.join('sprites', path)
+
         pic = image.load(path).convert_alpha()
 
         if size:
             size = (int(size[0]), int(size[1]))
-            pic = transform.smoothscale(pic, size).convert_alpha()
+            if smooth_scale:
+                pic = transform.smoothscale(pic, size).convert_alpha()
+            else:
+                pic = transform.scale(pic, size).convert_alpha()
 
-        pic = transform.rotate(pic, a).convert_alpha()
+        pic = transform.rotate(pic, angle).convert_alpha()
         return pic
     except (error, FileNotFoundError):
         print(f'No file {path}')
