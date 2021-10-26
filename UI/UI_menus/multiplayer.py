@@ -8,7 +8,8 @@ from settings.UI_setings.menus_settings.multiplayer import MULTIPLAYER_BUTTONS, 
 from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE, DEFAULT_BUTTON_Y_SIZE
 from pygame.draw import line as DrawLine
 from UI.UI_base.messages_UI import Messager
-from settings.screen_size import X_SCALE, Y_SCALE
+# from settings.screen_size import X_SCALE, Y_SCALE
+X_SCALE, Y_SCALE = 1, 1
 
 
 class Multiplayer(MenuUI):
@@ -20,12 +21,12 @@ class Multiplayer(MenuUI):
         self._fade_surface.fill(HALF_EMPTY_L)
         self._fade_surface.convert_alpha()
         self._server_pswrd = SERVER_PASSWORD
-        msg_x_size = DEFAULT_BUTTON_X_SIZE * 5.5
+        msg_x_size = DEFAULT_BUTTON_X_SIZE * 4
         msg_y_size = DEFAULT_BUTTON_Y_SIZE * 5
-        self.network_messager = Messager(HALF_SCREEN_W - msg_x_size/3, int(700 * Y_SCALE),
+        self.network_messager = Messager(HALF_SCREEN_W - msg_x_size/2, int(700 * Y_SCALE),
                                          size_x=msg_x_size,
                                          size_y=msg_y_size,
-                                         message_width=DEFAULT_BUTTON_X_SIZE * 5,
+                                         message_width=msg_x_size,
                                          transparent=0, background_color=(1, 1, 1, 255))
 
     def update(self):

@@ -2,8 +2,8 @@ from obj_properties.rect_form import Rectangle
 from settings.arena_settings import STANDARD_ARENA_SIZE, STANDARD_ARENA_BORDER_SIZE, ELEMENT_SIZE
 from common_things.common_objects_lists_dicts import BULLETS_LIST, WALLS_SET, \
     ITEMS_LIST, PLAYERS_LIST, UNITS_LIST, PARTICLE_LIST, DOORS_LIST, BREAKABLE_WALLS, ALL_OBJECT_DICT
-from settings.screen_size import GAME_SCALE
-from settings.game_objects_constants import BULLETS_TYPE
+# from settings.screen_size import GAME_SCALE
+from settings.weapon_settings.types_and_names import BULLETS_TYPE
 from settings.all_objects_names_classes_dict import ALL_NAMES_OBJECTS_DICT
 
 
@@ -21,9 +21,8 @@ class ArenaCellObject(Rectangle):
 
     def __init__(self, data: dict = {}, server_instance=False):
         self.server_instance = server_instance
-        self._size = ArenaCellObject.ARENA_SIZE if server_instance else int(ArenaCellObject.ARENA_SIZE * GAME_SCALE)
-        self._border_size = ArenaCellObject.BORDER_SIZE if server_instance else int(
-            ArenaCellObject.BORDER_SIZE * GAME_SCALE)
+        self._size = ArenaCellObject.ARENA_SIZE  # if server_instance else int(ArenaCellObject.ARENA_SIZE * GAME_SCALE)
+        self._border_size = ArenaCellObject.BORDER_SIZE  # if server_instance else int(ArenaCellObject.BORDER_SIZE * GAME_SCALE)
 
         super().__init__(x=0, y=0, size_x=self._size)
 
@@ -50,6 +49,10 @@ class ArenaCellObject(Rectangle):
 
         self._dead_objects = []
         self._new_objects = []
+        # if not self.server_instance:
+        #     from settings.screen_size import X_SCALE, Y_SCALE
+        #     self._x_scale = X_SCALE
+        #     self._y_scale = Y_SCALE
 
     def update(self):
         self._update()
@@ -81,11 +84,15 @@ class ArenaCellObject(Rectangle):
             if obj.TYPE == BULLETS_TYPE:
                 self._bullets.remove(obj)
 
-    def add_object(self, obj_data):
+    def add_object(self, obj_data, from_server=False):
         obj_global_key = obj_data.get('key')
         if not obj_global_key:
             obj_global_key = self.all_objects_counter
             self.all_objects_counter += 1
+
+        if from_server:
+            obj_data['data']['x'] = obj_data['data']['x']  # * self._x_scale
+            obj_data['data']['y'] = obj_data['data']['y']  # * self._y_scale
 
         obj = ALL_NAMES_OBJECTS_DICT.get(obj_data['name'])(**obj_data['data'], arena=self)
         obj.KEY = obj_global_key
@@ -138,7 +145,8 @@ class ArenaCellObject(Rectangle):
 
         return 0
 
-    def normalize_xy_for_element(self, x, y):
+    @staticmethod
+    def normalize_xy_for_element(x, y):
         return (x // ArenaCellObject.ELEMENT_SIZE) * ArenaCellObject.ELEMENT_SIZE, \
                (y // ArenaCellObject.ELEMENT_SIZE) * ArenaCellObject.ELEMENT_SIZE
 

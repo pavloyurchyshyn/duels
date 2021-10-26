@@ -1,15 +1,19 @@
-from settings.screen_size import SCREEN_H, SCREEN_W, HALF_SCREEN_W, HALF_SCREEN_H, X_SCALE, Y_SCALE
+from settings.screen_size import SCREEN_H, SCREEN_W, HALF_SCREEN_W, HALF_SCREEN_H#, X_SCALE, Y_SCALE, GAME_SCALE
 from settings.arena_settings import STANDARD_ARENA_SIZE
 
 
 class Camera:
-    def __init__(self, x: int, y: int):  # , max_x: int, max_y: int):
+    def __init__(self, x: int, y: int):
         self.camera_x = x
         self.camera_y = y
-        self.max_x = SCREEN_W - int(STANDARD_ARENA_SIZE * X_SCALE) + 2  # - ELEMENT_SIZE // 2
-        self.max_y = SCREEN_H - int(STANDARD_ARENA_SIZE * Y_SCALE) + 2  # - ELEMENT_SIZE // 2
+        self.max_x = SCREEN_W - int(STANDARD_ARENA_SIZE) + 2
+        self.max_y = SCREEN_H - int(STANDARD_ARENA_SIZE) + 2
+
+#        self.max_x = SCREEN_W - int(STANDARD_ARENA_SIZE * GAME_SCALE) + 2
+#        self.max_y = SCREEN_H - int(STANDARD_ARENA_SIZE * GAME_SCALE) + 2
+
         self.min_x = 0
-        self.min_y = 0  # + WALL_CELL_SIZE // 2
+        self.min_y = 0
 
         self.dx = self.dy = 0
         self.old_dx = x
@@ -21,6 +25,9 @@ class Camera:
 
     def reload(self, x: int, y: int):  # , max_x: int, max_y: int):
         self.__init__(x, y)  # , max_x, max_y)
+
+    def set_dx_dy(self, dx, dy):
+        self._camera = [dx, dy]
 
     def __normalize_camera(self):
         if self._camera[0] > self.min_x:

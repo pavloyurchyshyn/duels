@@ -4,7 +4,8 @@ from settings.game_stages_constants import CURRENT_STAGE, MAIN_MENU_STAGE, HOST_
 from settings.UI_setings.button_settings import DEFAULT_BUTTON_HALF_X_SIZE, DEFAULT_BUTTON_Y_SIZE, DEFAULT_BUTTON_X_SIZE
 from settings.network_settings.network_settings import DEFAULT_PORT, update_host_address, NETWORK_DATA, anon_host, IP, PASSWORD
 from settings.common_settings import PLAYER_NICKNAME_KEY, COMMON_GAME_SETTINGS_JSON_PATH
-from settings.screen_size import X_SCALE, Y_SCALE
+#from settings.screen_size import X_SCALE, Y_SCALE
+X_SCALE, Y_SCALE = 1, 1
 
 from UI.UI_base.input_element_UI import InputElement
 from UI.UI_base.button_UI import Button

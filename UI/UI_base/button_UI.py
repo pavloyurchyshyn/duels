@@ -14,8 +14,8 @@ from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE, \
 from settings.colors import simple_colors
 from settings.global_parameters import GLOBAL_SETTINGS
 from settings.window_settings import MAIN_SCREEN
-from settings.window_settings import Y_SCALE, X_SCALE
-
+# from settings.window_settings import Y_SCALE, X_SCALE
+X_SCALE, Y_SCALE = 1, 1
 
 class Button(Rectangle):
     HELP_TEXT_TIME = 3

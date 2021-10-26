@@ -1,6 +1,6 @@
 from network.network import Network
 from network.server_controller import SERVER_CONTROLLER
-from UI.camera import GLOBAL_CAMERA
+from common_things.camera import GLOBAL_CAMERA
 # from player_and_spells.player.commands_player import Player
 from player_and_spells.player.simple_player import SimplePlayer
 
@@ -10,14 +10,13 @@ from common_things.global_keyboard import GLOBAL_KEYBOARD
 from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.global_clock import ROUND_CLOCK
 
-from settings.screen_size import X_SCALE, Y_SCALE, GAME_SCALE, HALF_SCREEN_W, HALF_SCREEN_H
-from settings.network_settings.network_settings import DELETE_ALL_PLAYERS, SERVER_ACTION, DELETE_PLAYER, PLAYERS_DATA, \
-    SERVER_TIME, DAMAGED
+# from settings.screen_size import X_SCALE, Y_SCALE, GAME_SCALE
+X_SCALE, Y_SCALE, GAME_SCALE = 1, 1, 1
+
+from settings.screen_size import HALF_SCREEN_W, HALF_SCREEN_H
 from settings.global_parameters import GLOBAL_SETTINGS, pause_step, pause_available, set_multiplayer_menu_stage, \
-    set_multiplayers_round_stage, set_multiplayers_disconnect_stage, set_multiplayers_round_pause_stage
-from settings.game_stages_constants import CURRENT_STAGE, MAIN_MENU_STAGE, \
-    MULTIPLAYER_MENU_STAGE, MULTIPLAYER_CLIENT_DISCONNECT_STAGE, \
-    MULTIPLAYER_CLIENT_ROUND_PAUSE_STAGE, MULTIPLAYER_CLIENT_ROUND_STAGE
+    set_multiplayers_round_stage, set_multiplayers_disconnect_stage, set_multiplayers_round_pause_stage, \
+    set_main_menu_stage
 from settings.window_settings import MAIN_SCREEN
 from settings.network_settings.network_constants import *
 
@@ -80,7 +79,7 @@ class MultiplayerStage:
             x, y = server_response.get(POSITION, (100, 100))
             self._this_multiplayer_player = SimplePlayer(x=int(x * X_SCALE), y=int(y * Y_SCALE), follow_mouse=True)
             self._this_multiplayer_player.angle = server_response.get(ANGLE)
-            self._this_multiplayer_player.hp = server_response.get(HEALTH_POINTS)
+            self._this_multiplayer_player.health_points = server_response.get(HEALTH_POINTS)
             self._this_multiplayer_player.update()
 
             self._static_client_data[PLAYER_SKIN] = self._this_multiplayer_player.color
@@ -124,7 +123,7 @@ class MultiplayerStage:
 
             self.update_score(data_from_server.get(TEAM_SCORES))
             self.update_round(data_from_server.get(CURRENT_ROUND))
-            ROUND_CLOCK.set_time(*data_from_server.get(SERVER_TIME))
+            ROUND_CLOCK.set_time(*data_from_server.get(SERVER_TIME, (-999, -999)))
             self._round_timer_Text.change_text(ROUND_CLOCK.timer_format)
 
             self._multiplayer_cell.draw()
@@ -143,6 +142,10 @@ class MultiplayerStage:
 
             if data_from_server.get(WAITING_PLAYERS, False):
                 self._waiting_Text.draw()
+
+            if data_from_server.get(DISCONNECT, 0):
+                self._global_messager.add_message(data_from_server.get(SERVER_MESSAGE, ''))
+                set_multiplayers_disconnect_stage()
 
         self._this_multiplayer_player.draw()
 
@@ -174,12 +177,14 @@ class MultiplayerStage:
                         data_from_server[PLAYERS_DATA].pop(player_hash_to_delete)
 
     def add_new_objects(self, data_from_server):
-        for object_data in data_from_server[ADD_OBJECTS]:
-            self._multiplayer_cell.add_object(object_data)
+        if ADD_OBJECTS in data_from_server:
+            for object_data in data_from_server[ADD_OBJECTS]:
+                self._multiplayer_cell.add_object(object_data, from_server=1)
 
     def delete_objects(self, data_from_server):
-        for key in data_from_server[DELETE_OBJECTS]:
-            self._multiplayer_cell.delete_object_by_key(obj_key=key)
+        if DELETE_OBJECTS in data_from_server:
+            for key in data_from_server[DELETE_OBJECTS]:
+                self._multiplayer_cell.delete_object_by_key(obj_key=key)
 
     def update_this_player(self, players_data):
         if self._network_access_key in players_data:
@@ -189,16 +194,16 @@ class MultiplayerStage:
 
             self._this_multiplayer_player.angle = player_data.get(ANGLE)
             self._this_multiplayer_player.damage(player_data.get(DAMAGED))
-            self._this_multiplayer_player.hp = player_data.get(HEALTH_POINTS)
-            self._this_multiplayer_player.position = player_data.get(POSITION)
+            self._this_multiplayer_player.health_points = player_data.get(HEALTH_POINTS)
+            self._this_multiplayer_player.position = player_data[POSITION]
+            GLOBAL_CAMERA.update(player_pos=player_data[POSITION])
+
             commands = player_data.get('keyboard', ())
 
         else:
             commands = ()
 
         self._this_multiplayer_player.update(commands)
-
-        GLOBAL_CAMERA.update(player_pos=self._this_multiplayer_player.position)
 
     def update_and_draw_other_players(self, players_data):
         for player_hash, player in self._other_multiplayer_players_objects.items():
@@ -207,9 +212,11 @@ class MultiplayerStage:
                 commands = player_data.get('keyboard', {})
                 player.angle = player_data.get(ANGLE)
                 player.damage(player_data.get(DAMAGED))
-                player.hp = player_data.get(HEALTH_POINTS)
+                player.health_points = player_data.get(HEALTH_POINTS)
                 player.update(commands)
                 player.position = player_data.get(POSITION)
+                if player_data.get(REVISE, False):
+                    player.revise()
             else:
                 commands = ()
                 player.update(commands)
@@ -219,7 +226,8 @@ class MultiplayerStage:
     def create_new_players(self, players_data):
         if players_data:
             for player_hash, player_data in players_data.items():
-                player = SimplePlayer(*player_data.get(POSITION, (100, 100)), main_player=False,
+                player = SimplePlayer(*player_data.get(POSITION, (100, 100)),
+                                      main_player=False,
                                       player_skin=player_data.get(PLAYER_SKIN),
                                       under_circle_color=1, enemy=True)
 
@@ -228,7 +236,7 @@ class MultiplayerStage:
                 player.angle = player_data.get(ANGLE)
                 if player_data.get(REVISE, False):
                     player.revise()
-                player.hp = player_data.get(HEALTH_POINTS)
+                player.health_points = player_data.get(HEALTH_POINTS)
 
                 player.update(player_data.get('keyboard', {}))
                 player.draw()
@@ -244,6 +252,10 @@ class MultiplayerStage:
             self._current_round_Text.change_text(f"{round} ROUND")
 
     def MULTIPLAYER_CLIENT_DISCONNECT(self):
+        SERVER_CONTROLLER.stop_server()
+
+        if self._network:
+            self._network.send(data={STOP_SERVER: True})
         self._other_multiplayer_players_objects.clear()
         self._this_multiplayer_player = None
         self._multiplayer_cell = None
@@ -251,8 +263,7 @@ class MultiplayerStage:
         self._network = None
         self._network_access_key = None
 
-        self._g_settings[CURRENT_STAGE] = MAIN_MENU_STAGE
-        SERVER_CONTROLLER.stop_server()
+        set_main_menu_stage()
 
 
 GLOBAL_MUL_STAGE = MultiplayerStage()

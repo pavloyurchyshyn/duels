@@ -83,7 +83,7 @@ class Network:
 
     def send(self, data):
         try:
-            self.client.send(data)
+            self.client.send(self.json_to_str(data))
         except socket.error as e:
             LOGGER.error(f"Failed to send data {e}")
 
@@ -102,7 +102,7 @@ class Network:
         #     LOGGER.error(f"Failed to get data {e}")
 
     def update(self, data):
-        self.send(self.json_to_str(data))
+        self.send(data)
 
         return self.get_data()
 

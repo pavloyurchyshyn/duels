@@ -10,7 +10,9 @@ from common_things.font_loader import DEFAULT_FONT_SIZE
 from settings.window_settings import MAIN_SCREEN
 from settings.colors import YELLOW, WHITE, GREY
 from settings.global_parameters import GLOBAL_SETTINGS
-from settings.screen_size import X_SCALE, Y_SCALE
+# from settings.screen_size import X_SCALE, Y_SCALE
+X_SCALE, Y_SCALE = 1, 1
+
 from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE, DEFAULT_BUTTON_Y_SIZE, DEFAULT_BORDER_WIDTH
 
 from pygame import draw, Surface

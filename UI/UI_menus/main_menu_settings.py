@@ -1,5 +1,5 @@
 from UI.UI_base.menu_UI import MenuUI
-
+from common_things.camera import GLOBAL_CAMERA
 from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.global_keyboard import GLOBAL_KEYBOARD
 
@@ -38,6 +38,7 @@ class MainMenuSettings(MenuUI):
             MUTE_MUSIC_BUTTON.click(xy=xy)
 
         PLAYER_PIC.update()
+        GLOBAL_CAMERA.set_dx_dy(0, 0)
 
     def draw(self, dx=0, dy=0):
         self._draw(dx, dy)

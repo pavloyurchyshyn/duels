@@ -3,8 +3,8 @@ from common_things.global_clock import GLOBAL_CLOCK
 from pygame import font, Surface
 from pygame.transform import rotate, scale, smoothscale
 from settings.colors import WHITE
-from settings.screen_size import X_SCALE, Y_SCALE
-
+# from settings.screen_size import X_SCALE, Y_SCALE
+X_SCALE, Y_SCALE = 1, 1
 
 class Text:
     DEFAULT_FONT_SIZE = DEFAULT_FONT_SIZE

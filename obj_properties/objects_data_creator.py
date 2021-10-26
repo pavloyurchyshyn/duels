@@ -1,4 +1,4 @@
-from settings.game_objects_constants import ALL_OBJ_NAMES
+from settings.all_types_and_names import ALL_OBJ_NAMES
 from common_things.common_objects_lists_dicts import ALL_OBJECT_DICT
 
 
@@ -17,7 +17,7 @@ class BadObjectName(Exception):
         self.name = name
 
     def __str__(self):
-        return f'Bad object name: {self.name}'
+        return f'Bad object name: {self.name} | {ALL_OBJ_NAMES}'
 
 
 class BadObjectKey(Exception):

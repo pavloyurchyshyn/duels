@@ -14,7 +14,8 @@ from UI.UI_base.input_element_UI import InputElement
 from common_things.save_and_load_json_config import get_parameter_from_json_config, change_parameter_in_json_config
 from common_things.img_loader import normalize_color
 from player_and_spells.player.simple_player import SimplePlayer
-from settings.screen_size import X_SCALE, Y_SCALE
+#from settings.screen_size import X_SCALE, Y_SCALE
+X_SCALE, Y_SCALE = 1, 1
 
 
 # --------- SKIN SETTINGS ---------------
@@ -29,7 +30,7 @@ __player_color = get_parameter_from_json_config('player_skin', CGSJP, def_value=
 f_r, f_g, f_b = __player_color['face'][:3]
 b_r, b_g, b_b = __player_color['body'][:3]
 change_parameter_in_json_config('player_skin', __player_color, CGSJP)
-PLAYER_PIC = SimplePlayer(1500 * X_SCALE, 100 * Y_SCALE, turn_off_camera=True, size=PLAYER_SIZE * 5,
+PLAYER_PIC = SimplePlayer(1500 * X_SCALE, 200 * Y_SCALE, turn_off_camera=True, size=PLAYER_SIZE * 5,
                           player_color=__player_color, follow_mouse=1, draw_health_points=False, arena=None)
 
 FACE_INPUT_R = InputElement(1250 * X_SCALE, 100 * Y_SCALE, text=f'{f_r}', size_x=50, size_y=40,

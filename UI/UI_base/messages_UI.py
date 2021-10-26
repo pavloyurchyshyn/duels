@@ -6,7 +6,8 @@ from pygame import Surface
 from pygame.draw import lines
 from settings.window_settings import MAIN_SCREEN
 from common_things.global_clock import GLOBAL_CLOCK
-from settings.screen_size import X_SCALE, Y_SCALE
+# from settings.screen_size import X_SCALE, Y_SCALE
+X_SCALE, Y_SCALE = 1, 1
 
 
 class Messager(Rectangle):
@@ -76,6 +77,9 @@ class Messager(Rectangle):
         return y
 
     def add_message(self, text, msg_time=None, color=(255, 255, 255), font_size=None):
+        if not text:
+            return
+
         text = Text(f"{text}", screen=self.surface, color=color, font_size=font_size)
         msg_time = msg_time if msg_time else self.message_time
 

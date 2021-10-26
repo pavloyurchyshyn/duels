@@ -1,5 +1,5 @@
 from settings.window_settings import MAIN_SCREEN
-from settings.screen_size import GAME_SCALE
+# from settings.screen_size import GAME_SCALE
 from settings.default_common_settings import DEFAULT_CROSSHAIR_SIZE
 from common_things.save_and_load_json_config import get_param_from_cgs, save_param_to_cgs
 from common_things.sprites_functions import get_surface
@@ -18,7 +18,7 @@ from math import cos, sin, radians
 
 
 class Mouse:
-    MOUSE_SIZE = (DEFAULT_CROSSHAIR_SIZE * GAME_SCALE, DEFAULT_CROSSHAIR_SIZE * GAME_SCALE)
+    MOUSE_SIZE = (DEFAULT_CROSSHAIR_SIZE, DEFAULT_CROSSHAIR_SIZE)#(DEFAULT_CROSSHAIR_SIZE * GAME_SCALE, DEFAULT_CROSSHAIR_SIZE * GAME_SCALE)
     MAIN_SCREEN = MAIN_SCREEN
 
     def __init__(self, rel=None, pos=None, pressed=None):

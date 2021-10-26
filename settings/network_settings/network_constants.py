@@ -12,7 +12,7 @@ BAD_PASSWORD = 'Bad password {}'
 
 # server game constants
 WAITING_PLAYERS = 'waiting_players'
-
+DISCONNECT = 'disconnect'
 # CONSTANTS
 IP = 'ip'
 PORT = 'port'
@@ -63,3 +63,6 @@ ARENA_DATA = 'arena_data'
 
 ADD_OBJECTS = 'new_objects'
 DELETE_OBJECTS = 'dlt_objects'
+
+# COMMANDS TO SERVER
+STOP_SERVER = 'stop_server'

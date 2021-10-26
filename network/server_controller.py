@@ -6,6 +6,8 @@ from settings.network_settings.network_settings import *
 from settings.network_settings.network_constants import *
 import time
 from common_things.save_and_load_json_config import get_param_from_cgs
+from _thread import *
+from common_things.loggers import LOGGER
 
 
 class ServerController:
@@ -21,14 +23,17 @@ class ServerController:
         self.update_parameters()
         arguments = self.get_arguments()
         arguments = ['python', os.path.join(ROOT_OF_GAME, SERVER_FILE_NAME), *arguments]
-        logging.info('Server started.')
-        logging.info(f'Arguments.{arguments}')
-        self._server_process = subprocess.Popen(arguments, stdin=subprocess.PIPE)
+        LOGGER.info('Server started.')
+        LOGGER.info(f'Arguments.{arguments}')
+        self._server_process = subprocess.Popen(arguments)
 
     def stop_server(self):
+        start_new_thread(self.__terminate, ())
+
+    def __terminate(self):
         if self._server_process:
-            self._server_process.stdin.write('stop'.encode())
-            self._server_process.stdin.flush()
+            # self._server_process.stdin.write('stop'.encode())
+            # self._server_process.stdin.flush()
             time.sleep(5)
             self._server_process.terminate()
         self._server_process = None
@@ -41,8 +46,9 @@ class ServerController:
                      ]
 
         for key, values in SERVER_ARGUMENTS.items():
-            arguments.append(key)
-            arguments.append(str(values[0]))
+            if key not in arguments:
+                arguments.append(key)
+                arguments.append(str(values[0]))
 
         return arguments
 

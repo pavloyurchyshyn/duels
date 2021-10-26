@@ -1,4 +1,6 @@
-from settings.screen_size import X_SCALE, Y_SCALE
+# from settings.screen_size import X_SCALE, Y_SCALE
+X_SCALE, Y_SCALE = 1, 1
+
 from UI.UI_base.button_UI import Button
 from common_things.sound_loader import GLOBAL_MUSIC_PLAYER
 from settings.colors import WHITE, GREY_DARK_2

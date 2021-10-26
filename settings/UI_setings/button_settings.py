@@ -1,4 +1,5 @@
-from settings.screen_size import X_SCALE, Y_SCALE
+#from settings.screen_size import X_SCALE, Y_SCALE
+X_SCALE, Y_SCALE = 1, 1
 DEFAULT_BUTTON_X_SIZE = int(150 * X_SCALE)
 DEFAULT_BUTTON_HALF_X_SIZE = DEFAULT_BUTTON_X_SIZE // 2
 DEFAULT_BUTTON_Y_SIZE = int(50 * Y_SCALE)

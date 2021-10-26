@@ -1,6 +1,7 @@
 from settings.global_parameters import set_start_round_stage, set_main_menu_settings_stage, set_exit_stage, set_multiplayer_menu_stage
 
-from settings.screen_size import HALF_SCREEN_W, HALF_SCREEN_H, SCREEN_H, SCREEN_W, X_SCALE, Y_SCALE
+from settings.screen_size import HALF_SCREEN_W, HALF_SCREEN_H, SCREEN_H, SCREEN_W# , X_SCALE, Y_SCALE
+
 from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE
 
 from common_things.global_clock import ROUND_CLOCK
@@ -13,7 +14,7 @@ def start_game():
 
 MAIN_MENU_BUTTONS = {
     'start': {
-        'args': (HALF_SCREEN_W - DEFAULT_BUTTON_X_SIZE // 2, 500 * Y_SCALE),
+        'args': (HALF_SCREEN_W - DEFAULT_BUTTON_X_SIZE // 2, int(SCREEN_H * 0.455)),
         'kwargs': {
             'active': 1,
             'text': 'START',

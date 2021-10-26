@@ -5,7 +5,7 @@ from settings.network_settings.network_settings import GAME_TICK_RATE, END_ROUND
     TIME_TO_START_ROUND, WAIT_FOR_PLAYERS_TIME
 from settings.network_settings.network_constants import *
 from time import time, sleep
-from player_and_spells.player.player_object import NetworkPlayerObject
+from player_and_spells.player.network_player_object import NetworkPlayerObject
 import json
 from _thread import start_new_thread
 
@@ -119,6 +119,8 @@ class ServerGame:
 
     def ROUND(self):
         self.ARENA.update()
+        self.data_which_sending_to_players.clear()
+
         self.get_players_response_and_update_players(players_disabled=self.clock.time < 0)
         self.data_which_sending_to_players = self.updated_players_data_dict
         self.update_data_which_sending_by_server_actions()
@@ -178,6 +180,9 @@ class ServerGame:
 
                 new_player_data = self.server.str_to_json(new_player_data)
 
+                if player_hash == self.server.admin_access_key:
+                    self.check_for_admin_commands_to_server(new_player_data)
+
                 if player.alive:
                     player.angle = new_player_data.get(ANGLE)
                     commands = () if players_disabled else new_player_data.get('keyboard', ())
@@ -198,7 +203,7 @@ class ServerGame:
                 else:
                     if revise_after_death:
                         player.position = player.spawn_position
-                        player.hp = player.full_health_points
+                        player.revise()
 
                     player_action = player.update()
                     self.updated_players_data_dict[player_hash] = {
@@ -209,6 +214,11 @@ class ServerGame:
                         DEAD: player.dead,
                         REVISE: revise_after_death,
                     }
+
+    def check_for_admin_commands_to_server(self, player_data):
+        if player_data.get(STOP_SERVER, False):
+            self.logger.info('Server stopped by admin.')
+            self.server.stop_server()
 
     def ROUND_FINISHED(self):
         if self.round != self.max_number_of_rounds:
@@ -238,13 +248,15 @@ class ServerGame:
     def prepare_spawn_positions(self):
         number_of_players_in_team = self.server.max_number_of_players // 2 + 1
         arena_x_size = arena_y_size = self.ARENA._size
+        border_size = self.ARENA.BORDER_SIZE
         player_size = self.server.player_size
         arena_y_half_size = arena_y_size // 2
 
         for team_name in self.teams_names:
             self.teams_spawn_positions[team_name] = []
 
-        for team, dx_position in (('red', player_size * 2), ('blue', arena_x_size - player_size * 2)):
+        for team, dx_position in (
+                ('red', player_size * 2 + border_size), ('blue', arena_x_size - player_size * 2 - border_size)):
             # for 3 players position_k is [-2, -1, 0, 1, 2]
             for position_k in range(-(number_of_players_in_team // 2 + 1), number_of_players_in_team // 2 + 2):
                 self.teams_spawn_positions[team].append(

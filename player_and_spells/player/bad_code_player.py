@@ -1,7 +1,7 @@
 from player_and_spells.player.base_player import BasePlayer
 
 from pygame.constants import *
-from pygame import key, transform
+from pygame import transform
 from pygame.draw import circle, line
 
 from UI.UI_base.animation import Animation
@@ -10,20 +10,17 @@ from math import atan2, cos, sin, degrees, dist
 
 from settings.players_settings.player_settings import *
 from settings.screen_size import Y_SCALE, X_SCALE
-from settings.global_parameters import GLOBAL_SETTINGS
 from settings.colors import BLOOD_COLOR
 from settings.window_settings import MAIN_SCREEN
-from settings.default_keys import INTERACT_C, \
-    UP_C, LEFT_C, RIGHT_C, DOWN_C, \
-    SPELL_1_C, SPRINT_C, GRAB_C, DROP_C, RELOAD_C, \
-    WEAPON_1_C, WEAPON_2_C, WEAPON_3_C, SELF_DAMAGE
+from settings.default_keys import UP_C, LEFT_C, RIGHT_C, DOWN_C, \
+    SPRINT_C
 from settings.common_settings import COMMON_GAME_SETTINGS_JSON_PATH as CGSJP
 
 # global things
-from UI.camera import GLOBAL_CAMERA
+from common_things.camera import GLOBAL_CAMERA
 
 from common_things.global_clock import ROUND_CLOCK
-from common_things.save_and_load_json_config import get_parameter_from_json_config, change_parameter_in_json_config
+from common_things.save_and_load_json_config import get_parameter_from_json_config
 from player_and_spells.player.player_images import NORMAL_PLAYER_IMGS
 
 

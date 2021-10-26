@@ -1,20 +1,17 @@
-from settings.init_pygame import *
-
 from pygame.time import Clock
 from pygame import event as EVENT
 from pygame import key as KEY
 from pygame import quit as PY_QUIT
-from pygame import QUIT, K_ESCAPE, MOUSEBUTTONDOWN
-from pygame import display, draw, Surface, constants, mouse, key
+from pygame import K_ESCAPE, MOUSEBUTTONDOWN
+from pygame import display, constants, mouse
 
 from settings.colors import WHITE
 from settings.common_settings import DEFAULT_FONT, VERSION
-from settings.window_settings import MAIN_SCREEN, MAIN_SCREEN_RECT, SCREEN_H, SCREEN_W  # main screen of all game
+from settings.window_settings import MAIN_SCREEN, MAIN_SCREEN_RECT  # main screen of all game
 
 from common_things.global_clock import GLOBAL_CLOCK
 from common_things.global_mouse import GLOBAL_MOUSE
-from UI.camera import Camera
-from time import time
+from common_things.camera import Camera
 from sys import exit as SYS_EXIT
 
 display.set_caption(f'Boss Fight V{VERSION}')
@@ -36,8 +33,7 @@ def update_fps():
 
 el_pos = list(mouse.get_pos())
 
-from settings.arena_settings import STANDARD_ARENA_SIZE, STANDARD_ARENA_BORDER_SIZE, \
-    ELEMENT_SIZE, SUB_CELL_SIZE
+from settings.arena_settings import STANDARD_ARENA_SIZE, ELEMENT_SIZE
 from pygame import Rect, draw, transform, image, error, Surface
 
 PLAYER_SIZE = 45

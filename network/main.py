@@ -10,8 +10,7 @@ from settings.window_settings import MAIN_SCREEN as main_screen
 
 from settings.colors import WHITE
 from settings.common_settings import DEFAULT_FONT as font
-from settings.common_settings import FPS, VERSION
-from settings.window_settings import SCREEN_H, SCREEN_W
+from settings.common_settings import VERSION
 import time
 pg.display.set_caption(f'Boss Fight V{VERSION}')
 
@@ -59,10 +58,9 @@ def avg(fps):
 
 clock = pg.time.Clock()
 from player_and_spells.player.player import Player
-from UI.camera import Camera
+from common_things.camera import Camera
 from player_and_spells.player.simple_player import SimplePlayer as SPlayer
 from network.network import Network
-import pickle
 
 net = Network()
 camera = Camera(100, 100)

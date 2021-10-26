@@ -1,6 +1,6 @@
 from settings.players_settings.player_pic_and_anim import *
 from settings.colors import PLAYERS_COLORS
-from settings.screen_size import GAME_SCALE
+# from settings.screen_size import GAME_SCALE
 
 from common_things.img_loader import recolor_picture, load_image, load_animation
 
@@ -8,7 +8,7 @@ from common_things.img_loader import recolor_picture, load_image, load_animation
 class PlayerImagesManager:
     def __init__(self, size=None):
         self.size = size if size else PLAYER_SIZE
-        self.size = int(self.size * GAME_SCALE)
+        self.size = int(self.size)# * GAME_SCALE)
         self.pic_size = (self.size, self.size)
 
         self.raw_body = load_image(BODY_IMAGE, size=self.pic_size)

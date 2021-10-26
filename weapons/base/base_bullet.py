@@ -1,17 +1,18 @@
 from obj_properties.base_projectile import Projectile
 from obj_properties.lazy_load_mixin import PictureLazyLoadMixin
 from settings.weapon_settings.base_bullet import *
-from settings.game_objects_constants import *
-from UI.camera import GLOBAL_CAMERA
+from common_things.camera import GLOBAL_CAMERA
 from math import degrees
-from settings.game_objects_constants import BULLETS_TYPE
-from settings.game_objects_constants import SIMPLE_BULLET
+from settings.weapon_settings.types_and_names import BULLETS_TYPE, SIMPLE_BULLET
+from settings.game_objects_constants import ANGLE_CHANGE_P_SEC, STOP_FORCE_K, STOP_FORCE_VALUE
+from settings.all_types_and_names import add_type_and_name_to_collectors
 
 
 class SimpleBullet(Projectile, PictureLazyLoadMixin):
     TYPE = BULLETS_TYPE
-    DEFAULT_PICTURE_PATH = DEFAULT_BULLET_PICTURE
+    PICTURE_PATH = DEFAULT_BULLET_PICTURE
     NAME = SIMPLE_BULLET
+    add_type_and_name_to_collectors(TYPE, NAME)
 
     def __init__(self, x, y,
                  angle: float,
@@ -33,22 +34,16 @@ class SimpleBullet(Projectile, PictureLazyLoadMixin):
         self._picture = SimpleBullet.PICTURE
         self._main_screen = SimpleBullet.MAIN_SCREEN
         self._picture_rotate = SimpleBullet.ROTATE  # pygame transform.rotate
-
+        PictureLazyLoadMixin.__init__(self)
         self.size: tuple = (size, size)
         self.owner = owner
-        self.draw = self.__draw if self._picture else self.__lazy_load
 
         self.damage = damage if damage else DEFAULT_BULLET_DAMAGE
 
     def update(self):
         self._update()
 
-    def __lazy_load(self):
-        self._lazy_load_picture()
-        self.draw = self.__draw
-        self.draw()
-
-    def __draw(self):
+    def _draw(self):
         dx, dy = GLOBAL_CAMERA.camera
         x, y = self.int_position
 
@@ -69,4 +64,6 @@ class SimpleBullet(Projectile, PictureLazyLoadMixin):
             ANGLE_CHANGE_P_SEC: self._angle_change,
             STOP_FORCE_K: self._stop_force_k,
             STOP_FORCE_VALUE: self._stop_force_value,
+            'NAME': self.NAME,
+            'TYPE': self.TYPE,
         }

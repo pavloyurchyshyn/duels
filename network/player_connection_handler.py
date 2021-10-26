@@ -1,22 +1,21 @@
 from socket import socket
 from settings.network_settings.network_settings import CONNECTION_TIMEOUT
-from common_things.global_clock import ROUND_CLOCK
+from time import time
 
 
 class ConnectionHandler:
     def __init__(self, connection: socket):
         self.connection: socket = connection
-        self._timeout = 0
+        self._last_successful_send = time()
 
     def send(self, data):
         try:
             self.connection.send(data)
         except Exception as e:
-            self._timeout += ROUND_CLOCK.d_time
-            if CONNECTION_TIMEOUT < self._timeout:
+            if CONNECTION_TIMEOUT < time() - self._last_successful_send:
                 raise TimeoutError('Connection lost')
         else:
-            self._timeout = 0
+            self._last_successful_send = time()
 
     def recv(self, size=2048):
         return self.connection.recv(size)

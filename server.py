@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 import logging
 import datetime
 import json
-from player_and_spells.player.player_object import NetworkPlayerObject
+from player_and_spells.player.network_player_object import NetworkPlayerObject
 import signal
 from network.server_game import ServerGame
 from network.player_connection_handler import ConnectionHandler
@@ -17,8 +17,17 @@ ROOT_OF_GAME = os.getcwd()
 LOGS_FOLDER = os.path.join(ROOT_OF_GAME, 'logs')
 START = datetime.datetime.today().strftime("%Y-%m-%d-%H.%M.%S")
 
-logging.basicConfig(filename=f"{LOGS_FOLDER}/{START}_server_logs.txt", level=0)
-LOGGER = logging.getLogger(__name__)
+logging.basicConfig(level=0)
+file = logging.FileHandler(filename=f"{LOGS_FOLDER}/{START}_server_logs.txt")
+
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file.setFormatter(formatter)
+
+LOGGER = logging.getLogger(__file__)
+for hdlr in LOGGER.handlers[:]:  # remove all old handlers
+    LOGGER.removeHandler(hdlr)
+
+LOGGER.addHandler(file)
 
 
 class Server:
@@ -32,7 +41,6 @@ class Server:
         arguments = arg_parser.parse_args()
 
         self.player_size = int(arguments.player_size)
-
         self.game_password = arguments.password
         self.max_number_of_players = int(arguments.players_number)
         self.server_port = int(arguments.port)
@@ -40,8 +48,8 @@ class Server:
         self.rounds_number = int(arguments.rounds)
         self.game_mode = arguments.game_mode
         self.team_names = arguments.team_names.replace(' ', '').split(',')
-        self.admin_access_key = int(arguments.admin) if arguments.admin != 'None' else '_'
-
+        self.admin_access_key = str(arguments.admin) if arguments.admin != 'None' else '_'
+        self.admins_list = list(filter(bool, self.admin_access_key.split(',')))
         self.number_of_connected_players = 0
 
         self.spectators = []
@@ -102,7 +110,10 @@ class Server:
 
                 client_data = self.str_to_json(player_connection.recv(2048).decode())
                 network_access_key = client_data.get(NETWORK_ACCESS_KEY)
-                self.change_admin_access_key(network_access_key, player_hash)
+                if network_access_key in self.players_connections:
+                    network_access_key = player_hash
+
+                self.check_for_admin_access_key(network_access_key, player_hash)
 
                 if network_access_key in self.ban_list:
                     server_response_data[SERVER_MESSAGE] = 'You Banned.'
@@ -147,23 +158,13 @@ class Server:
 
                     player_connection.send(self.json_to_str(server_response_data))
 
-    def wait_for_stop_signal(self):
-        while 1:
-            try:
-                arguments = sys.stdin.readline()
-                if 'stop' in str(arguments):
-                    self.stop_server()
-                    break
-
-            except Exception as e:
-                LOGGER.error(e)
-            sleep(5)
-
     def connect_client_as_player(self, server_response_data, client_data, player_connection, player_hash):
         nickname = self.get_nickname(client_data[NICKNAME], player_hash=player_hash)
         team = self.get_team()
-        player = NetworkPlayerObject(*self.SERVER_GAME.get_spawn_position(team), team=team,
-                                     arena=self.SERVER_GAME.ARENA)
+        spawn_position = self.SERVER_GAME.get_spawn_position(team)
+        player = NetworkPlayerObject(*spawn_position, team=team,
+                                     arena=self.SERVER_GAME.ARENA,
+                                     spawn_position=spawn_position)
 
         if team in self.teams:
             self.teams[team].append(player_hash)
@@ -190,16 +191,26 @@ class Server:
                     f' Nickname {nickname}.'
                     f' Color: {client_data.get("player_color")}')
 
-    def change_admin_access_key(self, player_hash, new_hash):
+    def check_for_admin_access_key(self, player_hash, new_hash):
         if self.admin_access_key == player_hash:
             self.admin_access_key = new_hash
+            self.admins_list.append(new_hash)
+            if player_hash in self.admins_list:
+                self.admins_list.remove(player_hash)
+            LOGGER.info(f'Admin connected {new_hash}')
+
+        elif player_hash in self.admins_list:
+            self.admins_list.append(new_hash)
+            LOGGER.info(f'Admin connected {new_hash}')
+            if player_hash in self.admins_list:
+                self.admins_list.remove(player_hash)
 
     def get_team(self) -> str:
         if self.game_mode == CLASSIC_GAME_MODE:
             team = None
-            members_number = -1
+            members_number = 999
             for team_, players in self.teams.items():
-                if len(players) >= members_number:
+                if len(players) < members_number:
                     members_number = len(players)
                     team = team_
 
@@ -237,20 +248,24 @@ class Server:
         server_response[POSITION] = player.position
         server_response[ANGLE] = player.angle
         server_response[HEALTH_POINTS] = player.health_points
-        server_response[NETWORK_ACCESS_KEY] = player_hash
+        server_response[NETWORK_ACCESS_KEY] = network_access_key
         server_response[SERVER_MESSAGE] = 'Successfully reconnected.'
 
-        self.players_simple_data[player_hash] = {PLAYER_SKIN: player_data.get(PLAYER_SKIN),
+        self.players_simple_data[network_access_key] = {PLAYER_SKIN: player_data.get(PLAYER_SKIN),
                                                  NICKNAME: nickname,
                                                  TEAM: player.team,
                                                  }
 
-        self.players_connections[player_hash] = player_connection
+        self.players_connections[network_access_key] = player_connection
         self.player_connected_in_past.remove(network_access_key)
-        self.players_objects[player_hash] = self.players_objects.pop(network_access_key)
+        # self.players_objects[network_access_key] = self.players_objects.pop(network_access_key)
 
     def run_game_logic(self):
-        self.game_thread_id = start_new_thread(self.SERVER_GAME.run_game, ())
+        try:
+            self.game_thread_id = start_new_thread(self.SERVER_GAME.run_game, ())
+        except Exception as e:
+            LOGGER.error(e)
+            self.stop_server()
 
     def get_nickname(self, nickname, player_hash=None) -> str:
         if player_hash in self.players_names:
@@ -265,7 +280,9 @@ class Server:
 
     def stop_server(self):
         self.alive = False
-        self.disconnect_all_players()
+        LOGGER.info('Stopping server')
+        LOGGER.info('Disconnecting all players')
+        self.disconnect_all_players('Server stopped.')
         try:
             self.socket.close()
             self.socket_opened = 0
@@ -274,12 +291,18 @@ class Server:
         except Exception as e:
             LOGGER.error(f'Failed to stop server. {e}')
 
-    def disconnect_all_players(self):
+    def disconnect_all_players(self, msg_to_players='All players disconnected'):
+        data_to_players = self.json_to_str({DISCONNECT: True, SERVER_MESSAGE: msg_to_players})
         for player_hash in self.players_connections.copy():
             try:
+                self.players_connections[player_hash].send(data_to_players)
+            except Exception as e:
+                LOGGER.exception(f'Failed to send data to {player_hash} before disconnect.\n\n{e}')
+
+            try:
                 self.disconnect_player(player_hash)
-            except Exception:
-                pass
+            except Exception as e:
+                LOGGER.exception(f'Error while disconnecting {player_hash}: \n\n{e}')
 
     def disconnect_player(self, player_hash, ban_player=False):
         LOGGER.info(f'Disconnecting player {player_hash}.')
@@ -298,7 +321,10 @@ class Server:
 
     def stop_game_processor(self):
         if self.game_thread_id:
-            os.kill(self.game_thread_id, signal.SIGKILL)
+            # try:
+            #     os.kill(self.game_thread_id, signal.SIGKILL)
+            # except Exception as e:
+            #     LOGGER.error(e)
             self.game_thread_id = None
 
     @staticmethod

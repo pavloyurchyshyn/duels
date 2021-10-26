@@ -18,7 +18,7 @@ class Circle(CollideInterface):
 
         self._collide_able = 1
 
-    def _change_position(self, xy: tuple) -> None:
+    def _change_position(self, xy: tuple, make_dots=False) -> None:
         """
         Changing position of object center.
 
@@ -26,7 +26,8 @@ class Circle(CollideInterface):
         :return:
         """
         self._center = xy
-        # self._make_dots()
+        if make_dots:
+            self._make_dots()
 
     @abstractmethod
     def make_original_size(self):
