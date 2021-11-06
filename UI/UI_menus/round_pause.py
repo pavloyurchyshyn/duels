@@ -3,12 +3,13 @@ from UI.UI_buttons.test_draw import TEST_DRAW_BUTTON
 
 from common_things.global_keyboard import GLOBAL_KEYBOARD
 
-from settings.colors import HALF_EMPTY_L
 from settings.UI_setings.menus_settings.round_pause import ROUND_PAUSE_BUTTONS, \
-    PAUSE_MAIN_SCREEN_COPY, PAUSE_SCREEN
-from settings.global_parameters import GLOBAL_SETTINGS
-from settings.game_stages_constants import CURRENT_STAGE, ROUND_STAGE, MAIN_MENU_STAGE
-from settings.window_settings import MAIN_SCREEN
+    PAUSE_MAIN_SCREEN_COPY
+
+from common_things.stages import Stages
+from settings.game_stages_constants import ROUND_PAUSE_STAGE
+
+set_main_menu_stage = Stages().set_main_menu_stage
 
 
 class RoundPause(MenuUI):
@@ -16,7 +17,7 @@ class RoundPause(MenuUI):
 
     def __init__(self):
         super().__init__(buttons=ROUND_PAUSE_BUTTONS, buttons_objects=[TEST_DRAW_BUTTON, ],
-                         background_color=self.Pause_back_color, transparent=1)
+                         background_color=self.Pause_back_color, transparent=1, name=ROUND_PAUSE_STAGE)
         self.create_buttons()
         self._exit_warning = False
 
@@ -81,8 +82,7 @@ class RoundPause(MenuUI):
             else:
                 if self._exit_yes.click(xy):
                     self.deactivate_exit_buttons()
-                    GLOBAL_SETTINGS[CURRENT_STAGE] = MAIN_MENU_STAGE
-                    return
+                    set_main_menu_stage()
 
                 else:
                     self.deactivate_exit_buttons()

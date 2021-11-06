@@ -14,9 +14,9 @@ from common_things.global_clock import ROUND_CLOCK
 X_SCALE, Y_SCALE, GAME_SCALE = 1, 1, 1
 
 from settings.screen_size import HALF_SCREEN_W, HALF_SCREEN_H
-from settings.global_parameters import GLOBAL_SETTINGS, pause_step, pause_available, set_multiplayer_menu_stage, \
-    set_multiplayers_round_stage, set_multiplayers_disconnect_stage, set_multiplayers_round_pause_stage, \
-    set_main_menu_stage
+from settings.global_parameters import GLOBAL_SETTINGS, pause_step, pause_available
+
+from common_things.stages import Stages
 from settings.window_settings import MAIN_SCREEN
 from settings.network_settings.network_constants import *
 
@@ -31,7 +31,7 @@ class MultiplayerStage:
         self._server_controller = None
         self._network: Network = None
         self._network_access_key = None
-        self._multiplayer_cell: ArenaCell = None
+        self._arena_cell: ArenaCell = None
         self._this_multiplayer_player: SimplePlayer = None
 
         self._keyboard = GLOBAL_KEYBOARD
@@ -60,6 +60,8 @@ class MultiplayerStage:
                                        draw_surface_every_time=False, message_time=5,
                                        background_color=(0, 0, 0, 0))
 
+        self.stages_controller = Stages()
+
     def MULTIPLAYER_CLIENT_CONNECT(self):
         self._network = Network()
         server_response = self._network.connect()
@@ -74,7 +76,7 @@ class MultiplayerStage:
             if CURRENT_ROUND in server_response:
                 self.update_round(server_response[CURRENT_ROUND])
 
-            self._multiplayer_cell = ArenaCell(server_response[ARENA_DATA], draw_grid=True)
+            self._arena_cell = ArenaCell(server_response[ARENA_DATA], draw_grid=True)
 
             x, y = server_response.get(POSITION, (100, 100))
             self._this_multiplayer_player = SimplePlayer(x=int(x * X_SCALE), y=int(y * Y_SCALE), follow_mouse=True)
@@ -86,11 +88,11 @@ class MultiplayerStage:
 
             self._other_multiplayer_players_objects.clear()
 
-            set_multiplayers_round_stage()
+            self.stages_controller.set_multiplayers_round_stage()
 
         else:
             MULTIPLAYER_UI.network_messager.add_message(server_response.get(SERVER_MESSAGE))
-            set_multiplayer_menu_stage()
+            self.stages_controller.set_multiplayer_menu_stage()
 
     def UPDATE(self, pause=False):
         data_to_send = {
@@ -111,7 +113,7 @@ class MultiplayerStage:
 
         except Exception as e:
             LOGGER.error(f"Failed to receive server response with error:\n\t {e}")
-            set_multiplayers_disconnect_stage()
+            self.stages_controller.set_multiplayers_disconnect_stage()
             self._global_messager.add_message('Server connection lost')
 
         else:
@@ -119,17 +121,17 @@ class MultiplayerStage:
                 self.winner_message.add_message(data_from_server[ROUND_WINNER])
 
             if data_from_server.get('disconnect', False):
-                set_multiplayers_disconnect_stage()
+                self.stages_controller.set_multiplayers_disconnect_stage()
 
             self.update_score(data_from_server.get(TEAM_SCORES))
             self.update_round(data_from_server.get(CURRENT_ROUND))
             ROUND_CLOCK.set_time(*data_from_server.get(SERVER_TIME, (-999, -999)))
             self._round_timer_Text.change_text(ROUND_CLOCK.timer_format)
 
-            self._multiplayer_cell.draw()
+            self._arena_cell.draw()
             self.add_new_objects(data_from_server)
             self.delete_objects(data_from_server)
-            self._multiplayer_cell.update()
+            self._arena_cell.update()
 
             self.process_server_action(data_from_server=data_from_server)
 
@@ -145,13 +147,13 @@ class MultiplayerStage:
 
             if data_from_server.get(DISCONNECT, 0):
                 self._global_messager.add_message(data_from_server.get(SERVER_MESSAGE, ''))
-                set_multiplayers_disconnect_stage()
+                self.stages_controller.set_multiplayers_disconnect_stage()
 
         self._this_multiplayer_player.draw()
 
         if GLOBAL_KEYBOARD.ESC and pause_available():
             pause_step()
-            set_multiplayers_round_pause_stage()
+            self.stages_controller.set_multiplayers_round_pause_stage()
             self._network_last_data['keyboard'] = {}
 
         self.winner_message.update()
@@ -179,12 +181,12 @@ class MultiplayerStage:
     def add_new_objects(self, data_from_server):
         if ADD_OBJECTS in data_from_server:
             for object_data in data_from_server[ADD_OBJECTS]:
-                self._multiplayer_cell.add_object(object_data, from_server=1)
+                self._arena_cell.add_object(object_data, from_server=1)
 
     def delete_objects(self, data_from_server):
         if DELETE_OBJECTS in data_from_server:
             for key in data_from_server[DELETE_OBJECTS]:
-                self._multiplayer_cell.delete_object_by_key(obj_key=key)
+                self._arena_cell.delete_object_by_key(obj_key=key)
 
     def update_this_player(self, players_data):
         if self._network_access_key in players_data:
@@ -258,12 +260,12 @@ class MultiplayerStage:
             self._network.send(data={STOP_SERVER: True})
         self._other_multiplayer_players_objects.clear()
         self._this_multiplayer_player = None
-        self._multiplayer_cell = None
+        self._arena_cell = None
         self._server_controller = None
         self._network = None
         self._network_access_key = None
 
-        set_main_menu_stage()
+        self.stages_controller.set_main_menu_stage()
 
 
 GLOBAL_MUL_STAGE = MultiplayerStage()

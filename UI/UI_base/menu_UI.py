@@ -6,17 +6,22 @@ from obj_properties.rect_form import Rectangle
 from settings.window_settings import SCREEN_W, SCREEN_H, MAIN_SCREEN
 
 from UI.UI_base.button_UI import Button
+from UI.UI_controller import UI_TREE
 from common_things.global_mouse import GLOBAL_MOUSE
 
 
 class MenuUI(Rectangle):
     CLICK_DELAY = 0.2  # -------------->||
+    NEXT_CLICK = 1
+
     SCREEN_W = SCREEN_W
     SCREEN_H = SCREEN_H
 
     GLOBAL_MOUSE = GLOBAL_MOUSE
+    UI_CONTROLLER = UI_TREE
 
     def __init__(self,
+                 name,
                  buttons: dict = {},
                  buttons_objects: list = [],
 
@@ -36,7 +41,7 @@ class MenuUI(Rectangle):
                  ):
 
         super().__init__(x=x, y=y, size_x=size_x, size_y=size_y)
-
+        self.name = name
         # --------- BACKGROUND ------------------
         self._background_t = transparent
         self._background_color = background_color
@@ -58,6 +63,12 @@ class MenuUI(Rectangle):
         self._picture = picture
         self._x_pic = x_pic
         self._y_pic = y_pic
+
+    def add_elements_to_controller(self, *elements, enter_focus=None):
+        UI_TREE.add_menu(self, *elements, enter_focus=enter_focus)
+
+    def drop_focused(self):
+        UI_TREE.drop_focused()
 
     @abstractmethod
     def _update(self):
@@ -123,10 +134,12 @@ class MenuUI(Rectangle):
 
         return surface
 
-    def click(self) -> bool or int:
-        if self.GLOBAL_MOUSE.lmb:
-            if self.next_click < self._clock.time:
-                self.next_click = self._clock.time + self.CLICK_DELAY
+    @classmethod
+    def click(cls) -> bool or int:
+        if cls.GLOBAL_MOUSE.lmb:
+            if cls.NEXT_CLICK < GLOBAL_CLOCK.time:
+                cls.NEXT_CLICK = GLOBAL_CLOCK.time + cls.CLICK_DELAY
+                UI_TREE.drop_focused()
                 return 1
 
         return 0

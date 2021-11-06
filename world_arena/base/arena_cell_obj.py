@@ -1,10 +1,10 @@
 from obj_properties.rect_form import Rectangle
 from settings.arena_settings import STANDARD_ARENA_SIZE, STANDARD_ARENA_BORDER_SIZE, ELEMENT_SIZE
 from common_things.common_objects_lists_dicts import BULLETS_LIST, WALLS_SET, \
-    ITEMS_LIST, PLAYERS_LIST, UNITS_LIST, PARTICLE_LIST, DOORS_LIST, BREAKABLE_WALLS, ALL_OBJECT_DICT
+    ITEMS_LIST, UNITS_LIST, PARTICLE_LIST, DOORS_LIST, BREAKABLE_WALLS, ALL_OBJECT_DICT, NEW_OBJECTS, DEAD_OBJECTS
 # from settings.screen_size import GAME_SCALE
 from settings.weapon_settings.types_and_names import BULLETS_TYPE
-from settings.all_objects_names_classes_dict import ALL_NAMES_OBJECTS_DICT
+from common_things.object_creator import add_object
 
 
 class ArenaCellObject(Rectangle):
@@ -47,8 +47,8 @@ class ArenaCellObject(Rectangle):
         self.all_objects_counter = 1
         self.dead_objects_keys = set()
 
-        self._dead_objects = []
-        self._new_objects = []
+        self._dead_objects = DEAD_OBJECTS
+        self._new_objects = NEW_OBJECTS
         # if not self.server_instance:
         #     from settings.screen_size import X_SCALE, Y_SCALE
         #     self._x_scale = X_SCALE
@@ -75,8 +75,7 @@ class ArenaCellObject(Rectangle):
             self._dead_objects.extend(self.dead_objects_keys)
 
         while self.dead_objects_keys:
-            key = self.dead_objects_keys.pop()
-            self.delete_object_by_key(obj_key=key)
+            self.delete_object_by_key(obj_key=self.dead_objects_keys.pop())
 
     def delete_object_by_key(self, obj_key):
         if obj_key in self.all_objects_dict:
@@ -85,27 +84,7 @@ class ArenaCellObject(Rectangle):
                 self._bullets.remove(obj)
 
     def add_object(self, obj_data, from_server=False):
-        obj_global_key = obj_data.get('key')
-        if not obj_global_key:
-            obj_global_key = self.all_objects_counter
-            self.all_objects_counter += 1
-
-        if from_server:
-            obj_data['data']['x'] = obj_data['data']['x']  # * self._x_scale
-            obj_data['data']['y'] = obj_data['data']['y']  # * self._y_scale
-
-        obj = ALL_NAMES_OBJECTS_DICT.get(obj_data['name'])(**obj_data['data'], arena=self)
-        obj.KEY = obj_global_key
-
-        if obj.TYPE == BULLETS_TYPE:
-            self._bullets.append(obj)
-
-        self.all_objects_dict[obj_global_key] = obj
-
-        obj_data['key'] = obj_global_key
-
-        if self.server_instance:
-            self._new_objects.append(obj_data)
+        add_object(self, obj_data, from_server)
 
     def can_go(self):
         # TODO
@@ -165,5 +144,7 @@ class ArenaCellObject(Rectangle):
     def __del__(self):
         for objects_pull in (self._bullets, self._doors, self._breakable_walls,
                              self._walls, self._items, self._units,
-                             self._particles, self.all_objects_dict):
+                             self._particles, self.all_objects_dict,
+                             self._dead_objects, self._new_objects
+                             ):
             objects_pull.clear()

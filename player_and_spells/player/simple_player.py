@@ -62,6 +62,7 @@ class SimplePlayer(BasePlayer):
 
         main_screen = self.MAIN_SCREEN
         if self.under_player_circle:
+            print('draw', self.under_player_circle)
             self.under_player_circle.draw(dx=dx, dy=dy)
 
         img_copy = transform.rotate(self.image, -degrees(self._angle))

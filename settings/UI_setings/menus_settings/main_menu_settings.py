@@ -1,4 +1,4 @@
-from settings.global_parameters import set_main_menu_stage
+from common_things.stages import Stages
 from settings.window_settings import SCREEN_W
 from settings.window_settings import MAIN_SCREEN
 from settings.colors import WHITE, GREY_DARK_2, GREY_BLUE, GREY_RED, GREY_GREEN, PLAYERS_COLORS
@@ -11,7 +11,7 @@ from UI.UI_buttons.mute_music_button import MUTE_MUSIC_BUTTON
 from UI.UI_base.button_UI import Button
 from UI.UI_base.input_element_UI import InputElement
 
-from common_things.save_and_load_json_config import get_parameter_from_json_config, change_parameter_in_json_config
+from common_things.save_and_load_json_config import get_parameter_from_json_config, save_param_to_cgs
 from common_things.img_loader import normalize_color
 from player_and_spells.player.simple_player import SimplePlayer
 #from settings.screen_size import X_SCALE, Y_SCALE
@@ -23,13 +23,13 @@ def reload_color():
     face_color = normalize_color((int(FACE_INPUT_R.text), int(FACE_INPUT_G.text), int(FACE_INPUT_B.text), 255))
     body_color = normalize_color((int(BODY_INPUT_R.text), int(BODY_INPUT_G.text), int(BODY_INPUT_B.text), 255))
     PLAYER_PIC.update_color(body_color=body_color, face_color=face_color)
-    change_parameter_in_json_config('player_skin', {'body': body_color, 'face': face_color}, CGSJP)
+    save_param_to_cgs('player_skin', {'body': body_color, 'face': face_color})
 
 
 __player_color = get_parameter_from_json_config('player_skin', CGSJP, def_value=PLAYERS_COLORS['blue'])
 f_r, f_g, f_b = __player_color['face'][:3]
 b_r, b_g, b_b = __player_color['body'][:3]
-change_parameter_in_json_config('player_skin', __player_color, CGSJP)
+save_param_to_cgs('player_skin', __player_color)
 PLAYER_PIC = SimplePlayer(1500 * X_SCALE, 200 * Y_SCALE, turn_off_camera=True, size=PLAYER_SIZE * 5,
                           player_color=__player_color, follow_mouse=1, draw_health_points=False, arena=None)
 
@@ -146,7 +146,7 @@ MAIN_MENU_SETTINGS_BUTTONS = {
             'x': SCREEN_W - 55 * X_SCALE,
             'y': 10 * Y_SCALE,
             'text': 'X',
-            'on_click_action': set_main_menu_stage,
+            'on_click_action': Stages().set_main_menu_stage,
         }
     },
 

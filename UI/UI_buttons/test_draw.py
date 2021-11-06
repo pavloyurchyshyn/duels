@@ -6,8 +6,8 @@ from settings.window_settings import MAIN_SCREEN
 
 
 button = {
-    'x': 50,
-    'y': 50,
+    'p_x_pos': 0.01,
+    'p_y_pos': 0.01,
     'text': 'Turn On TEST_DRAW',
     'non_active_text': 'Turn Off TEST_DRAW',
     'on_click_action': change_test_draw_status,

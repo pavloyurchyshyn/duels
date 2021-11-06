@@ -3,11 +3,12 @@ from UI.UI_buttons.test_draw import TEST_DRAW_BUTTON
 
 from common_things.global_keyboard import GLOBAL_KEYBOARD
 
-from settings.colors import HALF_EMPTY_L
-from settings.UI_setings.menus_settings.mul_round_pause import MUL_ROUND_PAUSE_BUTTONS, \
-    PAUSE_MAIN_SCREEN_COPY, PAUSE_SCREEN
-from settings.global_parameters import GLOBAL_SETTINGS
-from settings.game_stages_constants import CURRENT_STAGE, ROUND_STAGE, MAIN_MENU_STAGE, MULTIPLAYER_CLIENT_DISCONNECT_STAGE
+from settings.UI_setings.menus_settings.mul_round_pause import MUL_ROUND_PAUSE_BUTTONS
+from common_things.stages import Stages
+
+from settings.game_stages_constants import MULTIPLAYER_CLIENT_ROUND_PAUSE_STAGE
+
+set_multiplayers_disconnect_stage = Stages().set_multiplayers_disconnect_stage
 
 
 class MulRoundPause(MenuUI):
@@ -15,7 +16,8 @@ class MulRoundPause(MenuUI):
 
     def __init__(self):
         super().__init__(buttons=MUL_ROUND_PAUSE_BUTTONS, buttons_objects=[TEST_DRAW_BUTTON, ],
-                         background_color=self.Pause_back_color, transparent=1)
+                         background_color=self.Pause_back_color, transparent=1,
+                         name=MULTIPLAYER_CLIENT_ROUND_PAUSE_STAGE)
         self.create_buttons()
         self._exit_warning = False
 
@@ -60,6 +62,7 @@ class MulRoundPause(MenuUI):
             self.surface.blit(self._fade_surface, (0, 0))
 
     def update(self):
+
         if GLOBAL_KEYBOARD.ESC and self._exit_warning:
             self.deactivate_exit_buttons()
 
@@ -80,7 +83,7 @@ class MulRoundPause(MenuUI):
             else:
                 if self._exit_yes.click(xy):
                     self.deactivate_exit_buttons()
-                    GLOBAL_SETTINGS[CURRENT_STAGE] = MULTIPLAYER_CLIENT_DISCONNECT_STAGE
+                    set_multiplayers_disconnect_stage()
                     return
 
                 else:

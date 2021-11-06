@@ -1,7 +1,6 @@
 from _thread import *
 
 from settings.global_parameters import GLOBAL_SETTINGS, pause_step, pause_available
-from settings.global_parameters import set_round_stage, set_round_pause_stage, set_main_menu_stage, set_loading_stage
 from settings.window_settings import MAIN_SCREEN, MAIN_SCREEN_DEF_COLOR
 from settings.UI_setings.menus_settings.round_pause import PAUSE_MAIN_SCREEN_COPY
 
@@ -11,6 +10,7 @@ from settings.game_stages_constants import CURRENT_STAGE, MAIN_MENU_STAGE, MAIN_
     MULTIPLAYER_CLIENT_ROUND_PAUSE_STAGE, MULTIPLAYER_CLIENT_ROUND_STAGE, \
     HOST_SERVER_STAGE, EXIT_STAGE, MULTIPLAYER_CLIENT_CONNECT_ROUND_STAGE, LOADING_STAGE
 
+from UI.UI_controller import UI_TREE
 from UI.UI_menus.main_menu import MAIN_MENU_UI
 from UI.UI_menus.main_menu_settings import MAIN_MENU_SETTINGS_UI
 from UI.UI_menus.round_pause import ROUND_PAUSE_UI
@@ -23,6 +23,7 @@ from world_arena.base.arena_cell import ArenaCell
 
 from player_and_spells.player.commands_player import Player
 
+from common_things.stages import Stages
 from common_things.global_keyboard import GLOBAL_KEYBOARD
 from common_things.global_clock import ROUND_CLOCK
 from common_things.global_mouse import GLOBAL_MOUSE
@@ -81,27 +82,32 @@ class GameBody:
 
         self._global_messager = GLOBAL_MESSAGER
 
+        self.STAGE_CONTROLLER = Stages()
+
     def game_loop(self):
         """
         Main part of game. Runs stages.
         """
-        if self._g_settings[CURRENT_STAGE] in self._fill_screen_stages:
+        if self.STAGE_CONTROLLER.current_stage in self._fill_screen_stages:
             MAIN_SCREEN.fill(MAIN_SCREEN_DEF_COLOR)
 
         self._music_player.update()
-        self.stages[self._g_settings[CURRENT_STAGE]]()
+        self.stages[self.STAGE_CONTROLLER.current_stage]()
         self._check_alt_and_f4()
         self._global_messager.update()
         self._global_messager.draw()
+        UI_TREE.update()
+        UI_TREE.draw()
 
     def ROUND_PAUSE(self):
         if GLOBAL_KEYBOARD.ESC and pause_available():
             pause_step()
-            set_round_stage()
+            self.STAGE_CONTROLLER.set_round_stage()
 
         ROUND_PAUSE_UI.update()
         ROUND_PAUSE_UI.draw()
         if GLOBAL_SETTINGS[CURRENT_STAGE] == MAIN_MENU_STAGE:
+            del self._ARENA
             self._ARENA = None
             self._PLAYER = None
 
@@ -117,18 +123,17 @@ class GameBody:
 
         if GLOBAL_KEYBOARD.ESC and pause_available():
             pause_step()
-            set_round_pause_stage()
+            self.STAGE_CONTROLLER.set_round_pause_stage()
             PAUSE_MAIN_SCREEN_COPY.blit(MAIN_SCREEN, (0, 0))
             ROUND_PAUSE_UI.draw_round()
 
         ROUND_PAUSE_BUTTON.draw()
         if GLOBAL_MOUSE.lmb:
-            xy = GLOBAL_MOUSE.pos
-            ROUND_PAUSE_BUTTON.click(xy)
+            ROUND_PAUSE_BUTTON.click(GLOBAL_MOUSE.pos)
 
     def PREPARE_TO_ROUND(self):
         start_new_thread(self.__load_round, (self,))
-        set_loading_stage()
+        self.STAGE_CONTROLLER.set_loading_stage()
 
     def LOADING(self):
         LOADING_MENU_UI.update()
@@ -141,11 +146,11 @@ class GameBody:
             self._PLAYER = Player(500, 500, arena=self._ARENA)
             self._round_clock.reload()
         except Exception as e:
-            set_main_menu_stage()
+            self.STAGE_CONTROLLER.set_main_menu_stage()
             self._global_messager.add_message(text='Failed to load round')
             self._global_messager.add_message(text=f'{e}')
         else:
-            set_round_stage()
+            self.STAGE_CONTROLLER.set_round_stage()
 
     def MAIN_MENU(self) -> None:
         """
@@ -167,7 +172,7 @@ class GameBody:
     def MULTIPLAYER_MENU(self):
         if GLOBAL_KEYBOARD.ESC and pause_available():
             pause_step()
-            set_main_menu_stage()
+            self.STAGE_CONTROLLER.set_main_menu_stage()
 
         MULTIPLAYER_UI.update()
         MULTIPLAYER_UI.draw()
@@ -176,9 +181,9 @@ class GameBody:
         SERVER_CONTROLLER.run_server()
         if GLOBAL_KEYBOARD.ESC and pause_available():
             pause_step()
-            self._g_settings[CURRENT_STAGE] = MULTIPLAYER_CLIENT_DISCONNECT_STAGE
+            self.STAGE_CONTROLLER.set_multiplayers_disconnect_stage()
 
-        self._g_settings[CURRENT_STAGE] = MULTIPLAYER_CLIENT_CONNECT_ROUND_STAGE
+        self.STAGE_CONTROLLER.set_multiplayer_client_connect_round_stage()
 
     @staticmethod
     def MULTIPLAYER_CLIENT_CONNECT():

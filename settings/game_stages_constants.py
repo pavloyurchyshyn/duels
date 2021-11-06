@@ -1,3 +1,4 @@
+
 CURRENT_STAGE = 'current_stage'
 
 TEST_DRAW_CONST = 'test_draw'
@@ -26,3 +27,5 @@ MULTIPLAYER_CLIENT_STAGE = 'multiplayer_client'
 EXIT_STAGE = 'exit'
 
 LOADING_STAGE = 'loading'
+
+MENUS_STAGES_LISTS = [MAIN_MENU_STAGE, MAIN_MENU_SETTINGS_STAGE]

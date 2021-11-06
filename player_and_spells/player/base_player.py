@@ -66,7 +66,7 @@ class BasePlayer(Circle):
         self.color = player_skin if player_skin else get_param_from_cgs(PLAYER_SKIN, def_value='blue')
         self.image = None
         self.face_anim = None
-        self.under_player_circle = kwargs.get('under_player_circle_color')
+        self.under_player_circle = kwargs.get('under_circle_color')
         self._draw_health_points = kwargs.get('draw_health_points', True)
 
         if kwargs.get('load_images'):

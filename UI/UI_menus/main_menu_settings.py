@@ -6,18 +6,25 @@ from common_things.global_keyboard import GLOBAL_KEYBOARD
 from settings.UI_setings.menus_settings.main_menu_settings import MAIN_MENU_SETTINGS_BUTTONS, \
     MUSIC_VOLUME_VALUE, VOLUME_PROGRESS_BAR, MUTE_MUSIC_BUTTON, PLAYER_PIC, COLORS_INPUTS_LIST
 
-from settings.global_parameters import pause_available, pause_step, set_main_menu_stage
+from settings.global_parameters import pause_available, pause_step
+from common_things.stages import Stages
+
+from settings.game_stages_constants import MAIN_MENU_SETTINGS_STAGE
+
+set_main_menu_stage = Stages().set_main_menu_stage
 
 
 class MainMenuSettings(MenuUI):
     def __init__(self):
-        super().__init__(buttons=MAIN_MENU_SETTINGS_BUTTONS)
+        super().__init__(buttons=MAIN_MENU_SETTINGS_BUTTONS, name=MAIN_MENU_SETTINGS_STAGE)
         self.create_buttons()
 
         self._chosen_button = None
         self._music_volume_value = MUSIC_VOLUME_VALUE
+        self.add_elements_to_controller(*self._buttons, *COLORS_INPUTS_LIST)
 
     def update(self):
+
         for inp_el in COLORS_INPUTS_LIST:
             inp_el.update()
 

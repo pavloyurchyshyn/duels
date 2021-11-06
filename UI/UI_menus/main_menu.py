@@ -6,31 +6,45 @@ from common_things.global_keyboard import GLOBAL_KEYBOARD
 from settings.colors import BLACK, HALF_EMPTY
 from settings.UI_setings.menus_settings.main_menu import MAIN_MENU_BUTTONS
 from settings.global_parameters import pause_available, pause_step
+from settings.game_stages_constants import MAIN_MENU_STAGE
 
 
 class MainMenu(MenuUI):
     def __init__(self):
-        super().__init__(buttons=MAIN_MENU_BUTTONS, buttons_objects=[TEST_DRAW_BUTTON, ])
+        super().__init__(buttons=MAIN_MENU_BUTTONS, buttons_objects=[TEST_DRAW_BUTTON, ], name=MAIN_MENU_STAGE)
         self.create_buttons()
         self._exit_warning = False
         self._fade_surface = self.get_surface(transparent=True)
         self._fade_surface.fill(HALF_EMPTY)
         self._fade_surface.convert_alpha()
+        self.add_elements_to_controller(*self._elements, enter_focus=self.start)
 
     def activate_exit_warning_message(self):
         self._exit_yes.make_active()
         self._exit_yes.make_visible()
         self._exit_no.make_active()
         self._exit_no.make_visible()
+
         self._exit_warning = 1
 
+        self.start.make_inactive()
+        self.multiplayer.make_inactive()
+        self._settings.make_inactive()
+        self._exit.make_inactive()
+
     def deactivate_exit_warning_message(self):
+        self._exit_warning = 0
+
+        self._surface.fill(BLACK)
         self._exit_yes.make_inactive()
         self._exit_yes.make_invisible()
         self._exit_no.make_inactive()
         self._exit_no.make_invisible()
-        self._exit_warning = 0
-        self._surface.fill(BLACK)
+
+        self.start.make_active()
+        self.multiplayer.make_active()
+        self._settings.make_active()
+        self._exit.make_active()
 
     def update(self):
         for button in self._elements:
@@ -42,10 +56,12 @@ class MainMenu(MenuUI):
         if GLOBAL_KEYBOARD.ESC and pause_available() and not self._exit_warning:
             pause_step()
             self.activate_exit_warning_message()
+            self.drop_focused()
 
         elif GLOBAL_KEYBOARD.ESC and pause_available() and self._exit_warning:
             pause_step()
             self.deactivate_exit_warning_message()
+            self.drop_focused()
 
         if self.click():
             xy = self.GLOBAL_MOUSE.pos

@@ -8,13 +8,15 @@ from settings.UI_setings.menus_settings.multiplayer import MULTIPLAYER_BUTTONS, 
 from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE, DEFAULT_BUTTON_Y_SIZE
 from pygame.draw import line as DrawLine
 from UI.UI_base.messages_UI import Messager
+from settings.game_stages_constants import MULTIPLAYER_MENU_STAGE
+
 # from settings.screen_size import X_SCALE, Y_SCALE
 X_SCALE, Y_SCALE = 1, 1
 
 
 class Multiplayer(MenuUI):
     def __init__(self):
-        super().__init__(buttons=MULTIPLAYER_BUTTONS)
+        super().__init__(buttons=MULTIPLAYER_BUTTONS, name=MULTIPLAYER_MENU_STAGE)
         self.create_buttons()
         self._exit_warning = False
         self._fade_surface = self.get_surface(transparent=True)
@@ -30,6 +32,7 @@ class Multiplayer(MenuUI):
                                          transparent=0, background_color=(1, 1, 1, 255))
 
     def update(self):
+
         PASSWORD_INPUT_CLIENT.update()
         self._server_pswrd.update()
 

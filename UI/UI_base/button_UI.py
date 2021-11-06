@@ -6,6 +6,7 @@ from pygame.constants import SRCALPHA
 from pygame import draw
 
 from UI.UI_base.text_UI import Text
+from UI.UI_controller import UI_TREE
 from common_things.global_clock import GLOBAL_CLOCK
 from common_things.font_loader import DEFAULT_FONT_SIZE
 
@@ -13,9 +14,11 @@ from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE, \
     DEFAULT_BUTTON_Y_SIZE, DEFAULT_CLICK_DELAY, DEFAULT_BORDER_WIDTH, CLICK_ANIMATION_DURATION
 from settings.colors import simple_colors
 from settings.global_parameters import GLOBAL_SETTINGS
-from settings.window_settings import MAIN_SCREEN
+from settings.window_settings import MAIN_SCREEN, SCREEN_W, SCREEN_H
+
 # from settings.window_settings import Y_SCALE, X_SCALE
 X_SCALE, Y_SCALE = 1, 1
+
 
 class Button(Rectangle):
     HELP_TEXT_TIME = 3
@@ -24,11 +27,12 @@ class Button(Rectangle):
     CLICK_DELAY = DEFAULT_CLICK_DELAY
     CLOCK = GLOBAL_CLOCK
     MAIN_SCREEN = MAIN_SCREEN
-
+    UI_TREE = UI_TREE
     CLICK_ANIMATION_DUR = CLICK_ANIMATION_DURATION
 
-    def __init__(self, x: int, y: int,
-                 screen,
+    def __init__(self, x: int = None, y: int = None,
+                 p_x_pos=None, p_y_pos=None,  # percent depends on screen size
+                 screen=MAIN_SCREEN,
 
                  size_x: int = 0, size_y: int = 0,
 
@@ -64,9 +68,18 @@ class Button(Rectangle):
 
                  click_delay=1,
                  time_b_click=None,
+                 id=None,
                  **kwargs):
-        x = int(x)
-        y = int(y)
+
+        self.id = id
+
+        x = int(x) if x else int(p_x_pos * SCREEN_W)
+        if not x:
+            raise Exception(f'{text} X position not defined')
+        y = int(y) if y else int(p_y_pos * SCREEN_H)
+        if not y:
+            raise Exception(f'{text} Y position not defined')
+
         size_x = int(size_x * X_SCALE) if size_x else Button.BUTTON_X_SIZE
         size_y = int(size_y * Y_SCALE) if size_y else Button.BUTTON_Y_SIZE
         pic_x = int(pic_x * X_SCALE)
@@ -90,7 +103,8 @@ class Button(Rectangle):
         self._non_active_text_text = non_active_text if non_active_text else text
         self._original_text_size = text_size if text_size else DEFAULT_FONT_SIZE
         self._text_size = self._original_text_size
-        self._text_x, self._text_y = int(text_x*X_SCALE) if text_x else text_x, int(text_y*Y_SCALE) if text_y else text_y
+        self._text_x, self._text_y = int(text_x * X_SCALE) if text_x else text_x, int(
+            text_y * Y_SCALE) if text_y else text_y
 
         self._active_text_color = text_color
         self._inactive_text_color = text_non_active_color
@@ -215,6 +229,8 @@ class Button(Rectangle):
         self._screen = screen
 
     def click(self, xy, *args, **kwargs):
+        self.UI_TREE.drop_focused()
+
         if self._active and self.collide_point(xy):
             self._clicked = 1
 
@@ -320,10 +336,10 @@ class Button(Rectangle):
         self._visible = 0
 
     def make_active(self):
-        self.active = 1
+        self._active = 1
 
     def make_inactive(self):
-        self.active = 0
+        self._active = 0
 
     @property
     def text(self):

@@ -6,7 +6,6 @@ from common_things.global_keyboard import GLOBAL_KEYBOARD
 from common_things.global_clock import GLOBAL_CLOCK
 from common_things.font_loader import DEFAULT_FONT_SIZE
 
-
 from settings.window_settings import MAIN_SCREEN
 from settings.colors import YELLOW, WHITE, GREY
 from settings.global_parameters import GLOBAL_SETTINGS
@@ -41,11 +40,12 @@ class InputElement(Rectangle):
                  active_border_color=WHITE,
                  non_active_border_width=DEFAULT_BORDER_WIDTH,
                  non_active_border_color=GREY,
-
                  on_change_action=None,
+                 id=None,
                  ):
         x = int(x)
         y = int(y)
+        self.id = id
         size_x = int(size_x*X_SCALE) if size_x else self.DEF_X_SIZE
         size_y = int(size_y*Y_SCALE) if size_y else self.DEF_Y_SIZE
         super().__init__(x, y, size_x, size_y)

@@ -151,3 +151,11 @@ class Rectangle(CollideInterface):
     @property
     def left_top(self):
         return self.x0, self.y0
+
+    @property
+    def sizes(self):
+        return self.size_x, self.size_y
+
+    @property
+    def center(self):
+        return self._center
