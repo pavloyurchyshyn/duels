@@ -1,8 +1,11 @@
 from interfaces.collide_interfaces import CollideInterface
 from abc import abstractmethod
+from obj_properties.properties_constants import CIRCLE_TYPE, RECT_TYPE, SEMI_CIRCLE_TYPE, LINE_TYPE
 
 
 class Rectangle(CollideInterface):
+    FORM_TYPE = RECT_TYPE
+
     def __init__(self, x, y, size_x, size_y=None):
         """
         Rect objects for collisions.
@@ -74,7 +77,7 @@ class Rectangle(CollideInterface):
         self.y1 = y + self.size_y
         self._make_dots()
 
-    def _change_position(self, xy: tuple):
+    def _change_position(self, xy: tuple, make_dots=None):
         """
         XY -> center of object
 
@@ -126,7 +129,6 @@ class Rectangle(CollideInterface):
     # if at least one dot inside rect
     def collide_dots(self, other) -> bool:
         for point in other._dots:
-            # x, y = point
             if self.collide_point(point):
                 return True
 
@@ -134,12 +136,16 @@ class Rectangle(CollideInterface):
 
     def collide(self, other) -> bool:
         if self._collide_able:
-            if other.size > self._size:
-                return other.collide(self)
-            else:
+            if other.FORM_TYPE == self.FORM_TYPE:
                 return self.collide_dots(other)
 
-        return False
+            elif other.FORM_TYPE == CIRCLE_TYPE:
+                return self.collide_circle(other._center, other._size)
+
+            elif other.FORM_TYPE == LINE_TYPE:
+                return other.collide_rect(self)
+
+        return 0
 
     @property
     def dots(self):

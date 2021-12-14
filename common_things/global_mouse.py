@@ -53,7 +53,7 @@ class Mouse:
 
     def update(self):
         self._rel = self.mouse.get_rel()
-        self._pos = self.mouse.get_pos()
+        self._pos = [*self.mouse.get_pos()]
         self._pressed = self.mouse.get_pressed()
         self._scroll_top = 0
         self._scroll_bot = 0

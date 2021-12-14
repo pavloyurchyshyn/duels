@@ -2,9 +2,10 @@ from abc import abstractmethod
 
 
 class CollideInterface:
+    FORM_TYPE = None
 
     @abstractmethod
-    def _change_position(self, xy: list) -> None:
+    def _change_position(self, xy: list, *args, **kwargs) -> None:
         raise NotImplementedError
 
     # did point inside object
@@ -32,3 +33,4 @@ class CollideInterface:
 
     def __contains__(self, item):
         return all(map(self.collide_point, item.dots))
+

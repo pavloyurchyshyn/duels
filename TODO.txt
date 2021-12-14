@@ -4,3 +4,6 @@ Split stages to classes
 
 add messages like bad ip value
 
+player step becomes to 0
+
+range weapon, melee weapon and 3 spells

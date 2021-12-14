@@ -13,7 +13,7 @@ from common_things.font_loader import DEFAULT_FONT_SIZE
 from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE, \
     DEFAULT_BUTTON_Y_SIZE, DEFAULT_CLICK_DELAY, DEFAULT_BORDER_WIDTH, CLICK_ANIMATION_DURATION
 from settings.colors import simple_colors
-from settings.global_parameters import GLOBAL_SETTINGS
+from settings.global_parameters import test_draw_status_is_on
 from settings.window_settings import MAIN_SCREEN, SCREEN_W, SCREEN_H
 
 # from settings.window_settings import Y_SCALE, X_SCALE
@@ -29,6 +29,7 @@ class Button(Rectangle):
     MAIN_SCREEN = MAIN_SCREEN
     UI_TREE = UI_TREE
     CLICK_ANIMATION_DUR = CLICK_ANIMATION_DURATION
+    TYPE = 'button'
 
     def __init__(self, x: int = None, y: int = None,
                  p_x_pos=None, p_y_pos=None,  # percent depends on screen size
@@ -289,7 +290,7 @@ class Button(Rectangle):
             # else:
             #     self._screen.blit(self._r_non_active_button, (self.x0 + dx, self.y0 + dy))
 
-            if GLOBAL_SETTINGS['test_draw']:
+            if test_draw_status_is_on():
                 color = simple_colors['yellow']
                 for dotx, doty in self._dots[1:]:
                     draw.circle(Button.MAIN_SCREEN, color, (dotx + dx, doty + dy), 2)

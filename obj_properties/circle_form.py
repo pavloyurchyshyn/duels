@@ -1,31 +1,39 @@
 from math import sin, cos, radians, dist
 from interfaces.collide_interfaces import CollideInterface
 from abc import abstractmethod
+from obj_properties.properties_constants import CIRCLE_TYPE, RECT_TYPE, SEMI_CIRCLE_TYPE, LINE_TYPE
 
 
 class Circle(CollideInterface):
     """
     Circle object.
     """
+    FORM_TYPE = CIRCLE_TYPE
 
-    def __init__(self, x: int, y: int, R: int, dots_angle: bool = False) -> None:
+    def __init__(self, x: int, y: int, R: int, dots_angle: bool or int = False, angle=0) -> None:
         self._original_size: float = R  # radius
         self._size: float = R  # radius
         self.h_size = R / 2
         self._center: list = [x, y]
         self._dots: list = []
         self._make_dots = self.__make_dots_with_angle if dots_angle else self.__make_dots
-
+        self._angle = angle
         self._collide_able = 1
+        self._make_dots()
 
-    def _change_position(self, xy: tuple, make_dots=False) -> None:
+    def _change_position(self, xy: tuple, make_dots=0, angle=None) -> None:
         """
         Changing position of object center.
 
         :param xy: tuple(int, int)
         :return:
         """
-        self._center = xy
+        if angle:
+            self._angle = angle
+
+        if self._center != xy:
+            self._center = xy
+
         if make_dots:
             self._make_dots()
 
@@ -56,13 +64,13 @@ class Circle(CollideInterface):
         self._dots.clear()
         x, y = self._center
         self._dots.append(self._center)
+        if self._size >= 1:
+            size = self._size
 
-        size = self._size
-
-        for angle in range(0, 360, 30):
-            x1: int = int(x + cos(radians(angle)) * size)
-            y1: int = int(y + sin(radians(angle)) * size)
-            self._dots.append((x1, y1))
+            for angle in range(0, 360, 30):
+                x1: int = int(x + cos(radians(angle)) * size)
+                y1: int = int(y + sin(radians(angle)) * size)
+                self._dots.append((x1, y1))
 
     def collide_circle(self, xy: tuple, R) -> bool:
         """
@@ -105,13 +113,20 @@ class Circle(CollideInterface):
         :param other:
         :return: bool
         """
-        # if other.size > self.size:
-        #     return other.collide(self)
-        # else:
+
         if self._collide_able:
+            if other.FORM_TYPE == self.FORM_TYPE:
+                return self.collide_circle(other._center, other._size)
+
+            elif other.FORM_TYPE == RECT_TYPE:
+                return other.collide_circle(self._center, self._size)
+
+            elif other.FORM_TYPE == LINE_TYPE:
+                return other.collide_circle(self._center, self._size)
+
             return self.collide_dots(other)
         else:
-            return False
+            return 0
 
     def get_size(self):
         return self._size

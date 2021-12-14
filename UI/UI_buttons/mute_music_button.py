@@ -7,6 +7,8 @@ from settings.colors import WHITE, GREY_DARK_2
 from settings.window_settings import MAIN_SCREEN
 from UI.UI_buttons.music_volume_progress_bar import VOLUME_PROGRESS_BAR
 
+MUTE_MUSIC_ID = 'music_mute'
+
 
 def mute_music_click():
     if GLOBAL_MUSIC_PLAYER.muted:
@@ -33,5 +35,6 @@ MUTE_MUSIC_BUTTON = Button(**{
     'border_non_active_color': WHITE,
     'text_non_active_color': WHITE,
     'active_pic': not GLOBAL_MUSIC_PLAYER.muted,
-    'screen': MAIN_SCREEN
+    'screen': MAIN_SCREEN,
+    'id': MUTE_MUSIC_ID,
 })

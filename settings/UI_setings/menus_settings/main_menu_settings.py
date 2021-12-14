@@ -13,9 +13,15 @@ from UI.UI_base.input_element_UI import InputElement
 
 from common_things.save_and_load_json_config import get_parameter_from_json_config, save_param_to_cgs
 from common_things.img_loader import normalize_color
-from player_and_spells.player.simple_player import SimplePlayer
-#from settings.screen_size import X_SCALE, Y_SCALE
+from player.simple_player import SimplePlayer
+
+# from settings.screen_size import X_SCALE, Y_SCALE
 X_SCALE, Y_SCALE = 1, 1
+
+SOUND_ADD_ID = 'sound_add'
+SOUND_MINUS_ID = 'sound_minus'
+EXIT_ID = 'exit'
+RELOAD_COLOR_ID = 'change_color'
 
 
 # --------- SKIN SETTINGS ---------------
@@ -34,18 +40,18 @@ PLAYER_PIC = SimplePlayer(1500 * X_SCALE, 200 * Y_SCALE, turn_off_camera=True, s
                           player_color=__player_color, follow_mouse=1, draw_health_points=False, arena=None)
 
 FACE_INPUT_R = InputElement(1250 * X_SCALE, 100 * Y_SCALE, text=f'{f_r}', size_x=50, size_y=40,
-                            text_active_color=GREY_RED)
+                            text_active_color=GREY_RED, id='face_inp_r')
 FACE_INPUT_G = InputElement(1250 * X_SCALE, 150 * Y_SCALE, text=f'{f_g}', size_x=50, size_y=40,
-                            text_active_color=GREY_GREEN)
+                            text_active_color=GREY_GREEN, id='face_inp_g')
 FACE_INPUT_B = InputElement(1250 * X_SCALE, 200 * Y_SCALE, text=f'{f_b}', size_x=50, size_y=40,
-                            text_active_color=GREY_BLUE)
+                            text_active_color=GREY_BLUE, id='face_inp_b')
 
 BODY_INPUT_R = InputElement(1250 * X_SCALE, 300 * Y_SCALE, text=f'{b_r}', size_x=50, size_y=40,
-                            text_active_color=GREY_RED)
+                            text_active_color=GREY_RED, id='body_inp_r')
 BODY_INPUT_G = InputElement(1250 * X_SCALE, 350 * Y_SCALE, text=f'{b_g}', size_x=50, size_y=40,
-                            text_active_color=GREY_GREEN)
+                            text_active_color=GREY_GREEN, id='body_inp_g')
 BODY_INPUT_B = InputElement(1250 * X_SCALE, 400 * Y_SCALE, text=f'{b_b}', size_x=50, size_y=40,
-                            text_active_color=GREY_BLUE)
+                            text_active_color=GREY_BLUE, id='body_inp_b')
 
 COLORS_INPUTS_LIST = [FACE_INPUT_B, FACE_INPUT_G, FACE_INPUT_R, BODY_INPUT_B, BODY_INPUT_G, BODY_INPUT_R]
 
@@ -116,6 +122,8 @@ MUSIC_VOLUME_VALUE = Button(x=50 * X_SCALE, y=100 * Y_SCALE,
                             transparent=1)
 
 # -------------------------------------------------------------
+
+
 MAIN_MENU_SETTINGS_BUTTONS = {
     '_sound_minus': {
         'kwargs': {
@@ -125,6 +133,7 @@ MAIN_MENU_SETTINGS_BUTTONS = {
             'y': 100 * Y_SCALE,
             'text': '-',
             'on_click_action': minus_music_volume,
+            'id': SOUND_ADD_ID,
         }
     },
 
@@ -136,6 +145,7 @@ MAIN_MENU_SETTINGS_BUTTONS = {
             'y': 100 * Y_SCALE,
             'text': '+',
             'on_click_action': add_music_volume,
+            'id': SOUND_MINUS_ID
         }
     },
 
@@ -147,6 +157,7 @@ MAIN_MENU_SETTINGS_BUTTONS = {
             'y': 10 * Y_SCALE,
             'text': 'X',
             'on_click_action': Stages().set_main_menu_stage,
+            'id': EXIT_ID,
         }
     },
 
@@ -155,7 +166,8 @@ MAIN_MENU_SETTINGS_BUTTONS = {
             'x': 1500 * X_SCALE,
             'y': 300 * Y_SCALE,
             'text': 'Reload color',
-            'on_click_action': reload_color
+            'on_click_action': reload_color,
+            'id': RELOAD_COLOR_ID
         }
     }
 

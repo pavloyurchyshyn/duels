@@ -8,6 +8,7 @@ from settings.UI_setings.menus_settings.round_pause import ROUND_PAUSE_BUTTONS, 
 
 from common_things.stages import Stages
 from settings.game_stages_constants import ROUND_PAUSE_STAGE
+from visual.visual_effects_controller import VisualEffectsController
 
 set_main_menu_stage = Stages().set_main_menu_stage
 
@@ -39,7 +40,7 @@ class RoundPause(MenuUI):
         self._exit_warning = 1
         self.draw_round()
 
-        self.surface.blit(self._fade_surface, (0, 0))
+        # self.surface.blit(self._fade_surface, (0, 0))
 
     def deactivate_exit_buttons(self):
         self._exit_yes.make_inactive()
@@ -53,7 +54,7 @@ class RoundPause(MenuUI):
             button.make_active()
 
         self._exit_warning = 0
-        self._surface.fill((0, 0, 0, 0))
+        # self._surface.fill((0, 0, 0, 0))
         self.draw_round()
 
     def draw_round(self, fill=1):

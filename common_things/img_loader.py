@@ -9,8 +9,8 @@ try:
     # maybe another pictures will load
     ERROR_PICTURE = image.load('sprites/error.png').convert_alpha()
     ERROR_PICTURE = transform.rotate(ERROR_PICTURE, 90).convert_alpha()
+
 except:
-    pass
     ERROR_PICTURE = None
 
 
@@ -53,7 +53,7 @@ def _normalize_color(color) -> int:
     elif color < 0:
         return 0
     else:
-        return color
+        return int(color)
 
 
 def normalize_color(color) -> tuple:

@@ -1,0 +1,2 @@
+BAR_X_SIZE = 100
+BAR_Y_SIZE = 50

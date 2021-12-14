@@ -5,7 +5,6 @@ from settings.network_settings.network_settings import GAME_TICK_RATE, END_ROUND
     TIME_TO_START_ROUND, WAIT_FOR_PLAYERS_TIME
 from settings.network_settings.network_constants import *
 from time import time, sleep
-from player_and_spells.player.network_player_object import NetworkPlayerObject
 import json
 from _thread import start_new_thread
 

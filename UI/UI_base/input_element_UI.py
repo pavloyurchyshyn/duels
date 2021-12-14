@@ -1,4 +1,5 @@
 from UI.UI_base.text_UI import Text
+from UI.UI_controller import UI_TREE
 
 from obj_properties.rect_form import Rectangle
 from common_things.global_mouse import GLOBAL_MOUSE
@@ -8,7 +9,8 @@ from common_things.font_loader import DEFAULT_FONT_SIZE
 
 from settings.window_settings import MAIN_SCREEN
 from settings.colors import YELLOW, WHITE, GREY
-from settings.global_parameters import GLOBAL_SETTINGS
+from settings.global_parameters import GLOBAL_SETTINGS, test_draw_status_is_on
+
 # from settings.screen_size import X_SCALE, Y_SCALE
 X_SCALE, Y_SCALE = 1, 1
 
@@ -22,6 +24,7 @@ class InputElement(Rectangle):
     INPUT_DELAY = 0.1
     DEF_X_SIZE = DEFAULT_BUTTON_X_SIZE
     DEF_Y_SIZE = DEFAULT_BUTTON_Y_SIZE
+    TYPE = 'input'
 
     def __init__(self, x, y, size_x=None, size_y=None,
                  surface=None,
@@ -32,6 +35,7 @@ class InputElement(Rectangle):
                  focused_border_color=WHITE,
                  unfocused_border_color=GREY,
                  active=1,
+                 visible=1,
                  autobuild=1,
                  text_active_color=WHITE,
                  text_non_active_color=GREY,
@@ -46,8 +50,9 @@ class InputElement(Rectangle):
         x = int(x)
         y = int(y)
         self.id = id
-        size_x = int(size_x*X_SCALE) if size_x else self.DEF_X_SIZE
-        size_y = int(size_y*Y_SCALE) if size_y else self.DEF_Y_SIZE
+        self.TREE = UI_TREE
+        size_x = int(size_x * X_SCALE) if size_x else self.DEF_X_SIZE
+        size_y = int(size_y * Y_SCALE) if size_y else self.DEF_Y_SIZE
         super().__init__(x, y, size_x, size_y)
         self._mouse = GLOBAL_MOUSE
         self._key = GLOBAL_KEYBOARD
@@ -80,7 +85,8 @@ class InputElement(Rectangle):
         self._focused_b_color = focused_border_color
         self._unfocused_b_color = unfocused_border_color
 
-        self.active = active
+        self._active = active
+        self._visible = visible
 
         self._active_border_w = active_border_width
         self._active_border_color = active_border_color
@@ -94,6 +100,9 @@ class InputElement(Rectangle):
 
         if autobuild:
             self.build()
+
+    def click(self, xy):
+        self._focused = 1
 
     def update(self):
         if self._mouse.lmb:
@@ -124,7 +133,7 @@ class InputElement(Rectangle):
                     self._next_input = self._clock.time + self.INPUT_DELAY
                     self._text_text = self._text_text[:-1]
 
-            if self._key.ENTER or self._key.ESC:
+            if (self._key.ENTER and self.TREE.enter_possible) or self._key.ESC:
                 self._focused = 0
                 self.set_default_text()
 
@@ -140,7 +149,7 @@ class InputElement(Rectangle):
 
     def draw(self, dx=0, dy=0):
         self._surface_to_draw.fill(self._background_color)
-        if self.active:
+        if self._active:
             self._surface_to_draw.blit(self._active_text_surface, (0, 0))
         else:
             self._surface_to_draw.blit(self._non_active_text_surface, (0, 0))
@@ -152,7 +161,7 @@ class InputElement(Rectangle):
 
         MAIN_SCREEN.blit(self._surface_to_draw, (self.x0, self.y0))
 
-        if GLOBAL_SETTINGS['test_draw']:
+        if test_draw_status_is_on():
             for dot in self._dots:
                 draw.circle(MAIN_SCREEN, YELLOW, (dot[0] + dx, dot[1] + dy), 1)
 
@@ -171,6 +180,25 @@ class InputElement(Rectangle):
 
         self._r_text_active.draw()
         self._r_text_non_active.draw()
+
+    def unfocus(self):
+        self._focused = 0
+
+    @property
+    def is_active(self):
+        return self._active
+
+    @property
+    def is_visible(self):
+        return self._visible
+
+    @property
+    def height(self):
+        return self.size_y
+
+    @property
+    def width(self):
+        return self.size_x
 
     @property
     def text(self):

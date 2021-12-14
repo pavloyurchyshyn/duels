@@ -9,7 +9,7 @@ IDLE_TIMES = (1.5, 0.2, 0.2, 0.2)
 RAGE_IMAGES = ('sprites/player/rage/rage_0.png', 'sprites/player/rage/rage_1.png',
                'sprites/player/rage/rage_2.png', 'sprites/player/rage/rage_3.png',
                'sprites/player/rage/rage_4.png', 'sprites/player/rage/rage_5.png',)
-RAGE_TIMES = (0.1, 0.1, 0.1, 0.1, 0.1, 0.1,)
+RAGE_TIMES = (0.2, 0.2, 0.2, 0.2, 0.2, 0.2,)
 
 DYING_IMAGES = ('sprites/player/to_death/to_death_0.png', 'sprites/player/to_death/to_death_1.png',
                 'sprites/player/to_death/to_death_2.png', 'sprites/player/to_death/to_death_3.png',

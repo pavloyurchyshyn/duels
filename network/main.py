@@ -57,9 +57,9 @@ def avg(fps):
 
 
 clock = pg.time.Clock()
-from player_and_spells.player.player import Player
+from player import Player
 from common_things.camera import Camera
-from player_and_spells.player.simple_player import SimplePlayer as SPlayer
+from player.simple_player import SimplePlayer as SPlayer
 from network.network import Network
 
 net = Network()

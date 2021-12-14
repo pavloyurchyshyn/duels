@@ -1,8 +1,3 @@
-
-CURRENT_STAGE = 'current_stage'
-
-TEST_DRAW_CONST = 'test_draw'
-
 MAIN_MENU_SETTINGS_STAGE = 'main_menu_settings'
 
 START_ROUND_STAGE = 'start_round'

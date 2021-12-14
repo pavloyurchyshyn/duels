@@ -1,4 +1,4 @@
-from player_and_spells.player.base_player import BasePlayer
+from player.base_player import BasePlayer
 
 from pygame.constants import *
 from pygame import transform
@@ -21,7 +21,7 @@ from common_things.camera import GLOBAL_CAMERA
 
 from common_things.global_clock import ROUND_CLOCK
 from common_things.save_and_load_json_config import get_parameter_from_json_config
-from player_and_spells.player.player_images import NORMAL_PLAYER_IMGS
+from player.player_images import NORMAL_PLAYER_IMGS
 
 
 class Player(BasePlayer):  # , PhysicalObj):

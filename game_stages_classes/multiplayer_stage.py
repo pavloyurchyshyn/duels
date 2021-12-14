@@ -2,7 +2,7 @@ from network.network import Network
 from network.server_controller import SERVER_CONTROLLER
 from common_things.camera import GLOBAL_CAMERA
 # from player_and_spells.player.commands_player import Player
-from player_and_spells.player.simple_player import SimplePlayer
+from player.simple_player import SimplePlayer
 
 from common_things.global_messager import GLOBAL_MESSAGER
 from common_things.loggers import LOGGER
@@ -10,10 +10,8 @@ from common_things.global_keyboard import GLOBAL_KEYBOARD
 from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.global_clock import ROUND_CLOCK
 
-# from settings.screen_size import X_SCALE, Y_SCALE, GAME_SCALE
-X_SCALE, Y_SCALE, GAME_SCALE = 1, 1, 1
 
-from settings.screen_size import HALF_SCREEN_W, HALF_SCREEN_H
+from settings.screen_size import HALF_SCREEN_W, HALF_SCREEN_H, X_SCALE, Y_SCALE, GAME_SCALE
 from settings.global_parameters import GLOBAL_SETTINGS, pause_step, pause_available
 
 from common_things.stages import Stages
@@ -89,12 +87,13 @@ class MultiplayerStage:
             self._other_multiplayer_players_objects.clear()
 
             self.stages_controller.set_multiplayers_round_stage()
-
+            GLOBAL_CAMERA.follow_player(self._this_multiplayer_player)
         else:
             MULTIPLAYER_UI.network_messager.add_message(server_response.get(SERVER_MESSAGE))
             self.stages_controller.set_multiplayer_menu_stage()
 
     def UPDATE(self, pause=False):
+        raise Exception('Not ready to play')
         data_to_send = {
             'keyboard': tuple(self._keyboard.commands),
             'mouse_data': self._mouse.network_data,
@@ -181,7 +180,7 @@ class MultiplayerStage:
     def add_new_objects(self, data_from_server):
         if ADD_OBJECTS in data_from_server:
             for object_data in data_from_server[ADD_OBJECTS]:
-                self._arena_cell.add_object(object_data, from_server=1)
+                self._arena_cell.add_object(object_data)
 
     def delete_objects(self, data_from_server):
         if DELETE_OBJECTS in data_from_server:
@@ -198,7 +197,7 @@ class MultiplayerStage:
             self._this_multiplayer_player.damage(player_data.get(DAMAGED))
             self._this_multiplayer_player.health_points = player_data.get(HEALTH_POINTS)
             self._this_multiplayer_player.position = player_data[POSITION]
-            GLOBAL_CAMERA.update(player_pos=player_data[POSITION])
+            GLOBAL_CAMERA.update()
 
             commands = player_data.get('keyboard', ())
 
@@ -266,6 +265,6 @@ class MultiplayerStage:
         self._network_access_key = None
 
         self.stages_controller.set_main_menu_stage()
-
+        GLOBAL_CAMERA.unfollow_player()
 
 GLOBAL_MUL_STAGE = MultiplayerStage()

@@ -14,3 +14,5 @@ def get_surface(size_x, size_y=None, transparent: bool = 0, flags=SRCALPHA, colo
 
     surface.convert_alpha()
     return surface
+
+#def get_border()

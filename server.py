@@ -2,13 +2,11 @@ from settings.network_settings.network_settings import *
 import socket
 from _thread import *
 import os
-import sys
 from argparse import ArgumentParser
 import logging
 import datetime
 import json
-from player_and_spells.player.network_player_object import NetworkPlayerObject
-import signal
+from player.network_player_object import NetworkPlayerObject
 from network.server_game import ServerGame
 from network.player_connection_handler import ConnectionHandler
 from time import sleep

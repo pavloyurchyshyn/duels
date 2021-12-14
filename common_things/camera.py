@@ -1,16 +1,23 @@
-from settings.screen_size import SCREEN_H, SCREEN_W, HALF_SCREEN_W, HALF_SCREEN_H#, X_SCALE, Y_SCALE, GAME_SCALE
-from settings.arena_settings import STANDARD_ARENA_SIZE
+from settings.screen_size import SCREEN_H, SCREEN_W, HALF_SCREEN_W, HALF_SCREEN_H
+from settings.arena_settings import STANDARD_ARENA_SIZE, STANDARD_ARENA_Y_SIZE
+from common_things.global_clock import GLOBAL_CLOCK, ROUND_CLOCK
+from math import sin, cos, dist
 
 
 class Camera:
-    def __init__(self, x: int, y: int):
+    def __init__(self, x: int, y: int, round_clock: bool = 1, player=None):
         self.camera_x = x
         self.camera_y = y
+        self._player = player
         self.max_x = SCREEN_W - int(STANDARD_ARENA_SIZE) + 2
-        self.max_y = SCREEN_H - int(STANDARD_ARENA_SIZE) + 2
+        self.max_y = SCREEN_H - int(STANDARD_ARENA_Y_SIZE)
 
-#        self.max_x = SCREEN_W - int(STANDARD_ARENA_SIZE * GAME_SCALE) + 2
-#        self.max_y = SCREEN_H - int(STANDARD_ARENA_SIZE * GAME_SCALE) + 2
+        self._old_player_pos = None
+        self._old_player_angle = None
+
+        self._move_speed = 225
+        self._max_range = 100
+        self._angle_add = 250
 
         self.min_x = 0
         self.min_y = 0
@@ -21,7 +28,22 @@ class Camera:
 
         self.default_camera = [HALF_SCREEN_W - x, HALF_SCREEN_H - y]
         self.current_default_camera = self.default_camera
+
         self._camera = [HALF_SCREEN_W - x, HALF_SCREEN_H - y]
+        self._clock = None
+        self.set_clock(round_clock=round_clock)
+        self._real_position = None
+
+    def unfollow_player(self):
+        self._player = None
+        self._camera = [0, 0]
+        self._real_position = [0, 0]
+
+    def follow_player(self, player):
+        self._player = player
+
+    def set_clock(self, round_clock=1):
+        self._clock = ROUND_CLOCK if round_clock else GLOBAL_CLOCK
 
     def reload(self, x: int, y: int):  # , max_x: int, max_y: int):
         self.__init__(x, y)  # , max_x, max_y)
@@ -44,15 +66,47 @@ class Camera:
     def camera(self):
         return self._camera
 
-    def update(self, player_pos):
-        self.dx += self.old_dx - player_pos[0]
-        self.dy += self.old_dy - player_pos[1]
+    def move_camera(self):
+        if self._camera != self._real_position:
+            for i in range(2):
+                real_pos = self._real_position[i]
+                current_pos = self._camera[i]
+                if current_pos < real_pos:
+                    current_pos += self._move_speed * self._clock.d_time
+                    if current_pos >= real_pos:
+                        current_pos = real_pos
 
-        self._camera = ([int(self.default_camera[0] + self.dx), int(self.default_camera[1] + self.dy)])
+                elif current_pos > real_pos:
+                    current_pos -= self._move_speed * self._clock.d_time
 
-        self.__normalize_camera()
+                    if current_pos <= real_pos:
+                        current_pos = real_pos
 
-        self.old_dx, self.old_dy = player_pos
+                self._camera[i] = current_pos
+
+            self.__normalize_camera()
+
+    def update(self):
+        if self._player and self._player.alive:
+            player_pos = self._player.position
+            player_angle = self._player.angle
+
+            if player_pos != self._old_player_pos:
+                self._real_position = [int(self.default_camera[0] + self.dx), int(self.default_camera[1] + self.dy)]
+
+                self.dx += self.old_dx - player_pos[0]
+                self.dy += self.old_dy - player_pos[1]
+
+                self.old_dx, self.old_dy = player_pos
+                self._old_player_pos = player_pos
+
+            if player_angle is not None:
+                self._real_position = [int(self.default_camera[0] + self.dx), int(self.default_camera[1] + self.dy)]
+
+                self._real_position[0] = self._real_position[0] - cos(player_angle) * self._angle_add
+                self._real_position[1] = self._real_position[1] - sin(player_angle) * self._angle_add
+
+        self.move_camera()
 
 
 GLOBAL_CAMERA = Camera(0, 0)

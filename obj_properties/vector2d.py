@@ -2,7 +2,7 @@ from math import sqrt
 
 
 class Vector_2d:
-    MIN_VALUE = 0.01  # min vector value
+    MIN_VALUE = 0.001  # min vector value
     """
     Simple 2D vector.
     """
@@ -88,6 +88,7 @@ class Vector_2d:
 
         other_vector.x += x
         other_vector.y += y
+        return self
 
     def stop(self) -> None:
         self._x = self._y = 0.0

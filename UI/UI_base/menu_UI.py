@@ -8,6 +8,7 @@ from settings.window_settings import SCREEN_W, SCREEN_H, MAIN_SCREEN
 from UI.UI_base.button_UI import Button
 from UI.UI_controller import UI_TREE
 from common_things.global_mouse import GLOBAL_MOUSE
+from visual.visual_effects_controller import VisualEffectsController
 
 
 class MenuUI(Rectangle):
@@ -36,7 +37,8 @@ class MenuUI(Rectangle):
 
                  picture=None,
                  x_pic=0,
-                 y_pic=0
+                 y_pic=0,
+                 surface=None,
 
                  ):
 
@@ -58,7 +60,7 @@ class MenuUI(Rectangle):
 
         self._elements = []
 
-        self._surface = self.get_surface()
+        self._surface = surface if surface else self.get_surface()
 
         self._picture = picture
         self._x_pic = x_pic

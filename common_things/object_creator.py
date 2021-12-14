@@ -5,18 +5,13 @@ from common_things.common_objects_lists_dicts import *
 
 TYPE_LIST_DICT = {
     BULLETS_TYPE: BULLETS_LIST,
-    WALL_TYPE: WALLS_SET,
 }
 
 
-def add_object(arena, obj_data, from_server=False):
+def add_object(arena, obj_data):
     obj_global_key = obj_data.get('key')
     if not obj_global_key:
         obj_global_key = int(max(ALL_OBJECT_DICT)) + 1 if ALL_OBJECT_DICT else 1
-
-    # if from_server:
-    #     obj_data['data']['x'] = obj_data['data']['x']  # * self._x_scale
-    #     obj_data['data']['y'] = obj_data['data']['y']  # * self._y_scale
 
     obj = ALL_NAMES_OBJECTS_DICT.get(obj_data['name'])(**obj_data['data'], arena=arena)
     obj.KEY = obj_global_key

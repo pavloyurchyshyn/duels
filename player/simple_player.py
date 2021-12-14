@@ -1,16 +1,14 @@
 from settings.players_settings.player_settings import *
 from pygame import mouse, transform, draw
-from UI.UI_base.animation import Animation, RotateAnimation
 
 from math import degrees
 
-from settings.global_parameters import GLOBAL_SETTINGS  # , X_SCALE, Y_SCALE
+from settings.global_parameters import GLOBAL_SETTINGS, test_draw_status_is_on  # , X_SCALE, Y_SCALE
 
-from common_things.camera import GLOBAL_CAMERA
 from common_things.global_clock import GLOBAL_CLOCK
 
 from settings.default_keys import SPELL_1_C
-from player_and_spells.player.base_player import BasePlayer
+from player.base_player import BasePlayer
 
 
 class SimplePlayer(BasePlayer):
@@ -39,7 +37,10 @@ class SimplePlayer(BasePlayer):
             self.face_anim.change_animation('rage')
 
         if self.follow_mouse:
-            self.rotate_to_cursor(mouse.get_pos(), *(0, 0) if self.turn_off_camera else self.camera.camera)
+            mouse_pos = mouse.get_pos()
+            c = self.camera.camera
+            abs_mouse_pos = mouse_pos[0] - c[0], mouse_pos[1] - c[1]
+            self.rotate_to_cursor(abs_mouse_pos)
 
         self.update_circle_under_player()
         self.update_hands_endpoints()
@@ -62,13 +63,12 @@ class SimplePlayer(BasePlayer):
 
         main_screen = self.MAIN_SCREEN
         if self.under_player_circle:
-            print('draw', self.under_player_circle)
             self.under_player_circle.draw(dx=dx, dy=dy)
 
         img_copy = transform.rotate(self.image, -degrees(self._angle))
         main_screen.blit(img_copy, (x0 - img_copy.get_width() // 2 + dx, y0 - img_copy.get_height() // 2 + dy))
 
-        if self.global_settings['test_draw']:
+        if test_draw_status_is_on():
             for dot in self._dots:
                 draw.circle(main_screen, (255, 0, 0), (dot[0] + dx, dot[1] + dy), 3)
 

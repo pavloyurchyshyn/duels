@@ -21,7 +21,7 @@ class MainMenuSettings(MenuUI):
 
         self._chosen_button = None
         self._music_volume_value = MUSIC_VOLUME_VALUE
-        self.add_elements_to_controller(*self._buttons, *COLORS_INPUTS_LIST)
+        self.add_elements_to_controller(*self._buttons, *COLORS_INPUTS_LIST, MUTE_MUSIC_BUTTON)
 
     def update(self):
 

@@ -10,7 +10,7 @@ from world_arena.base.arena_cell_obj import ArenaCellObject
 class ArenaCell(ArenaCellObject):
     def __init__(self, data: dict = {}, draw_grid=False, server_instance=False):
         super().__init__(data=data, server_instance=server_instance)
-        self._PICTURE = self.get_surface(self._size, self._size)  # MAIN SURFACE OF CELL
+        self._PICTURE = self.get_surface(self.size_x, self.size_y)  # MAIN SURFACE OF CELL
         self._PICTURE.fill(GREY_DARK)
 
         if draw_grid:
@@ -20,7 +20,6 @@ class ArenaCell(ArenaCellObject):
         self._update()
 
     def draw(self):
-        # MAIN_SCREEN.blit(self._PICTURE, (*GLOBAL_CAMERA.camera,  SCREEN_W, SCREEN_H))
         MAIN_SCREEN.blit(self._PICTURE, GLOBAL_CAMERA.camera)
 
     def build_cell(self):

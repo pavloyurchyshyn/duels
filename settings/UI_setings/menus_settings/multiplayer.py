@@ -13,7 +13,7 @@ from UI.UI_base.input_element_UI import InputElement
 from UI.UI_base.button_UI import Button
 from UI.UI_base.text_UI import Text
 
-from common_things.save_and_load_json_config import get_parameter_from_json_config, save_param_to_cgs, get_param_from_cgs
+from common_things.save_and_load_json_config import save_param_to_cgs, get_param_from_cgs
 
 import clipboard
 import socket

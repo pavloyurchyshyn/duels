@@ -8,7 +8,8 @@ from pygame import QUIT, K_ESCAPE, MOUSEBUTTONDOWN
 from pygame import display, draw, Surface, constants, mouse
 
 from settings.colors import WHITE
-from settings.common_settings import DEFAULT_FONT, VERSION
+from settings.common_settings import VERSION
+from common_things.font_loader import DEFAULT_FONT
 from settings.window_settings import MAIN_SCREEN, MAIN_SCREEN_RECT, SCREEN_H, SCREEN_W  # main screen of all game
 
 from common_things.global_clock import GLOBAL_CLOCK

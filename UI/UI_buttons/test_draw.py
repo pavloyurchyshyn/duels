@@ -1,7 +1,7 @@
 from UI.UI_base.button_UI import Button
-from settings.global_parameters import GLOBAL_SETTINGS, change_test_draw_status
+from settings.global_parameters import change_test_draw_status
 from settings.colors import WHITE, GREY_GREEN, GREY_RED
-from settings.game_stages_constants import TEST_DRAW_CONST
+from settings.global_parameters import test_draw_status_is_on
 from settings.window_settings import MAIN_SCREEN
 
 
@@ -17,7 +17,7 @@ button = {
     'border_color': GREY_GREEN,
     'border_non_active_color': GREY_RED,
     'text_non_active_color': WHITE,
-    'active_pic': not GLOBAL_SETTINGS[TEST_DRAW_CONST],
+    'active_pic': test_draw_status_is_on,
     'screen': MAIN_SCREEN,
 }
 

@@ -1,16 +1,9 @@
-from settings.global_parameters import GLOBAL_SETTINGS
 from settings.window_settings import HALF_SCREEN_W, HALF_SCREEN_H, MAIN_SCREEN
 from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE
-from settings.game_stages_constants import TEST_DRAW_CONST
 from common_things.stages import Stages
 
 PAUSE_MAIN_SCREEN_COPY = MAIN_SCREEN.copy()
 PAUSE_SCREEN = MAIN_SCREEN.copy()
-
-
-def test_draw():
-    GLOBAL_SETTINGS[TEST_DRAW_CONST] = not GLOBAL_SETTINGS[TEST_DRAW_CONST]
-
 
 ROUND_PAUSE_BUTTONS = {
     '_continue': {

@@ -1,8 +1,7 @@
 from obj_properties.rect_form import Rectangle
-from settings.arena_settings import STANDARD_ARENA_SIZE, STANDARD_ARENA_BORDER_SIZE, ELEMENT_SIZE
-from common_things.common_objects_lists_dicts import BULLETS_LIST, WALLS_SET, \
-    ITEMS_LIST, UNITS_LIST, PARTICLE_LIST, DOORS_LIST, BREAKABLE_WALLS, ALL_OBJECT_DICT, NEW_OBJECTS, DEAD_OBJECTS
-# from settings.screen_size import GAME_SCALE
+from settings.arena_settings import STANDARD_ARENA_SIZE, STANDARD_ARENA_BORDER_SIZE, ELEMENT_SIZE, STANDARD_ARENA_Y_SIZE
+from common_things.common_objects_lists_dicts import BULLETS_LIST, ITEMS_LIST, PARTICLE_LIST_L1,\
+    ALL_OBJECT_DICT, NEW_OBJECTS, DEAD_OBJECTS
 from settings.weapon_settings.types_and_names import BULLETS_TYPE
 from common_things.object_creator import add_object
 
@@ -21,10 +20,10 @@ class ArenaCellObject(Rectangle):
 
     def __init__(self, data: dict = {}, server_instance=False):
         self.server_instance = server_instance
-        self._size = ArenaCellObject.ARENA_SIZE  # if server_instance else int(ArenaCellObject.ARENA_SIZE * GAME_SCALE)
-        self._border_size = ArenaCellObject.BORDER_SIZE  # if server_instance else int(ArenaCellObject.BORDER_SIZE * GAME_SCALE)
+        self._size = ArenaCellObject.ARENA_SIZE
+        self._border_size = ArenaCellObject.ARENA_SIZE * ArenaCellObject.BORDER_SIZE
 
-        super().__init__(x=0, y=0, size_x=self._size)
+        super().__init__(x=0, y=0, size_x=self._size, size_y=STANDARD_ARENA_Y_SIZE)
 
         self._data = data
 
@@ -34,14 +33,9 @@ class ArenaCellObject(Rectangle):
         self.__create_borders()
 
         # -------- LISTS --------
-        self._breakable_walls = BREAKABLE_WALLS
-        self._walls = WALLS_SET
-
-        self._doors = DOORS_LIST
         self._items = ITEMS_LIST
         self._bullets = BULLETS_LIST
-        self._units = UNITS_LIST
-        self._particles = PARTICLE_LIST
+        self._particles = PARTICLE_LIST_L1
 
         self.all_objects_dict = ALL_OBJECT_DICT
         self.all_objects_counter = 1
@@ -49,20 +43,11 @@ class ArenaCellObject(Rectangle):
 
         self._dead_objects = DEAD_OBJECTS
         self._new_objects = NEW_OBJECTS
-        # if not self.server_instance:
-        #     from settings.screen_size import X_SCALE, Y_SCALE
-        #     self._x_scale = X_SCALE
-        #     self._y_scale = Y_SCALE
 
     def update(self):
         self._update()
 
     def _update(self):
-        for door in self._doors.copy():
-            door.update()
-            if not self.server_instance:
-                door.draw()
-
         for bullet in self._bullets.copy():
             bullet.update()
             if bullet.dead:
@@ -83,8 +68,8 @@ class ArenaCellObject(Rectangle):
             if obj.TYPE == BULLETS_TYPE:
                 self._bullets.remove(obj)
 
-    def add_object(self, obj_data, from_server=False):
-        add_object(self, obj_data, from_server)
+    def add_object(self, obj_data):
+        add_object(self, obj_data)
 
     def can_go(self):
         # TODO
@@ -104,13 +89,13 @@ class ArenaCellObject(Rectangle):
         """
         BORDER_POSITIONS = {
             # top border
-            'top': {'x': 0, 'y': 0, 'size_x': self._size, 'size_y': self._border_size},
+            'top': {'x': 0, 'y': 0, 'size_x': self.size_x, 'size_y': self._border_size},
             # right border
-            'right': {'x': self._size - self._border_size, 'y': 0, 'size_x': self._border_size, 'size_y': self._size},
+            'right': {'x': self.size_x - self._border_size, 'y': 0, 'size_x': self._border_size, 'size_y': self._size},
             # bot border
-            'bot': {'x': 0, 'y': self._size - self._border_size, 'size_x': self._size, 'size_y': self._border_size},
+            'bot': {'x': 0, 'y': self.size_y - self._border_size, 'size_x': self.size_x, 'size_y': self._border_size},
             # left border
-            'left': {'x': 0, 'y': 0, 'size_x': self._border_size, 'size_y': self._size},
+            'left': {'x': 0, 'y': 0, 'size_x': self._border_size, 'size_y': self.size_y},
         }
 
         for key in BORDER_POSITIONS:
@@ -142,8 +127,7 @@ class ArenaCellObject(Rectangle):
         return new_obj
 
     def __del__(self):
-        for objects_pull in (self._bullets, self._doors, self._breakable_walls,
-                             self._walls, self._items, self._units,
+        for objects_pull in (self._bullets, self._items,
                              self._particles, self.all_objects_dict,
                              self._dead_objects, self._new_objects
                              ):

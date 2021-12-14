@@ -1,7 +1,7 @@
-from pygame import display, Surface, SRCALPHA, DOUBLEBUF, HWACCEL, FULLSCREEN, SCALED
+from pygame import display, Surface, SRCALPHA, DOUBLEBUF, HWACCEL, FULLSCREEN, SCALED, OPENGL, HWSURFACE
 from settings.screen_size import *
 
-flags = 0#FULLSCREEN | DOUBLEBUF | HWACCEL
+flags = 0#FULLSCREEN | DOUBLEBUF | HWSURFACE
 MAIN_SCREEN_DEF_COLOR = (0, 0, 0)
 
 MAIN_SCREEN = display.set_mode((SCREEN_W, SCREEN_H), flags)

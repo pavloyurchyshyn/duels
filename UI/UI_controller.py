@@ -1,12 +1,14 @@
 from common_things.singletone import Singleton
 from settings.window_settings import MAIN_SCREEN
 from common_things.global_clock import GLOBAL_CLOCK
+from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.global_keyboard import GLOBAL_KEYBOARD
 from settings.default_keys import *
 from pygame.draw import lines
 from pygame import constants
-from math import dist
+from math import dist, cos
 from common_things.stages import Stages
+from common_things.img_loader import normalize_color
 
 
 class UI_controller(metaclass=Singleton):
@@ -18,7 +20,7 @@ class UI_controller(metaclass=Singleton):
 
         self.enter_default_focus = {}
 
-        self.color = [255, 255, 255, 255]
+        self.color = [0, 0, 0]
         self.color_step = -1
 
         self.next_step = 1
@@ -28,16 +30,28 @@ class UI_controller(metaclass=Singleton):
 
         self.get_current_stage = Stages().get_current_stage
         self.current_stage_is_menu = Stages().current_stage_is_menu
+        self.last_interacted = None
 
     def update(self):
+        if GLOBAL_KEYBOARD.ESC:
+            self.drop_focused()
+
         if self.next_enter < 0:
             self.next_enter += GLOBAL_CLOCK.d_time
 
         if self.current_stage_is_menu() and self.get_current_stage() in self.tree:
+
             if self.next_step < 0:
                 self.next_step += GLOBAL_CLOCK.d_time
 
             self.current_menu = self.get_current_stage()
+            if not self.focused_element and self.last_interacted and self.last_interacted.is_active and self.last_interacted.is_visible:
+                self.focused_element = self.last_interacted if self.last_interacted.id in self.tree[
+                    self.current_menu] else None
+
+            mouse_el = self.get_mouse_focus()
+            self.focused_element = mouse_el if mouse_el else self.focused_element
+
             if self.focused_element is None:
                 self.focused_element = self.enter_default_focus.get(self.current_menu)
 
@@ -50,37 +64,53 @@ class UI_controller(metaclass=Singleton):
 
                 if GLOBAL_KEYBOARD.ENTER and self.next_enter >= 0:
                     self.next_enter = -0.5
+                    self.last_interacted = self.focused_element
                     self.focused_element.click(xy=self.focused_element.center)
-
+                    self.drop_focused()
         else:
             self.drop_focused()
 
+    def get_mouse_focus(self):
+        for element in self.tree[self.current_menu].values():
+            if element.is_active and element.is_visible and element.collide_point(GLOBAL_MOUSE.pos):
+                return element
+
+        return None
+
     def move(self):
         if self.next_step > 0:
+
             self.next_step = -self.step_delay
 
             foc_el = self.focused_element
             pressed_keys = GLOBAL_KEYBOARD.pressed
             commands = GLOBAL_KEYBOARD.commands
 
+            focused_element_not_inp = (not self.focused_element) or self.focused_element.TYPE != 'input'
             x = y = 0
-            if pressed_keys[constants.K_UP] or UP_C in commands:
+            if pressed_keys[constants.K_UP] or (UP_C in commands and focused_element_not_inp):
                 y -= 1
-            elif pressed_keys[constants.K_DOWN] or DOWN_C in commands:
+            elif pressed_keys[constants.K_DOWN] or (DOWN_C in commands and focused_element_not_inp):
                 y += 1
 
-            if pressed_keys[constants.K_LEFT] or LEFT_C in commands:
+            if pressed_keys[constants.K_LEFT] or (LEFT_C in commands and focused_element_not_inp):
                 x -= 1
-            elif pressed_keys[constants.K_RIGHT] or RIGHT_C in commands:
+            elif pressed_keys[constants.K_RIGHT] or (RIGHT_C in commands and focused_element_not_inp):
                 x += 1
 
             if x:
                 new = self.__make_x_step(foc_el, x)
                 if new:
+                    if self.focused_element.TYPE == 'input':
+                        self.focused_element.unfocus()
+
                     self.focused_element = new
             elif y:
                 new = self.__make_y_step(foc_el, y)
                 if new:
+                    if self.focused_element.TYPE == 'input':
+                        self.focused_element.unfocus()
+                        
                     self.focused_element = new
 
     def __make_y_step(self, obj, y_step):
@@ -139,15 +169,28 @@ class UI_controller(metaclass=Singleton):
 
         return new_item
 
-    def update_color(self):
-        self.color[-1] += self.color_step * GLOBAL_CLOCK.d_time
-        if self.color[-1] > 255:
-            self.color_step = -1
-            self.color[-1] = 255
+    def get_element(self, *path):
+        res = None
+        for step in path:
+            if res:
+                res = res.get(step)
+            else:
+                res = self.tree[step]
 
-        elif self.color[-1] < 0:
-            self.color_step = 1
-            self.color[-1] = 0
+        return res
+
+    def update_color(self):
+        color = 256 * abs(cos(GLOBAL_CLOCK.time)) #* 0.5
+        self.color = (color, color, color)
+
+        # self.color[-1] += self.color_step * GLOBAL_CLOCK.d_time
+        # if self.color[-1] > 255:
+        #     self.color_step = -1
+        #     self.color[-1] = 255
+        #
+        # elif self.color[-1] < 0:
+        #     self.color_step = 1
+        #     self.color[-1] = 0
 
     def draw(self):
         if self.focused_element:
@@ -156,7 +199,7 @@ class UI_controller(metaclass=Singleton):
             y1 = y0 + self.focused_element.height + 3
             x0 -= 4
             y0 -= 4
-            lines(MAIN_SCREEN, self.color, 1, ((x0, y0), (x1, y0), (x1, y1), (x0, y1)), 3)
+            lines(MAIN_SCREEN, normalize_color(self.color), 1, ((x0, y0), (x1, y0), (x1, y1), (x0, y1)), 3)
 
     def add_button_to_menu(self, menu, button):
         if button.id:
@@ -190,6 +233,10 @@ class UI_controller(metaclass=Singleton):
                     left_top_el = element
 
         return left_top_el
+
+    @property
+    def enter_possible(self):
+        return self.next_step > 0
 
 
 UI_TREE = UI_controller()

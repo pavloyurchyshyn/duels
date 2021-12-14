@@ -1,19 +1,29 @@
 from obj_properties.circle_form import Circle
-from settings.players_settings.player_settings import *
-from settings.global_parameters import GLOBAL_SETTINGS
+from obj_properties.physic_body import PhysicalObj
+
 from abc import abstractmethod
-from settings.default_keys import UP_C, LEFT_C, RIGHT_C, DOWN_C, SPRINT_C, WEAPON_1_C, WEAPON_2_C, WEAPON_3_C
-from math import atan2, cos, sin
+
+from math import atan2, cos, sin, radians
 from world_arena.base.arena_cell_obj import ArenaCellObject
-from common_things.common_objects_lists_dicts import BULLETS_LIST, PLAYERS_LIST
-from settings.effects import *
-from settings.colors import BLOOD_COLOR
+
+from common_things.common_objects_lists_dicts import BULLETS_LIST, PLAYERS_LIST, SPELLS_LIST
 from common_things.camera import GLOBAL_CAMERA
 from common_things.save_and_load_json_config import get_param_from_cgs
+from common_things.loggers import LOGGER
+
 from settings.network_settings.network_constants import PLAYER_SKIN
+from settings.players_settings.player_settings import *
+from settings.global_parameters import GLOBAL_SETTINGS
+from settings.player_effects import *
+from settings.colors import BLOOD_COLOR
+from settings.default_keys import UP_C, LEFT_C, RIGHT_C, DOWN_C, SPRINT_C, \
+    WEAPON_1_C, WEAPON_2_C, WEAPON_3_C, \
+    SPELL_1_C, SPELL_2_C, SPELL_3_C
+
+rad_180 = radians(180)
 
 
-class BasePlayer(Circle):
+class BasePlayer(Circle, PhysicalObj):
     PLAYER_HP = PLAYER_HEALTH_POINTS
     PLAYER_SPEED = PLAYER_SPEED
     PLAYER_SPRINT_SPEED = PLAYER_SPRINT_SPEED
@@ -31,37 +41,46 @@ class BasePlayer(Circle):
                  size=PLAYER_SIZE,
                  **kwargs):
         super().__init__(x, y, size, dots_angle=True)
+        PhysicalObj.__init__(self, 1)
         self._arena: ArenaCellObject = arena
-        self.team = team
-        self._angle = 0.0
+        self.camera = kwargs.get('camera', GLOBAL_CAMERA)
         self.global_settings = GLOBAL_SETTINGS
+
+        self.team = team
 
         self._full_health_points = kwargs.get('health_points', BasePlayer.PLAYER_HP)
         self._health_points = self._full_health_points
 
+        self._angle = 0.0
         self.speed = kwargs.get('speed', BasePlayer.PLAYER_SPEED)
         self.sprint_speed = kwargs.get('sprint_speed', BasePlayer.PLAYER_SPRINT_SPEED)
 
         self.spawn_position = kwargs.get(SPAWN_POSITION, (x, y))
 
+        self.spells = {
+            SPELL_1_C: kwargs.get(SPELL_1_C),
+            SPELL_2_C: kwargs.get(SPELL_2_C),
+            SPELL_3_C: kwargs.get(SPELL_3_C),
+        }
+        self._build_spells()
+
         self._time = 0.000000001
         self._d_time = 0.00000001
 
-        self._inventory = {
-            1: kwargs.get(WEAPON_1_C, None),
-            2: kwargs.get(WEAPON_2_C, None),
-            3: kwargs.get(WEAPON_3_C, None),
+        self._weapon = {
+            WEAPON_1_C: kwargs.get(WEAPON_1_C, None),
+            WEAPON_2_C: kwargs.get(WEAPON_2_C, None),
         }
-        self._damaged = 0
+        self._active_weapon = self._weapon[WEAPON_1_C]
+
         self.hands_radius = PLAYER_HANDS_SIZE
         self._hands_endpoint = [0, 0]
 
         self.bullets_list = BULLETS_LIST
+        self.spells_list = SPELLS_LIST
         self.effects: dict = {}
         self.active_effects = {}
-        PLAYERS_LIST.append(self)
 
-        self.camera = kwargs.get('camera', GLOBAL_CAMERA)
         self.turn_off_camera = kwargs.get('turn_off_camera', False)
         self.color = player_skin if player_skin else get_param_from_cgs(PLAYER_SKIN, def_value='blue')
         self.image = None
@@ -69,20 +88,62 @@ class BasePlayer(Circle):
         self.under_player_circle = kwargs.get('under_circle_color')
         self._draw_health_points = kwargs.get('draw_health_points', True)
 
+        self._statisic = {}
+
         if kwargs.get('load_images'):
             self._pictures_lazy_load()
 
         else:
             self.draw = self._pictures_lazy_load
 
+        self._damaged = 0
+
+        PLAYERS_LIST.append(self)
+
+    def _build_spells(self):
+        for key, spell in self.spells.items():
+            if spell:
+                self.spells[key] = spell(self)
+
+    def use_weapon(self):
+        if self._active_weapon:
+            self._active_weapon.use()
+
+    def alt_use_weapon(self):
+        if self._active_weapon:
+            self._active_weapon.alt_use()
+
+    def check_for_weapon_switch(self, commands):
+        for key in self._weapon:
+            if key in commands:
+                self._active_weapon = self._weapon[key]
+
+    def update_weapon(self):
+        for weapon in self._weapon.values():
+            if weapon:
+                if weapon == self._active_weapon:
+                    weapon.update(angle=self._angle, position=self._hands_endpoint)
+                else:
+                    weapon.update(angle=self._angle + rad_180, position=self._dots[7])
+
+    def use_spells(self, commands):
+        for key, spell in self.spells.items():
+            if key in commands and spell:
+                spell.use()
+
+    def update_spells(self):
+        for spell in self.spells.values():
+            if spell:
+                spell.update()
+
     def _pictures_lazy_load(self):
         from settings.window_settings import MAIN_SCREEN
-        from player_and_spells.player.player_images import PlayerImagesManager
+        from player.player_images import PlayerImagesManager
         from UI.UI_base.animation import Animation, RotateAnimation
         from UI.UI_base.text_UI import Text
 
         self.MAIN_SCREEN = MAIN_SCREEN
-        self.images_manager = PlayerImagesManager(size=self._size *2 if self._size == PLAYER_SIZE else self._size)
+        self.images_manager = PlayerImagesManager(size=self._size * 2 if self._size == PLAYER_SIZE else self._size)
         pictures = self.images_manager.get_new_skin(self.color)
         self.image = pictures['body']
         self.face_anim = Animation(self._center,
@@ -111,11 +172,15 @@ class BasePlayer(Circle):
     def _draw(self):
         raise NotImplementedError('Draw has to be implemented in subclasses')
 
-    def check_for_bullets_damage(self):
+    def check_for_bullets_interaction(self):
         for bullet in self.bullets_list:
             if bullet.alive and self.collide_point(bullet.position):
-                self.damage(bullet.damage)
-                bullet.kill()
+                bullet.interact_with_object(self)
+
+    def check_for_spells_interaction(self):
+        for spell in self.spells_list:
+            if spell.alive and self.collide(spell):
+                spell.interact_with_object(self)
 
     def update_hands_endpoints(self):
         self._hands_endpoint[0] = self._center[0] + cos(self._angle) * self.PLAYER_HANDS_SIZE
@@ -154,7 +219,7 @@ class BasePlayer(Circle):
 
         return False
 
-    def rotate_to_cursor(self, mouse_pos: tuple, camera_x_position=0, camera_y_position=0) -> bool:
+    def rotate_to_cursor(self, mouse_pos: tuple) -> bool:
         """
         :return: True if angle changed
         """
@@ -163,9 +228,6 @@ class BasePlayer(Circle):
 
         x_mouse_position, y_mouse_position = mouse_pos
         x_center_position, y_center_position = self._center
-
-        x_center_position += camera_x_position
-        y_center_position += camera_y_position
 
         d_x = 0.00001 if x_mouse_position - x_center_position == 0 else x_mouse_position - x_center_position
         d_y = 0.00001 if y_mouse_position - y_center_position == 0 else y_mouse_position - y_center_position
@@ -223,12 +285,11 @@ class BasePlayer(Circle):
 
     @property
     def damaged(self):
-        d = self._damaged
-        self._damaged = 0
+        d, self._damaged = self._damaged, 0
         return d
 
     @abstractmethod
-    def update(self, commands=(), mouse_buttons=(0, 0, 0), mouse_pos=None):
+    def update(*args, **kwargs):
         raise NotImplementedError
 
     @property
@@ -274,4 +335,7 @@ class BasePlayer(Circle):
         self._health_points = health_points
 
     def __del__(self):
-        PLAYERS_LIST.remove(self)
+        try:
+            PLAYERS_LIST.remove(self)
+        except ValueError as e:
+            LOGGER.error(f"Player not in list: {e}")

@@ -6,7 +6,7 @@ from settings.network_settings.network_settings import *
 from settings.network_settings.network_constants import *
 import time
 from common_things.save_and_load_json_config import get_param_from_cgs
-from _thread import *
+from _thread import start_new_thread
 from common_things.loggers import LOGGER
 
 

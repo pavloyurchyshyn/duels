@@ -31,6 +31,10 @@ class Keyboard:
     def __init__(self):
         if os.path.exists(KEYS_CONFIG_FILE):
             self._keys = load_json_config(KEYS_CONFIG_FILE)
+            if len(self._keys) < len(DEFAULT_GAME_KEYS):
+                keys = DEFAULT_GAME_KEYS.copy()
+                keys.update(self._keys)
+                self._keys = keys
         else:
             self._keys = DEFAULT_GAME_KEYS
             self.save()
