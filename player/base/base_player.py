@@ -1,5 +1,7 @@
 from obj_properties.circle_form import Circle
 from obj_properties.physic_body import PhysicalObj
+from obj_properties.lazy_load_mixin import PlayerLazyLoad
+from player.player_effects import *
 
 from abc import abstractmethod
 
@@ -14,11 +16,9 @@ from common_things.loggers import LOGGER
 from settings.network_settings.network_constants import PLAYER_SKIN
 from settings.players_settings.player_settings import *
 from settings.global_parameters import GLOBAL_SETTINGS
-from settings.player_effects import *
 from settings.colors import BLOOD_COLOR
 from settings.default_keys import UP_C, LEFT_C, RIGHT_C, DOWN_C, SPRINT_C, \
-    WEAPON_1_C, WEAPON_2_C, WEAPON_3_C, \
-    SPELL_1_C, SPELL_2_C, SPELL_3_C
+    WEAPON_1_C, WEAPON_2_C, SPELL_1_C, SPELL_2_C, SPELL_3_C
 
 rad_180 = radians(180)
 
@@ -41,7 +41,7 @@ class BasePlayer(Circle, PhysicalObj):
                  size=PLAYER_SIZE,
                  **kwargs):
         super().__init__(x, y, size, dots_angle=True)
-        PhysicalObj.__init__(self, 1)
+        PhysicalObj.__init__(self, f_coef=3)
         self._arena: ArenaCellObject = arena
         self.camera = kwargs.get('camera', GLOBAL_CAMERA)
         self.global_settings = GLOBAL_SETTINGS
@@ -57,6 +57,9 @@ class BasePlayer(Circle, PhysicalObj):
 
         self.spawn_position = kwargs.get(SPAWN_POSITION, (x, y))
 
+        self._time = 0.000000001
+        self._d_time = 0.00000001
+
         self.spells = {
             SPELL_1_C: kwargs.get(SPELL_1_C),
             SPELL_2_C: kwargs.get(SPELL_2_C),
@@ -64,13 +67,12 @@ class BasePlayer(Circle, PhysicalObj):
         }
         self._build_spells()
 
-        self._time = 0.000000001
-        self._d_time = 0.00000001
-
         self._weapon = {
             WEAPON_1_C: kwargs.get(WEAPON_1_C, None),
             WEAPON_2_C: kwargs.get(WEAPON_2_C, None),
         }
+        self._build_weapon()
+
         self._active_weapon = self._weapon[WEAPON_1_C]
 
         self.hands_radius = PLAYER_HANDS_SIZE
@@ -85,20 +87,24 @@ class BasePlayer(Circle, PhysicalObj):
         self.color = player_skin if player_skin else get_param_from_cgs(PLAYER_SKIN, def_value='blue')
         self.image = None
         self.face_anim = None
+        self.high_image = None
+        self.high_face_anim = None
         self.under_player_circle = kwargs.get('under_circle_color')
         self._draw_health_points = kwargs.get('draw_health_points', True)
 
         self._statisic = {}
 
-        if kwargs.get('load_images'):
-            self._pictures_lazy_load()
-
-        else:
-            self.draw = self._pictures_lazy_load
-
         self._damaged = 0
 
+        self._switch_cd = kwargs.get('switch_cd', -0.5)
+        self._next_switch = 1
+
         PLAYERS_LIST.append(self)
+
+    def _build_weapon(self):
+        for key, weapon in self._weapon.items():
+            if weapon:
+                self._weapon[key] = weapon(*self.position, self)
 
     def _build_spells(self):
         for key, spell in self.spells.items():
@@ -114,9 +120,13 @@ class BasePlayer(Circle, PhysicalObj):
             self._active_weapon.alt_use()
 
     def check_for_weapon_switch(self, commands):
-        for key in self._weapon:
-            if key in commands:
-                self._active_weapon = self._weapon[key]
+        if self._next_switch >= 0.0:
+            for key in self._weapon:
+                if key in commands:
+                    self._active_weapon = self._weapon[key]
+                    self._next_switch = self._switch_cd
+        elif self._next_switch < 0.0:
+            self._next_switch += self._d_time
 
     def update_weapon(self):
         for weapon in self._weapon.values():
@@ -136,40 +146,7 @@ class BasePlayer(Circle, PhysicalObj):
             if spell:
                 spell.update()
 
-    def _pictures_lazy_load(self):
-        from settings.window_settings import MAIN_SCREEN
-        from player.player_images import PlayerImagesManager
-        from UI.UI_base.animation import Animation, RotateAnimation
-        from UI.UI_base.text_UI import Text
-
-        self.MAIN_SCREEN = MAIN_SCREEN
-        self.images_manager = PlayerImagesManager(size=self._size * 2 if self._size == PLAYER_SIZE else self._size)
-        pictures = self.images_manager.get_new_skin(self.color)
-        self.image = pictures['body']
-        self.face_anim = Animation(self._center,
-                                   idle_frames=pictures['idle_animation'],
-                                   **pictures['other_animation'])
-        self.under_player_circle = RotateAnimation(self._center,
-                                                   self.images_manager.get_circle()) if self.under_player_circle else None
-
-        self.health_points_text = Text(int(self._health_points), MAIN_SCREEN, x=self._center[0],
-                                       y=self._center[1] + self._size,
-                                       auto_draw=False)
-        self._additional_lazy_load()
-        self.draw = self._draw
-
-    def update_color(self, body_color=None, face_color=None):
-        from UI.UI_base.animation import Animation
-        pictures = self.images_manager.get_new_skin((body_color, face_color))
-        self.image = pictures['body']
-        self.face_anim = Animation(self._center,
-                                   idle_frames=pictures['idle_animation'],
-                                   **pictures['other_animation'])
-
-    def _additional_lazy_load(self):
-        pass
-
-    def _draw(self):
+    def draw(self):
         raise NotImplementedError('Draw has to be implemented in subclasses')
 
     def check_for_bullets_interaction(self):
@@ -339,3 +316,55 @@ class BasePlayer(Circle, PhysicalObj):
             PLAYERS_LIST.remove(self)
         except ValueError as e:
             LOGGER.error(f"Player not in list: {e}")
+
+
+class PlayerWithPictures(BasePlayer, PlayerLazyLoad):
+    def __init__(self, *args, **kwargs):
+        super(PlayerWithPictures, self).__init__(*args, **kwargs)
+        PlayerLazyLoad.__init__(self)
+
+    # def _pictures_lazy_load(self):
+    #     from settings.window_settings import MAIN_SCREEN
+    #     from player.player_images import PlayerImagesManager
+    #     from UI.UI_base.animation import Animation, RotateAnimation
+    #     from UI.UI_base.text_UI import Text
+    #     from pygame.transform import scale, smoothscale
+    #
+    #     BasePlayer.SCALE = scale
+    #     BasePlayer.SMOOTH_SCALE = smoothscale
+    #
+    #     self.MAIN_SCREEN = MAIN_SCREEN
+    #
+    #     self.images_manager = PlayerImagesManager(size=self._size * 2 if self._size == PLAYER_SIZE else self._size)
+    #     pictures = self.images_manager.get_new_skin(self.color)
+    #     self.image = pictures['body']
+    #     self.face_anim = Animation(self._center,
+    #                                idle_frames=pictures['idle_animation'],
+    #                                **pictures['other_animation'])
+    #
+    #     self.high_images_manager = PlayerImagesManager(original_size=1)
+    #     high_pic = self.high_images_manager.get_new_skin(self.color)
+    #     self.high_image = high_pic['body']
+    #     self.high_face_anim = Animation(self._center,
+    #                                     idle_frames=high_pic['idle_animation'],
+    #                                     **high_pic['other_animation'])
+    #
+    #     self.under_player_circle = RotateAnimation(self._center,
+    #                                                self.images_manager.get_circle()) if self.under_player_circle else None
+    #
+    #     self.health_points_text = Text(int(self._health_points), MAIN_SCREEN, x=self._center[0],
+    #                                    y=self._center[1] + self._size,
+    #                                    auto_draw=False)
+    #     self._additional_lazy_load()
+    #     self.draw = self._draw
+
+    def update_color(self, body_color=None, face_color=None):
+        from UI.UI_base.animation import Animation
+        pictures = self.images_manager.get_new_skin((body_color, face_color))
+        self.image = pictures['body']
+        self.face_anim = Animation(self._center,
+                                   idle_frames=pictures['idle_animation'],
+                                   **pictures['other_animation'])
+
+    def _additional_lazy_load(self):
+        pass

@@ -18,13 +18,14 @@ class TransparentCircle(Projectile, BaseEffect):
     def __init__(self, x, y, angle=0,
                  size=20, size_scale=0,
                  color=[255, 255, 255, 255],
-                 arena=Rectangle(0, 0, SCREEN_W, SCREEN_H),
+                 arena=None,
                  speed=100,
                  circle_width=0,
                  alive_condition=None,
                  round_clock=0,
                  transparent=1,
                  **kwargs):
+        arena = arena if arena else Rectangle(0, 0, SCREEN_W, SCREEN_H)
         self.alive_condition = alive_condition if alive_condition else self.__alive_condition
 
         super(TransparentCircle, self).__init__(x=x, y=y,

@@ -1,6 +1,5 @@
 from common_things.camera import GLOBAL_CAMERA
 from common_things.global_clock import ROUND_CLOCK, GLOBAL_CLOCK
-from obj_properties.lazy_load_mixin import PictureLazyLoadMixin
 from settings.window_settings import MAIN_SCREEN
 from pygame.transform import rotate, scale, smoothscale
 from pygame.draw import circle, line, lines, polygon, rect
