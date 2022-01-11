@@ -14,8 +14,9 @@ except:
     ERROR_PICTURE = None
 
 
-def load_image(path: str, size: (int, int) = None, angle=90, smooth_scale = True):
+def load_image(path: str, size: (int, int) = None, angle=90, smooth_scale=True):
     try:
+        angle = angle if angle else 90
         if not path.startswith('sprites'):
             path = os.path.join('sprites', path)
 
@@ -37,11 +38,11 @@ def load_image(path: str, size: (int, int) = None, angle=90, smooth_scale = True
 
 
 # @time_control_wrapper
-def load_animation(pic_list, timings_list, size: (int, int) = None, anim_dict=None) -> dict:
+def load_animation(pic_list, timings_list, size: (int, int) = None, anim_dict=None, angle=90) -> dict:
     anim_dict = anim_dict if type(anim_dict) is dict else {}
 
     for i, path in enumerate(pic_list):
-        anim_dict[i] = {'frame': load_image(path, size),
+        anim_dict[i] = {'frame': load_image(path, size, angle=angle),
                         'cd': timings_list[i]}
 
     return anim_dict

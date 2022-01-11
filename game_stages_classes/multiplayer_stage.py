@@ -4,7 +4,7 @@ from common_things.camera import GLOBAL_CAMERA
 # from player_and_spells.player.commands_player import Player
 from player.simple_player import SimplePlayer
 
-from common_things.global_messager import GLOBAL_MESSAGER
+from UI.global_messager import GLOBAL_MESSAGER
 from common_things.loggers import LOGGER
 from common_things.global_keyboard import GLOBAL_KEYBOARD
 from common_things.global_mouse import GLOBAL_MOUSE

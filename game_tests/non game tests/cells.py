@@ -33,7 +33,7 @@ def update_fps():
 
 el_pos = list(mouse.get_pos())
 
-from settings.arena_settings import STANDARD_ARENA_SIZE, ELEMENT_SIZE
+from settings.arena_settings import STANDARD_ARENA_X_SIZE, ELEMENT_SIZE
 from pygame import Rect, draw, transform, image, error, Surface
 
 PLAYER_SIZE = 45
@@ -92,11 +92,11 @@ def TEST_ELEMENT_DRAW(*args):
     G_Clock = GLOBAL_CLOCK
     G_Mouse = GLOBAL_MOUSE
 
-    new_surf = Surface((STANDARD_ARENA_SIZE, STANDARD_ARENA_SIZE))
+    new_surf = Surface((STANDARD_ARENA_X_SIZE, STANDARD_ARENA_X_SIZE))
 
     i = 0
-    for x in range(0, STANDARD_ARENA_SIZE, ELEMENT_SIZE):
-        for y in range(0, STANDARD_ARENA_SIZE, ELEMENT_SIZE):
+    for x in range(0, STANDARD_ARENA_X_SIZE, ELEMENT_SIZE):
+        for y in range(0, STANDARD_ARENA_X_SIZE, ELEMENT_SIZE):
             r = Rect((x, y), (ELEMENT_SIZE, ELEMENT_SIZE))
             draw.rect(new_surf, (55, 55, 55), r, 5)
             i += 1

@@ -3,6 +3,10 @@ import traceback
 import sys
 
 try:
+    from settings.global_parameters import SET_CLIENT_INSTANCE
+
+    SET_CLIENT_INSTANCE(1)
+
     from settings.init_pygame import *  # do not remove its ok
 
     from pygame.time import Clock
@@ -17,8 +21,6 @@ try:
     from settings.common_settings import VERSION, FPS
     from settings.window_settings import MAIN_SCREEN, MAIN_SCREEN_RECT
     from settings.game_stages_constants import ROUND_STAGE
-    from settings.global_parameters import SET_CLIENT_INSTANCE
-    SET_CLIENT_INSTANCE(1)
 
     from common_things.font_loader import DEFAULT_FONT
     from common_things.global_clock import GLOBAL_CLOCK, ROUND_CLOCK
@@ -30,7 +32,6 @@ try:
 
     from game_body import GameBody
     from time import time
-    from _thread import start_new_thread
 
     display.set_caption(f'V{VERSION}')
 
@@ -41,8 +42,10 @@ try:
         fps_text = DEFAULT_FONT.render(str(int(fps)), 1, WHITE, (0, 0, 0))
         MAIN_SCREEN.blit(fps_text, (0, 0))
 
+
     def max_fps():
         data = {'i': 0, 'max': '0'}
+
         def calc(fps, dt):
             if data['i'] > 3:
                 data['i'] = 0
@@ -52,10 +55,13 @@ try:
                 data['max'] = str(int(fps))
             fps_text = DEFAULT_FONT.render(f"Max:{data['max']}", 1, WHITE, (0, 0, 0))
             MAIN_SCREEN.blit(fps_text, (0, 30))
+
         return calc
+
 
     def min_fps():
         data = {'i': 0, 'min': '999999'}
+
         def calc(fps, dt):
             if data['i'] > 3:
                 data['i'] = 0
@@ -64,21 +70,31 @@ try:
             if int(data['min']) > fps:
                 data['min'] = str(int(fps))
             fps_text = DEFAULT_FONT.render(f"Min:{data['min']}", 1, WHITE, (0, 0, 0))
-            MAIN_SCREEN.blit(fps_text, (0, 90))
+            MAIN_SCREEN.blit(fps_text, (0, 120))
+
         return calc
 
+
     def avg_fps():
-        data = {'i': 0, 'avg': []}
+        data = {'i': 0, 'avg': [], 'all_avg': []}
+
         def calc(fps, dt):
             if data['i'] > 5:
                 data['i'] = 0
                 data['avg'].clear()
             data['i'] += dt
             data['avg'].append(fps)
+            data['all_avg'].append(fps)
             avg = sum(data['avg']) // len(data['avg'])
             fps_text = DEFAULT_FONT.render(f"AVG:{str(avg)}", 1, WHITE, (0, 0, 0))
             MAIN_SCREEN.blit(fps_text, (0, 60))
+
+            avg = sum(data['all_avg']) // len(data['all_avg'])
+            fps_text = DEFAULT_FONT.render(f"ALL AVG:{str(avg)}", 1, WHITE, (0, 0, 0))
+            MAIN_SCREEN.blit(fps_text, (0, 90))
+
         return calc
+
 
     surface = Surface((200, 100), constants.SRCALPHA, 32)
     surface.fill((0, 0, 0, 50))
@@ -114,7 +130,7 @@ try:
 
             # update mouse and keyboard
             G_Mouse.update()
-            G_Keyboard.update()
+            G_Keyboard.update(events)
 
             # scroll up and scroll down update
             for event in events:

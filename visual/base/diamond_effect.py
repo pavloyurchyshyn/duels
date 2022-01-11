@@ -1,21 +1,12 @@
 from obj_properties.base_projectile import Projectile
-from obj_properties.rect_form import Rectangle
 from settings.visual_settings.diamond_effect import *
 from settings.visual_settings.effects_types import DIAMOND_TYPE
-from settings.window_settings import SCREEN_W, SCREEN_H
-from math import cos, sin, degrees, radians
-
-from common_things.sprites_functions import get_surface
+from settings.visual_settings.visual_settings import BASE_RECT
+from math import cos, sin
+from common_things.global_round_parameters import GLOBAL_ROUND_PARAMETERS
 from common_things.img_loader import normalize_color
 
-from pygame.draw import polygon as draw_polygon
-from pygame.draw import lines as draw_lines
-
-from visual.base_effect import BaseEffect
-
-from pygame import Surface, BLEND_RGB_ADD, transform
-from pygame.draw import circle as draw_circle
-from math import degrees
+from visual.base.base_effect import BaseEffect
 
 
 class DiamondEffect(Projectile, BaseEffect):
@@ -33,8 +24,9 @@ class DiamondEffect(Projectile, BaseEffect):
                  round_clock=0,
                  color=[255, 255, 255, 255],
                  color_change=None,
-                 arena=Rectangle(0, 0, SCREEN_W, SCREEN_H),
+                 arena=None,
                  **kwargs):
+        arena = arena if arena else GLOBAL_ROUND_PARAMETERS.arena
         super(DiamondEffect, self).__init__(x=x, y=y,
                                             speed=speed, angle=angle,
                                             round_clock=round_clock,

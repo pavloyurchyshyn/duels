@@ -1,6 +1,5 @@
-from player.base_player import BasePlayer
+from player.base.base_player import BasePlayer
 from common_things.global_clock import ROUND_CLOCK
-from obj_properties.objects_data_creator import objects_data_creator
 from settings.default_keys import SELF_DAMAGE
 from weapons.base.base_range import BaseRange
 

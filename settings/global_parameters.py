@@ -1,9 +1,7 @@
 from time import time as current_time
 
-# TEST_DRAW_CONST = 'test_draw'
-
 GLOBAL_SETTINGS = {
-    'test_draw1': 0,
+    'test_draw': 0,
     'next_pause': -1,
     'pause_delay': 0.25,
     'client_instance': 0,
@@ -27,8 +25,8 @@ def pause_step():
 
 
 def change_test_draw_status():
-    GLOBAL_SETTINGS['test_draw1'] = not GLOBAL_SETTINGS['test_draw1']
+    GLOBAL_SETTINGS['test_draw'] = not GLOBAL_SETTINGS['test_draw']
 
 
 def test_draw_status_is_on():
-    return GLOBAL_SETTINGS['test_draw1']
+    return GLOBAL_SETTINGS['test_draw']

@@ -1,6 +1,5 @@
 from player.base.player_with_pictures import PlayerLazyLoad
 from player.base.base_player import BasePlayer
-from pygame import transform
 from pygame.draw import circle
 
 from math import degrees
@@ -74,7 +73,7 @@ class Player(BasePlayer, PlayerLazyLoad):
                5)
         self._active_weapon.draw()
 
-        img_copy = transform.rotate(self.image, -degrees(self._angle))
+        img_copy = self.ROTATE(self.image, -degrees(self._angle))
         main_screen.blit(img_copy, (x0 - img_copy.get_width() // 2 + dx, y0 - img_copy.get_height() // 2 + dy))
 
         if test_draw_status_is_on():

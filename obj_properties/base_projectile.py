@@ -1,10 +1,10 @@
-from math import sin, cos, radians, degrees
+from math import sin, cos
 from interfaces.collide_interfaces import CollideInterface
 from settings.game_objects_constants import *
 from common_things.global_clock import ROUND_CLOCK, GLOBAL_CLOCK
 from abc import abstractmethod
 from interfaces.any_object_interface import AnyObjInterface
-from visual.visual_effects_controller import VisualEffectsController
+from visual.base.visual_effects_controller import VisualEffectsController
 
 
 class Projectile(AnyObjInterface):
@@ -180,3 +180,7 @@ class Projectile(AnyObjInterface):
     @property
     def dead(self):
         return not self._alive
+
+    @property
+    def _center(self):
+        return self._position

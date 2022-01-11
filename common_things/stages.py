@@ -1,12 +1,12 @@
 from common_things.singletone import Singleton
 from settings.game_stages_constants import *
-from visual.visual_effects_controller import VisualEffectsController
+from visual.base.visual_effects_controller import VisualEffectsController
 
 
 class Stages(metaclass=Singleton):
     def __init__(self):
         self.current_stage = 'main_menu'
-        # self.set_start_round_stage()
+        self.set_start_round_stage()
 
     def get_current_stage(self) -> str:
         return self.current_stage

@@ -16,6 +16,4 @@ PLAYER_HEALTH_POINTS = 100.0
 PLAYER_RAYS_NUM = 60
 PLAYER_VISION_RANGE = 300
 
-# players actions
-PLAYER_ACTION = 'action'  # dict of actions
-SPAWN_POSITION = 'spawn_position'
+

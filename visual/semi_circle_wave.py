@@ -1,11 +1,10 @@
-from obj_properties.lazy_load_mixin import PictureLazyLoadMixin
+# from obj_properties.lazy_load_mixin import PictureLazyLoadMixin
 from obj_properties.base_projectile import Projectile
 from obj_properties.rect_form import Rectangle
 from settings.window_settings import SCREEN_W, SCREEN_H
-from visual.base_effect import BaseEffect
-from math import radians, degrees, cos, sin
+from visual.base.base_effect import BaseEffect
+from math import radians, cos, sin
 from pygame.draw import lines as draw_lines
-from pygame.draw import polygon as draw_polygon
 from common_things.img_loader import normalize_color
 
 
@@ -14,6 +13,7 @@ class SemiCircleWave(Projectile, BaseEffect):
     ANGLES = [radians(angle) for angle in range(-46, 45, 15)]
 
     def __init__(self, x, y, angle,
+                 owner,
                  R=50, size_scale=0,
                  color=[255, 255, 255],
                  arena=Rectangle(0, 0, SCREEN_W, SCREEN_H),
@@ -37,7 +37,7 @@ class SemiCircleWave(Projectile, BaseEffect):
         self._dots = []
         self.angles = angles if angles else self.ANGLES
         self._alive_time = alive_time
-
+        self.owner = owner
         self.build_dots()
 
     def build_dots(self):

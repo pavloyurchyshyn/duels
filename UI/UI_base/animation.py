@@ -30,7 +30,7 @@ class Animation:
 
         self.animations.update(**kwargs)
 
-        self.image = self.animations['idle'][self.frame]['frame']
+        self.image = self.animations[self.current_anim][self.frame]['frame']
 
         self.next_frame = self._time + self.animations[self.current_anim][self.frame]['cd']
 

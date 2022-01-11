@@ -1,14 +1,13 @@
 from settings.window_settings import MAIN_SCREEN, HALF_SCREEN_H, SCREEN_W
 from settings.colors import simple_colors, EMPTY
-# from settings.screen_size import X_SCALE, Y_SCALE
-from common_things.font_loader import DEFAULT_FONT_SIZE
-X_SCALE, Y_SCALE = 1, 1
+from settings.screen_size import X_SCALE, Y_SCALE
+from common_things.font_loader import DEFAULT_FONT
 
 from pygame import draw
 from pygame import Rect
 
 
-class Progress_Bar:
+class ProgressBar:
     MAIN_SCREEN = MAIN_SCREEN
     BAR_X_SIZE = int(1200 * X_SCALE)
     BAR_Y_SIZE = int(10 * Y_SCALE)
@@ -18,16 +17,24 @@ class Progress_Bar:
                  bar_pos: (int, int) = None,
                  bar_inner_color=(255, 255, 255),
                  bar_x_size: int = None,
-                 bar_y_size: int = None,
-                 text_pos: (int, int) = None):
-        bar_x_size = int(bar_x_size * X_SCALE) if bar_x_size else self.BAR_X_SIZE
-        bar_y_size = int(bar_y_size * Y_SCALE) if bar_y_size else self.BAR_Y_SIZE
+                 bar_y_size: int = None, scale=1,
+                 text_pos: (int, int) = None,
+                 border_radius=0, out_border_radius=0,
+                 border_x_step=6, border_y_step=6):
+
+        if bar_x_size and scale:
+            bar_x_size *= X_SCALE
+        if bar_y_size and scale:
+            bar_y_size *= Y_SCALE
+
+        bar_x_size = int(bar_x_size) if bar_x_size else self.BAR_X_SIZE
+        bar_y_size = int(bar_y_size) if bar_y_size else self.BAR_Y_SIZE
 
         self._current_stage = stage
         self.stages_num = stages_num
 
-        self.screen = screen if screen else Progress_Bar.MAIN_SCREEN
-        self.percent = 0
+        self.screen = screen if screen else ProgressBar.MAIN_SCREEN
+        self.percent = round(self._current_stage / self.stages_num * 100, 2)
 
         self._message = text
 
@@ -50,11 +57,15 @@ class Progress_Bar:
         else:
             self.text_position = self.bar_position[0], self.bar_position[1] + self.y_size * 2
         # ======================================
+        self.border_x_step = border_x_step
+        self.border_y_step = border_y_step
+        self.borders_rect = Rect(self.bar_position[0] - self.border_x_step//2,
+                                 self.bar_position[1] - self.border_y_step//2,
+                                 self.x_size + self.border_x_step,
+                                 self.y_size + self.border_y_step)
 
-        self.borders_rect = Rect(self.bar_position[0] - 5,
-                                 self.bar_position[1] - 9,
-                                 self.x_size + 10,
-                                 self.y_size + 10)
+        self.border_radius = border_radius
+        self.out_border_radius = out_border_radius
 
     def _get_percent(self):
         self.percent = round(self._current_stage / self.stages_num * 100, 2)
@@ -63,10 +74,11 @@ class Progress_Bar:
         self._text = DEFAULT_FONT.render(self._message, 1, self._text_color)
 
     def _bar_endpos(self):
-        endpos = (int(self.bar_position[0] + self.x_size * (self._current_stage / self.stages_num)),
-                  self.bar_position[1])
-
-        return endpos
+        # endpos = (int(self.bar_position[0] + self.x_size * (self._current_stage / self.stages_num)),
+        #           self.bar_position[1])
+        #
+        # return endpos
+        return self.x_size * (self._current_stage / self.stages_num), self.y_size
 
     def update(self, current_stage: int = None, text=None, stages_num: int = None, text_pos=None, bar_pos=None,
                bar_color=None):
@@ -103,15 +115,20 @@ class Progress_Bar:
         draw.rect(surface=self.screen,
                   color=self.border_color,
                   rect=self.borders_rect,
-                  width=1)
+                  width=1, border_radius=self.out_border_radius)
 
         # BAR
         if self._current_stage:
-            draw.line(surface=self.screen,
-                      color=self.bar_color,
-                      start_pos=self.bar_position,
-                      end_pos=self._bar_endpos(),
-                      width=self.y_size)
+            draw.rect(surface=self.screen,
+                      color=self.border_color,
+                      rect=(self.bar_position, self._bar_endpos()),
+                      width=0, border_radius=self.out_border_radius)
+
+            # draw.line(surface=self.screen,
+            #           color=self.bar_color,
+            #           start_pos=self.bar_position,
+            #           end_pos=self._bar_endpos(),
+            #           width=self.y_size)
 
         if self._text:
             self.screen.blit(self._text, self.text_position)

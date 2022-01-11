@@ -1,27 +1,33 @@
 from settings.players_settings.player_pic_and_anim import *
 from settings.colors import PLAYERS_COLORS
-# from settings.screen_size import GAME_SCALE
 
 from common_things.img_loader import recolor_picture, load_image, load_animation
 
 
 class PlayerImagesManager:
-    def __init__(self, size=None):
-        self.size = size if size else PLAYER_SIZE
-        self.size = int(self.size)# * GAME_SCALE)
-        self.pic_size = (self.size, self.size)
+    def __init__(self, size=None, original_size=0, angle=90):
 
-        self.raw_body = load_image(BODY_IMAGE, size=self.pic_size)
+        self.size = size
+        if size:
+            self.size = int(self.size)
+            self.pic_size = (self.size, self.size) if size else size
+            self.circle_size = (int(self.size * 1.1), int(self.size * 1.1))
+
+        if original_size or size is None:
+            self.size = self.pic_size = self.circle_size = None
+
+        self.raw_body = load_image(BODY_IMAGE, size=self.pic_size, angle=angle)
         self.raw_animations = {
-            ANIM_IDLE_K: load_animation(IDLE_IMAGES, IDLE_TIMES, size=self.pic_size),
-            ANIM_RAGE_K: load_animation(RAGE_IMAGES, RAGE_TIMES, size=self.pic_size),
-            ANIM_DEAD_K: load_animation(DEAD_IMAGES, DEAD_TIMES, size=self.pic_size),
-            ANIM_DYING_K: load_animation(DYING_IMAGES, DYING_TIMES, size=self.pic_size)
+            ANIM_IDLE_K: load_animation(IDLE_IMAGES, IDLE_TIMES, size=self.pic_size, angle=angle),
+            ANIM_RAGE_K: load_animation(RAGE_IMAGES, RAGE_TIMES, size=self.pic_size, angle=angle),
+            ANIM_DEAD_K: load_animation(DEAD_IMAGES, DEAD_TIMES, size=self.pic_size, angle=angle),
+            ANIM_DYING_K: load_animation(DYING_IMAGES, DYING_TIMES, size=self.pic_size, angle=angle)
         }
+
         self.raw_animations[ANIM_RAGE_K]['end'] = ANIM_IDLE_K
         self.raw_animations[ANIM_DYING_K]['end'] = ANIM_DEAD_K
         self.raw_animations[ANIM_DEAD_K]['end'] = ANIM_DEAD_K
-        self.under_player_circle = load_image(CIRCLE_IMAGE, size=(self.size + 4, self.size + 4))
+        self.under_player_circle = load_image(CIRCLE_IMAGE, size=self.circle_size)
 
     def get_new_skin(self, colors: str or tuple or dict = 'blue'):
         if type(colors) is str:

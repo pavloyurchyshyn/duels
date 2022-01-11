@@ -7,7 +7,7 @@ from abc import abstractmethod, ABC
 
 
 class PhysicalObj:
-    def __init__(self, mass: float, f_coef: float = 2):
+    def __init__(self, mass: float=1, f_coef: float = 2):
         self._f_coef = f_coef
         self._mass = mass
 

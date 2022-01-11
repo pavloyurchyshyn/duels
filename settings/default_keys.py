@@ -22,28 +22,25 @@ WEAPON_2_C = 'weapon_2'
 WEAPON_3_C = 'weapon_3'
 
 SELF_DAMAGE = 'self_damage'
+SELF_REVISE = 'self_revise'
 TEST_MESSAGE = 'test_message'
 
 DEFAULT_GAME_KEYS = {
-    UP_C: 119,
-    LEFT_C: 97,
-    RIGHT_C: 100,
-    DOWN_C: 115,
+    'w': UP_C,
+    'a': LEFT_C,
+    'd': RIGHT_C,
+    's': DOWN_C,
 
-    RELOAD_C: 114,
+    '1': WEAPON_1_C,
+    '2': WEAPON_2_C,
+    #'3': WEAPON_3_C,
 
-    WEAPON_1_C: 49,
-    WEAPON_2_C: 50,
-    # WEAPON_3_C: 51,
+    'q': SPELL_1_C,  # q
+    'e': SPELL_2_C,  # e
+    'space': SPELL_3_C,  # space
 
-    SPELL_1_C: 113,  # q
-    SPELL_2_C: 101,  # e
-    SPELL_3_C: 32,  # space
-
-    GRAB_C: 102,
-    DROP_C: 103,
-
-    SPRINT_C: 1073742049,
-    SELF_DAMAGE: 112,
-    TEST_MESSAGE: 111,
+    'left shift': SPRINT_C,
+    'p': SELF_DAMAGE,
+    'o': TEST_MESSAGE,
+    'l': SELF_REVISE,
 }

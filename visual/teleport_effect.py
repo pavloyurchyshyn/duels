@@ -1,6 +1,6 @@
-from visual.visual_effects_controller import VisualEffectsController
-from visual.base_effect import BaseEffect
-from visual.transparent_circle_effect import TransparentCircle
+from visual.base.visual_effects_controller import VisualEffectsController
+from visual.base.base_effect import BaseEffect
+from visual.base.transparent_circle_effect import TransparentCircle
 from common_things.common_functions import get_angle_between_dots
 from common_things.global_clock import GLOBAL_CLOCK, ROUND_CLOCK
 from math import radians, cos, sin
@@ -29,6 +29,7 @@ class TeleportEffect(BaseEffect):
                  dest_position,
                  round_clock=1,
                  radius=10,
+                 arena=None,
                  **kwargs
                  ):
         self._clock = ROUND_CLOCK if round_clock else GLOBAL_CLOCK
@@ -50,6 +51,7 @@ class TeleportEffect(BaseEffect):
 
         self._clock_int = round_clock
         self._alive_time = 5
+        self._arena = arena
 
     def update(self):
         self._alive_time -= self._clock.d_time
@@ -71,6 +73,7 @@ class TeleportEffect(BaseEffect):
                                                                      transparent=0,
                                                                      color_change=(255, 255, 255),
                                                                      size_scale=-random() - 0.5,
+                                                                     arena=self._arena,
                                                                      ),
                                                    layer=0)
 

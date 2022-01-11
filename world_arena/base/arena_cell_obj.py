@@ -1,9 +1,11 @@
 from obj_properties.rect_form import Rectangle
-from settings.arena_settings import STANDARD_ARENA_SIZE, STANDARD_ARENA_BORDER_SIZE, ELEMENT_SIZE, STANDARD_ARENA_Y_SIZE
-from common_things.common_objects_lists_dicts import BULLETS_LIST, ITEMS_LIST, PARTICLE_LIST_L1,\
-    ALL_OBJECT_DICT, NEW_OBJECTS, DEAD_OBJECTS
+from settings.arena_settings import STANDARD_ARENA_X_SIZE, STANDARD_ARENA_BORDER_SIZE, ELEMENT_SIZE, \
+    STANDARD_ARENA_Y_SIZE
+from common_things.common_objects_lists_dicts import BULLETS_LIST, OBJECTS_LIST, PARTICLE_LIST_L1, \
+    ALL_OBJECT_DICT, NEW_OBJECTS, DEAD_OBJECTS, MELEE_HITS_LIST
 from settings.weapon_settings.types_and_names import BULLETS_TYPE
 from common_things.object_creator import add_object
+from settings.global_parameters import its_client_instance
 
 
 class ArenaCellObject(Rectangle):
@@ -14,16 +16,16 @@ class ArenaCellObject(Rectangle):
     ARENA, BULLETS, UNITS and ITEMS CONTROLLER
 
     """
-    ARENA_SIZE = STANDARD_ARENA_SIZE  # world cell_size
+    ARENA_SIZE = STANDARD_ARENA_X_SIZE, STANDARD_ARENA_Y_SIZE  # world cell_size
     BORDER_SIZE = STANDARD_ARENA_BORDER_SIZE  # borders of cell
     ELEMENT_SIZE = ELEMENT_SIZE
 
-    def __init__(self, data: dict = {}, server_instance=False):
+    def __init__(self, data: dict = {}, server_instance=not its_client_instance()):
         self.server_instance = server_instance
         self._size = ArenaCellObject.ARENA_SIZE
-        self._border_size = ArenaCellObject.ARENA_SIZE * ArenaCellObject.BORDER_SIZE
+        self._border_size = STANDARD_ARENA_X_SIZE * ArenaCellObject.BORDER_SIZE
 
-        super().__init__(x=0, y=0, size_x=self._size, size_y=STANDARD_ARENA_Y_SIZE)
+        super().__init__(x=0, y=0, size_x=STANDARD_ARENA_X_SIZE, size_y=STANDARD_ARENA_Y_SIZE)
 
         self._data = data
 
@@ -33,7 +35,7 @@ class ArenaCellObject(Rectangle):
         self.__create_borders()
 
         # -------- LISTS --------
-        self._items = ITEMS_LIST
+        self._objects = OBJECTS_LIST
         self._bullets = BULLETS_LIST
         self._particles = PARTICLE_LIST_L1
 
@@ -48,6 +50,13 @@ class ArenaCellObject(Rectangle):
         self._update()
 
     def _update(self):
+        for obj in self._objects.copy():
+            obj.update()
+            if obj.dead:
+                self.dead_objects_keys.add(obj.KEY)
+            elif not self.server_instance:
+                obj.draw()
+
         for bullet in self._bullets.copy():
             bullet.update()
             if bullet.dead:
@@ -55,6 +64,11 @@ class ArenaCellObject(Rectangle):
 
             elif not self.server_instance:
                 bullet.draw()
+
+        for hit in MELEE_HITS_LIST.copy():
+            hit.update()
+            if hit.dead:
+                MELEE_HITS_LIST.remove(hit)
 
         if self.server_instance and self.dead_objects_keys:
             self._dead_objects.extend(self.dead_objects_keys)
@@ -109,11 +123,6 @@ class ArenaCellObject(Rectangle):
 
         return 0
 
-    @staticmethod
-    def normalize_xy_for_element(x, y):
-        return (x // ArenaCellObject.ELEMENT_SIZE) * ArenaCellObject.ELEMENT_SIZE, \
-               (y // ArenaCellObject.ELEMENT_SIZE) * ArenaCellObject.ELEMENT_SIZE
-
     @property
     def dead_objects(self):
         dead_obj = self._dead_objects.copy()
@@ -127,7 +136,7 @@ class ArenaCellObject(Rectangle):
         return new_obj
 
     def __del__(self):
-        for objects_pull in (self._bullets, self._items,
+        for objects_pull in (self._bullets, self._objects, MELEE_HITS_LIST,
                              self._particles, self.all_objects_dict,
                              self._dead_objects, self._new_objects
                              ):

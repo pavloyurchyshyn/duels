@@ -1,5 +1,5 @@
 from obj_properties.circle_form import Circle
-from obj_properties.lazy_load_mixin import PictureLazyLoadMixin
+from obj_properties.img_lazy_load import PictureLazyLoadMixin
 from math import degrees
 from common_things.camera import GLOBAL_CAMERA
 

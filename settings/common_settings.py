@@ -15,7 +15,7 @@ if not os.path.exists(SETTINGS_PATH):
 SOUNDS_FOLDER = os.path.join(ROOT_OF_GAME, 'sounds')
 SERVER_FOLDER = os.path.join(ROOT_OF_GAME, 'network')
 
-COMMON_GAME_SETTINGS_JSON_PATH = os.path.join(SETTINGS_PATH, 'common_game_settings.json')
+COMMON_GAME_SETTINGS_JSON_PATH = 'common_game_settings.json'  # os.path.join(SETTINGS_PATH, 'common_game_settings.json')
 
 PLAYER_NICKNAME_KEY = 'player_nickname'
 

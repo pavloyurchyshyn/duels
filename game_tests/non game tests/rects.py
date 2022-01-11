@@ -1,4 +1,4 @@
-from settings.arena_settings import STANDARD_ARENA_SIZE, STANDARD_ARENA_BORDER_SIZE, \
+from settings.arena_settings import STANDARD_ARENA_X_SIZE, STANDARD_ARENA_BORDER_SIZE, \
     ELEMENT_SIZE, SUB_CELL_SIZE
 from pygame import Rect, draw
 import time
@@ -7,8 +7,8 @@ from obj_properties.rect_form import Rectangle
 rects = []
 start = time.time()
 
-for x in range(0, STANDARD_ARENA_SIZE, ELEMENT_SIZE):
-    for y in range(0, STANDARD_ARENA_SIZE, ELEMENT_SIZE):
+for x in range(0, STANDARD_ARENA_X_SIZE, ELEMENT_SIZE):
+    for y in range(0, STANDARD_ARENA_X_SIZE, ELEMENT_SIZE):
         rects.append(Rect((x, y), (ELEMENT_SIZE, ELEMENT_SIZE)))
 
 print(time.time() - start)
@@ -16,8 +16,8 @@ print(time.time() - start)
 rects = []
 start = time.time()
 
-for x in range(0, STANDARD_ARENA_SIZE, ELEMENT_SIZE):
-    for y in range(0, STANDARD_ARENA_SIZE, ELEMENT_SIZE):
+for x in range(0, STANDARD_ARENA_X_SIZE, ELEMENT_SIZE):
+    for y in range(0, STANDARD_ARENA_X_SIZE, ELEMENT_SIZE):
         rects.append(Rectangle(x, y, ELEMENT_SIZE, ELEMENT_SIZE))
 
 print(time.time() - start)

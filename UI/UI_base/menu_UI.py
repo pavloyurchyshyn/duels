@@ -8,7 +8,6 @@ from settings.window_settings import SCREEN_W, SCREEN_H, MAIN_SCREEN
 from UI.UI_base.button_UI import Button
 from UI.UI_controller import UI_TREE
 from common_things.global_mouse import GLOBAL_MOUSE
-from visual.visual_effects_controller import VisualEffectsController
 
 
 class MenuUI(Rectangle):

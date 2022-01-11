@@ -14,15 +14,11 @@ from UI.UI_menus.main_menu_settings import MAIN_MENU_SETTINGS_UI
 from UI.UI_menus.multiplayer import MULTIPLAYER_UI
 from UI.UI_menus.mul_round_pause import MUL_ROUND_PAUSE_UI
 
-from visual.visual_effects_controller import VisualEffectsController
-
 from common_things.camera import GLOBAL_CAMERA
 from common_things.stages import Stages
 from common_things.global_keyboard import GLOBAL_KEYBOARD
-from common_things.global_clock import ROUND_CLOCK
-from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.sound_loader import GLOBAL_MUSIC_PLAYER
-from common_things.global_messager import GLOBAL_MESSAGER
+from UI.global_messager import GLOBAL_MESSAGER
 
 from network.server_controller import SERVER_CONTROLLER
 
@@ -32,7 +28,9 @@ import sys
 from game_stages_classes.multiplayer_stage import GLOBAL_MUL_STAGE
 from game_stages_classes.single_round_stage import SINGLE_STAGE
 from pygame import quit as close_program_pygame
-from common_things.loggers import LOGGER
+from UI.music_player import MusicPlayerUI
+
+m_player = MusicPlayerUI(200, 20)
 
 
 class GameBody:
@@ -87,6 +85,8 @@ class GameBody:
         self._global_messager.update()
         self._global_messager.draw()
 
+        m_player.update()
+        m_player.draw()
         UI_TREE.update()
         UI_TREE.draw()
 

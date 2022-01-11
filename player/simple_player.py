@@ -3,24 +3,27 @@ from pygame import mouse, transform, draw
 
 from math import degrees
 
-from settings.global_parameters import GLOBAL_SETTINGS, test_draw_status_is_on  # , X_SCALE, Y_SCALE
+from settings.global_parameters import GLOBAL_SETTINGS, test_draw_status_is_on
 
 from common_things.global_clock import GLOBAL_CLOCK
+from common_things.camera import GLOBAL_CAMERA
 
-from settings.default_keys import SPELL_1_C
-from player.base_player import BasePlayer
+from player.base.base_player import BasePlayer
+from player.base.player_with_pictures import PlayerLazyLoad
 
 
-class SimplePlayer(BasePlayer):
+class SimplePlayer(BasePlayer, PlayerLazyLoad):
     def __init__(self, x, y,
                  arena=None,
                  size=PLAYER_SIZE,
                  follow_mouse=False,
                  **kwargs):
         size = int(size)
-        super().__init__(x, y, size=size, arena=arena, load_images=True, **kwargs)
+        super().__init__(x, y, size=size, arena=arena, **kwargs)
+        PlayerLazyLoad.__init__(self)
+        self.img_size = size, size
         self.follow_mouse = follow_mouse
-
+        self.camera = kwargs.get('camera', GLOBAL_CAMERA)
         self.global_settings = GLOBAL_SETTINGS
 
         self.rotate_to_cursor((0, 0))
@@ -33,27 +36,24 @@ class SimplePlayer(BasePlayer):
 
         self.update_effects(time_d)
 
-        if SPELL_1_C in commands:
-            self.face_anim.change_animation('rage')
-
         if self.follow_mouse:
             mouse_pos = mouse.get_pos()
             c = self.camera.camera
             abs_mouse_pos = mouse_pos[0] - c[0], mouse_pos[1] - c[1]
             self.rotate_to_cursor(abs_mouse_pos)
 
-        self.update_circle_under_player()
+        # self.update_circle_under_player()
         self.update_hands_endpoints()
 
         self.face_anim.update(time_d, self._center, self._angle)
 
-        self.health_points_text.change_pos(self._center[0], self._center[1] + self._size)
+    #         self.health_points_text.change_pos(self._center[0], self._center[1] + self._size)
 
     def update_circle_under_player(self):
         if self.under_player_circle:
             self.under_player_circle.update(self._d_time, position=self._center)
 
-    def _draw(self) -> None:
+    def draw(self) -> None:
         if self.turn_off_camera:
             dx = dy = 0
         else:
@@ -65,7 +65,7 @@ class SimplePlayer(BasePlayer):
         if self.under_player_circle:
             self.under_player_circle.draw(dx=dx, dy=dy)
 
-        img_copy = transform.rotate(self.image, -degrees(self._angle))
+        img_copy = transform.rotate(transform.scale(self.image, self.img_size), -degrees(self._angle))
         main_screen.blit(img_copy, (x0 - img_copy.get_width() // 2 + dx, y0 - img_copy.get_height() // 2 + dy))
 
         if test_draw_status_is_on():
@@ -78,8 +78,9 @@ class SimplePlayer(BasePlayer):
                     3)
 
         self.face_anim.draw(dx, dy)
-        if self._draw_health_points:
-            self.health_points_text.draw(dx, dy)
+
+        # if self._draw_health_points:
+        #   self.health_points_text.draw(dx, dy)
 
     @property
     def health_points(self):
@@ -95,17 +96,19 @@ class SimplePlayer(BasePlayer):
                 self.face_anim.change_animation('idle')
 
             self._health_points = health_points
-            self.health_points_text.change_text(int(health_points))
+
+    #       self.health_points_text.change_text(int(health_points))
 
     def revise(self):
         BasePlayer.revise(self)
         self.face_anim.change_animation('idle')
-        self.health_points_text.change_text(int(self.health_points))
+
+    #        self.health_points_text.change_text(int(self.health_points))
 
     def damage(self, damage):
         if damage:
             BasePlayer.damage(self, damage)
-            self.health_points_text.change_text(int(self._health_points))
+            #             self.health_points_text.change_text(int(self._health_points))
             if self._health_points <= 0.0:
                 self.face_anim.change_animation('dying')
             else:
@@ -113,11 +116,8 @@ class SimplePlayer(BasePlayer):
 
     @property
     def position(self):
-        # return self._center[0] / X_SCALE, self._center[1] / Y_SCALE
         return self._center[0], self._center[1]
 
     @position.setter
     def position(self, xy):
-        x = xy[0]  # * X_SCALE
-        y = xy[1]  # * Y_SCALE
-        self._change_position((x, y), True)
+        self._change_position(xy, 1)

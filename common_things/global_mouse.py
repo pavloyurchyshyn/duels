@@ -18,7 +18,8 @@ from math import cos, sin, radians
 
 
 class Mouse:
-    MOUSE_SIZE = (DEFAULT_CROSSHAIR_SIZE, DEFAULT_CROSSHAIR_SIZE)#(DEFAULT_CROSSHAIR_SIZE * GAME_SCALE, DEFAULT_CROSSHAIR_SIZE * GAME_SCALE)
+    MOUSE_SIZE = (DEFAULT_CROSSHAIR_SIZE,
+                  DEFAULT_CROSSHAIR_SIZE)  # (DEFAULT_CROSSHAIR_SIZE * GAME_SCALE, DEFAULT_CROSSHAIR_SIZE * GAME_SCALE)
     MAIN_SCREEN = MAIN_SCREEN
 
     def __init__(self, rel=None, pos=None, pressed=None):
@@ -54,7 +55,7 @@ class Mouse:
     def update(self):
         self._rel = self.mouse.get_rel()
         self._pos = [*self.mouse.get_pos()]
-        self._pressed = self.mouse.get_pressed()
+        self._pressed = list(self.mouse.get_pressed())
         self._scroll_top = 0
         self._scroll_bot = 0
 
@@ -107,6 +108,10 @@ class Mouse:
     @property
     def lmb(self):
         return self._pressed[0]
+
+    @lmb.setter
+    def lmb(self, val):
+        self._pressed[0] = val
 
     @property
     def network_data(self):

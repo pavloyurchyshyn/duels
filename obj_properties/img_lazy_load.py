@@ -1,6 +1,8 @@
-from visual.visual_effects_controller import VisualEffectsController
+from visual.base.visual_effects_controller import VisualEffectsController
 from settings.global_parameters import its_client_instance
 from common_things.loggers import LOGGER
+
+CLIENT_INST = its_client_instance()
 
 
 class ScreenLazyLoad:
@@ -9,7 +11,7 @@ class ScreenLazyLoad:
     MAIN_SCREEN = None
 
     def __init__(self):
-        if its_client_instance() and ScreenLazyLoad.MAIN_SCREEN is None:
+        if ScreenLazyLoad.MAIN_SCREEN is None and CLIENT_INST:
             self.load_screen()
 
     @staticmethod
@@ -19,6 +21,7 @@ class ScreenLazyLoad:
         LOGGER.info('Main screen loaded')
         ScreenLazyLoad.CLIENT_INSTANCE = 1
 
+
 class LoadPictureMethodLazyLoad:
     LOAD_IMAGE = None
     LOAD_ANIMATION = None
@@ -26,7 +29,7 @@ class LoadPictureMethodLazyLoad:
     ROTATE_ANIMATION = None
 
     def __init__(self):
-        if its_client_instance() and LoadPictureMethodLazyLoad.LOAD_IMAGE is None:
+        if CLIENT_INST and LoadPictureMethodLazyLoad.LOAD_IMAGE is None:
             super(LoadPictureMethodLazyLoad, self).__init__()
             self.load_img_loader()
 
@@ -74,17 +77,25 @@ class PygameMethodsLazyLoad:
         PygameMethodsLazyLoad.SMOOTH_SCALE = smoothscale
 
 
+class AdditionalLazyLoad:
+    def __init__(self, client_inst=0):
+        if client_inst or CLIENT_INST:
+            self.additional_lazy_load()
+
+    def additional_lazy_load(self):
+        raise NotImplementedError
+
+
 class OnePictureLazyLoad(LoadPictureMethodLazyLoad, PygameMethodsLazyLoad, ScreenLazyLoad):
     PICTURE_PATH = None
     PICTURE = None
 
     def __init__(self, size=None, angle=None, smooth_scale=0):
-        if self.PICTURE is None and its_client_instance():
+        if self.PICTURE is None and CLIENT_INST:
             super().__init__()
             PygameMethodsLazyLoad.__init__(self)
             ScreenLazyLoad.__init__(self)
             self.load_picture(size, angle, smooth_scale)
-            self.additional_lazy_load()
 
     @classmethod
     def load_picture(cls, size, angle, smooth_scale):
@@ -94,7 +105,3 @@ class OnePictureLazyLoad(LoadPictureMethodLazyLoad, PygameMethodsLazyLoad, Scree
                                          smooth_scale=smooth_scale)
 
             LOGGER.info(f'One picture loaded: {cls.PICTURE_PATH}')
-
-    def additional_lazy_load(self):
-        pass
-

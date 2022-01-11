@@ -9,7 +9,7 @@ from common_things.img_loader import normalize_color
 
 from pygame import Surface, BLEND_RGB_ADD
 from pygame.draw import circle as draw_circle
-from visual.base_effect import BaseEffect
+from visual.base.base_effect import BaseEffect
 
 
 class TransparentCircle(Projectile, BaseEffect):

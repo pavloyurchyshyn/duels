@@ -3,7 +3,7 @@ from common_things.global_clock import GLOBAL_CLOCK
 from pygame import font, Surface
 from pygame.transform import rotate, scale, smoothscale
 from settings.colors import WHITE
-
+from settings.window_settings import MAIN_SCREEN
 # from settings.screen_size import X_SCALE, Y_SCALE
 X_SCALE, Y_SCALE = 1, 1
 
@@ -13,7 +13,7 @@ class Text:
     CLOCK = GLOBAL_CLOCK
     MIN_Y = 7
 
-    def __init__(self, text, screen, x=None, y=None,
+    def __init__(self, text, screen=MAIN_SCREEN, x=None, y=None,
                  color=WHITE,
                  size=None,
                  shadow=False,

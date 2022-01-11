@@ -1,0 +1,1 @@
+BALL_DEFAULT_R = 15

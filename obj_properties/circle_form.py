@@ -1,7 +1,7 @@
 from math import sin, cos, radians, dist
 from interfaces.collide_interfaces import CollideInterface
 from abc import abstractmethod
-from obj_properties.properties_constants import CIRCLE_TYPE, RECT_TYPE, SEMI_CIRCLE_TYPE, LINE_TYPE
+from obj_properties.properties_constants import CIRCLE_TYPE, RECT_TYPE, SEMI_CIRCLE_TYPE, LINE_TYPE, POINT_TYPE
 
 
 class Circle(CollideInterface):
@@ -21,7 +21,7 @@ class Circle(CollideInterface):
         self._collide_able = 1
         self._make_dots()
 
-    def _change_position(self, xy: tuple, make_dots=0, angle=None) -> None:
+    def _change_position(self, xy: list, make_dots=0, angle=None) -> None:
         """
         Changing position of object center.
 
@@ -123,6 +123,9 @@ class Circle(CollideInterface):
 
             elif other.FORM_TYPE == LINE_TYPE:
                 return other.collide_circle(self._center, self._size)
+
+            elif other.FORM_TYPE == POINT_TYPE:
+                return self.collide_point(other._center)
 
             return self.collide_dots(other)
         else:

@@ -7,7 +7,6 @@ class SimpleWeaponInterface:
         raise NotImplementedError
 
     @abstractmethod
-    @property
     def damage(self):
         raise NotImplementedError
 

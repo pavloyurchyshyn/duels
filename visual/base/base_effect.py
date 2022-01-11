@@ -1,11 +1,13 @@
 from common_things.camera import GLOBAL_CAMERA
 from common_things.global_clock import ROUND_CLOCK, GLOBAL_CLOCK
+from common_things.global_round_parameters import GLOBAL_ROUND_PARAMETERS
 from settings.window_settings import MAIN_SCREEN
 from pygame.transform import rotate, scale, smoothscale
 from pygame.draw import circle, line, lines, polygon, rect
 
 
 class BaseEffect:
+    ROUND_PARAMETERS = GLOBAL_ROUND_PARAMETERS
     EFFECT_TYPE = None
 
     MAIN_SCREEN = MAIN_SCREEN

@@ -1,6 +1,6 @@
 from interfaces.collide_interfaces import CollideInterface
 from abc import abstractmethod
-from obj_properties.properties_constants import CIRCLE_TYPE, RECT_TYPE, SEMI_CIRCLE_TYPE, LINE_TYPE
+from obj_properties.properties_constants import CIRCLE_TYPE, RECT_TYPE, SEMI_CIRCLE_TYPE, LINE_TYPE, POINT_TYPE
 
 
 class Rectangle(CollideInterface):
@@ -136,14 +136,18 @@ class Rectangle(CollideInterface):
 
     def collide(self, other) -> bool:
         if self._collide_able:
-            if other.FORM_TYPE == self.FORM_TYPE:
+            other_type = other.FORM_TYPE
+            if other_type == self.FORM_TYPE:
                 return self.collide_dots(other)
 
-            elif other.FORM_TYPE == CIRCLE_TYPE:
-                return self.collide_circle(other._center, other._size)
+            elif other_type == CIRCLE_TYPE:
+                return self.collide_circle(other._center, other.h_size)
 
-            elif other.FORM_TYPE == LINE_TYPE:
+            elif other_type == LINE_TYPE:
                 return other.collide_rect(self)
+
+            elif other_type == POINT_TYPE:
+                return self.collide_point(other._center)
 
         return 0
 
@@ -165,3 +169,6 @@ class Rectangle(CollideInterface):
     @property
     def center(self):
         return self._center
+
+    def get_rect(self):
+        return (self.x0, self.y0, self.size_x, self.size_y)

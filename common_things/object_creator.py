@@ -5,6 +5,7 @@ from common_things.common_objects_lists_dicts import *
 
 TYPE_LIST_DICT = {
     BULLETS_TYPE: BULLETS_LIST,
+    MELEE_HIT_TYPE: MELEE_HITS_LIST,
 }
 
 

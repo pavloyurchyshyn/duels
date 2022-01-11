@@ -19,9 +19,11 @@ class Logger(metaclass=Singleton):
                 pass
 
         start = datetime.datetime.today().strftime("%Y-%m-%d-%H.%M.%S")
-        logging.basicConfig(filename=LOG_FILE_PATTERN.format('last'), level=0)
+        logging.basicConfig(filename=LOG_FILE_PATTERN.format('last'),
+                            format='%(asctime)s|%(levelname)s: %(message)s', datefmt='%H:%M:%S',
+                            level=0)
         self.LOGGER = logging.getLogger(__name__)
-
+        self.LOGGER.info(f'Start: {start}')
 
 LOGGER = Logger().LOGGER
 # logger.info(f'Game started {start}')

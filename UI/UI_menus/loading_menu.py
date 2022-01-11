@@ -2,8 +2,7 @@ from UI.UI_base.menu_UI import MenuUI
 from settings.UI_setings.menus_settings.loading import PLAYER_PIC
 from settings.game_stages_constants import LOADING_STAGE
 from visual.fire import GreenFire, FireEffect, BlueFire, VioletFire
-from visual.tornado_effect import Tornado
-from visual.visual_effects_controller import VisualEffectsController
+from visual.base.visual_effects_controller import VisualEffectsController
 from math import sin, cos, radians
 from obj_properties.rect_form import Rectangle
 from settings.window_settings import SCREEN_W, SCREEN_H
@@ -44,6 +43,7 @@ class Loading_menu(MenuUI):
             if effect not in VisualEffectsController.effects():
                 VisualEffectsController.add_effect(effect)
 
+        VisualEffectsController.update()
         PLAYER_PIC.update()
 
     def draw(self, dx=0, dy=0):

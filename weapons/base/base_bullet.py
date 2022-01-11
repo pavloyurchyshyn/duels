@@ -1,14 +1,16 @@
 from obj_properties.base_projectile import Projectile
-from obj_properties.lazy_load_mixin import PictureLazyLoadMixin
+from obj_properties.img_lazy_load import OnePictureLazyLoad, AdditionalLazyLoad
+from obj_properties.point import Point
 from settings.weapon_settings.base_bullet import *
 from common_things.camera import GLOBAL_CAMERA
+from common_things.common_objects_lists_dicts import PLAYERS_LIST, OBJECTS_LIST
 from math import degrees, cos, sin
 from settings.weapon_settings.types_and_names import BULLETS_TYPE, SIMPLE_BULLET
 from settings.game_objects_constants import ANGLE_CHANGE_P_SEC, STOP_FORCE_K, STOP_FORCE_VALUE
 from settings.all_types_and_names import add_type_and_name_to_collectors
 
 
-class SimpleBullet(Projectile, PictureLazyLoadMixin):
+class SimpleBullet(Projectile, OnePictureLazyLoad, Point, AdditionalLazyLoad):
     TYPE = BULLETS_TYPE
     PICTURE_PATH = DEFAULT_BULLET_PICTURE
     NAME = SIMPLE_BULLET
@@ -20,11 +22,11 @@ class SimpleBullet(Projectile, PictureLazyLoadMixin):
 
     def __init__(self, x, y,
                  angle: float,
+                 owner,
                  speed: float = None,
                  size: float = None,
-                 owner=None,
                  damage=None,
-                 push_force=150,
+                 push_force=300,
                  **kwargs):
         size = size if size else DEFAULT_SIZE
         self.size: tuple = (size, size)
@@ -36,11 +38,12 @@ class SimpleBullet(Projectile, PictureLazyLoadMixin):
                          angle=angle,
                          collide_shape=collide_shape,
                          **kwargs)
+        OnePictureLazyLoad.__init__(self)
+        AdditionalLazyLoad.__init__(self)
 
         self._picture = SimpleBullet.PICTURE
         self._main_screen = SimpleBullet.MAIN_SCREEN
         self._picture_rotate = SimpleBullet.ROTATE  # pygame transform.rotate
-        PictureLazyLoadMixin.__init__(self)
         self.owner = owner
 
         self.damage = damage if damage else DEFAULT_BULLET_DAMAGE
@@ -60,20 +63,34 @@ class SimpleBullet(Projectile, PictureLazyLoadMixin):
         if self.CREATION_EFFECT:
             self.EFFECTS_CON.add_effect(self.CREATION_EFFECT(*self._position, speed=self._speed,
                                                              head_len=self.size[0] + self.size[0] + self.size[0],
-                                                             tail_len=self.size[0], width_len=self.size[0]/2,
+                                                             tail_len=self.size[0], width_len=self.size[0] / 2,
                                                              fill=1,
                                                              angle=self.angle, arena=self.arena),
                                         layer=0)
 
     def additional_lazy_load(self):
-        from visual.diamond_effect import DiamondEffect
-        SimpleBullet.CREATION_EFFECT = DiamondEffect
+        pass
+
+        # from visual.diamond_effect import DiamondEffect
+        # SimpleBullet.CREATION_EFFECT = DiamondEffect
         # SimpleBullet
 
     def update(self):
         self._update()
+        self.check_for_players_intersection()
+        self.check_for_object_intersection()
 
-    def _draw(self):
+    def check_for_object_intersection(self):
+        for obj in OBJECTS_LIST:
+            if obj.collide(self):
+                self.interact_with_object(obj)
+
+    def check_for_players_intersection(self):
+        for player in PLAYERS_LIST:
+            if player.collide(self):
+                self.interact_with_object(player)
+
+    def draw(self):
         dx, dy = GLOBAL_CAMERA.camera
         x, y = self.int_position
 

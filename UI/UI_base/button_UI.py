@@ -16,8 +16,7 @@ from settings.colors import simple_colors
 from settings.global_parameters import test_draw_status_is_on
 from settings.window_settings import MAIN_SCREEN, SCREEN_W, SCREEN_H
 
-# from settings.window_settings import Y_SCALE, X_SCALE
-X_SCALE, Y_SCALE = 1, 1
+from settings.window_settings import Y_SCALE, X_SCALE
 
 
 class Button(Rectangle):
@@ -63,6 +62,7 @@ class Button(Rectangle):
                  border_color=simple_colors['white'],
                  border_width=DEFAULT_BORDER_WIDTH,
                  border_non_active_color=simple_colors['grey'],
+                 border_parameters={},
 
                  background_color=(0, 0, 0, 120),  # r, g, b, t
                  transparent=0,
@@ -70,6 +70,8 @@ class Button(Rectangle):
                  click_delay=1,
                  time_b_click=None,
                  id=None,
+
+                 click_anim_dur=None,
                  **kwargs):
 
         self.id = id
@@ -121,6 +123,7 @@ class Button(Rectangle):
         self._border_active_color = border_color
         self._border_non_active_color = border_non_active_color
         self._border_width = border_width
+        self._border_parameters = border_parameters
 
         # --------- BACKGROUND ------------------
         self._background_t = transparent
@@ -162,7 +165,9 @@ class Button(Rectangle):
         self._clicked_border = self.get_surface(1, (0, 0, 0, 0))
 
         DrawRect(self._clicked_border, self._border_active_color, self._clicked_border.get_rect(),
-                 int(self._border_width * 2))
+                 int(self._border_width * 2), **self._border_parameters)
+
+        self._click_anim_dur = click_anim_dur if click_anim_dur else self.CLICK_ANIMATION_DUR
 
     def build(self, k=1):
         self._button_surface = self.get_surface()  # surface of button for drawing
@@ -172,8 +177,11 @@ class Button(Rectangle):
         active_button_s = self.get_surface()  # create background surface
         non_active_button_s = self.get_surface()
 
-        active_button_s.fill(self._background_color)  # fill background surface
-        non_active_button_s.fill(self._background_color)
+        # active_button_s.fill(self._background_color)  # fill background surface
+        DrawRect(active_button_s, self._background_color, active_button_s.get_rect(), 0, **self._border_parameters)
+        # non_active_button_s.fill(self._background_color)
+        DrawRect(non_active_button_s, self._background_color, non_active_button_s.get_rect(), 0, **self._border_parameters)
+
         self._text_size = self._text_size * k if self._text_size * k >= 1 else self._text_size
 
         if len(self._text_text) > 0:
@@ -194,10 +202,10 @@ class Button(Rectangle):
 
         if self._border_width > 0:
             DrawRect(active_button_s, color=self._border_active_color,
-                     rect=self._border, width=self._border_width)
+                     rect=self._border, width=self._border_width, **self._border_parameters)
 
             DrawRect(non_active_button_s, color=self._border_non_active_color,
-                     rect=self._border, width=self._border_width)
+                     rect=self._border, width=self._border_width, **self._border_parameters)
 
         self._r_active_button = active_button_s  # should be created button picture
         self._r_active_button.convert_alpha()
@@ -242,7 +250,7 @@ class Button(Rectangle):
                 else:
                     return 0
 
-            self._animation_finish_time = Button.CLOCK.time + self.CLICK_ANIMATION_DUR
+            self._animation_finish_time = Button.CLOCK.time +  self._click_anim_dur
 
             if self._non_active_after_click:
                 self._current_button_pic = self._r_non_active_button

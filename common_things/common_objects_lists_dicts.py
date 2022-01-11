@@ -34,7 +34,8 @@ PARTICLE_LIST_L1 = []  # NumList()
 PARTICLE_LIST_L0 = []  # NumList()
 BULLETS_LIST = []  # NumList()
 SPELLS_LIST = []
-ITEMS_LIST = []
+MELEE_HITS_LIST = []
+OBJECTS_LIST = []
 PLAYERS_LIST = []
 
 

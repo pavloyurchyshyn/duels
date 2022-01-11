@@ -6,11 +6,10 @@ from settings.visual_settings.effects_types import FIRE_TYPE
 from common_things.camera import GLOBAL_CAMERA
 from common_things.global_clock import GLOBAL_CLOCK
 
-
 from pygame.draw import circle as draw_circle
 
-from visual.transparent_circle_effect import TransparentCircle
-from visual.visual_effects_controller import VisualEffectsController
+from visual.base.transparent_circle_effect import TransparentCircle
+from visual.base.visual_effects_controller import VisualEffectsController
 from random import randrange, random, choice
 
 
@@ -23,7 +22,7 @@ class FireEffect(Projectile):
     SPARKLE_COLORS = [255, 125, 0], [225, 225, 0]
     SPARKLE_COLOR_CHANGE = [-200, -255, 0]
 
-    HEAD_COLOR = (255, 255, 255)
+    HEAD_COLOR = (255, 255, 155)
 
     speed_frequency = 10 * 0.1
 
@@ -61,7 +60,7 @@ class FireEffect(Projectile):
         self._head_color = head_color if head_color else self.HEAD_COLOR
         self._head_line_width = head_line_width
 
-        self._particle_creating_delay = -particle_creating_delay # + particle_speed*self.speed_frequency
+        self._particle_creating_delay = -particle_creating_delay  # + particle_speed*self.speed_frequency
         self._particle_size = particle_size
         self._particle_size_scale = particle_size_scale
         self._particle_speed = particle_speed
@@ -75,6 +74,8 @@ class FireEffect(Projectile):
         self._fire_particles = []
         self._position_rand_range = (-particle_size // 15, particle_size // 15)
 
+        self.alive_condition = kwargs['alive_condition'] if kwargs.get('alive_condition') else self._alive_condition
+
     def update(self):
         self._update()
 
@@ -85,7 +86,7 @@ class FireEffect(Projectile):
             x, y = self._position
             x += randrange(*self._position_rand_range)
             y += randrange(*self._position_rand_range)
-            fire = TransparentCircle(x=x, y=y,
+            fire = TransparentCircle(x=x, y=y, arena=self.arena,
                                      size=self._particle_size,
                                      speed=self._particle_speed,
                                      size_scale=self._particle_size_scale,
@@ -100,13 +101,13 @@ class FireEffect(Projectile):
 
             if self._sparkles and random() > 0.8:
                 self._fire_particles.append(TransparentCircle(x=x, y=y,
-                                                              size=5,
+                                                              size=5, arena=self.arena,
                                                               speed=self._particle_speed * 5,
                                                               angle=self._angle + randrange(-90, 90),
                                                               color=choice(self._sparkles_colors).copy(),
                                                               transparent=0,
                                                               color_change=self._sparkles_color_change,
-                                                              size_scale=-.5,
+                                                              size_scale=-0.5,
                                                               ))
 
         for effect in self._fire_particles.copy():
@@ -129,9 +130,10 @@ class FireEffect(Projectile):
 
         if self._head_radius:
             draw_circle(self._screen, self._head_color, (x + dx, y + dy), self._head_radius, self._head_line_width)
+            draw_circle(self._screen, (255, 255, 255), (x + dx, y + dy), self._head_radius, 1)
 
     @staticmethod
-    def alive_condition(self):
+    def _alive_condition(self):
         if self._live_time:
             return self._live_time > 0
         else:
@@ -149,7 +151,7 @@ class VioletFire(FireEffect):
     SPARKLE_COLORS = [255, 0, 255], [255, 50, 255]
     SPARKLE_COLOR_CHANGE = [-200, -255, -255]
 
-    HEAD_COLOR = (100, 0, 100)
+    HEAD_COLOR = (255, 50, 255)
 
 
 class GreenBlueFire(FireEffect):
@@ -159,6 +161,8 @@ class GreenBlueFire(FireEffect):
     SPARKLE_COLORS = [100, 220, 255], [255, 220, 220]
     SPARKLE_COLOR_CHANGE = [-255, -255, -200]
 
+    HEAD_COLOR = (100, 255, 255)
+
 
 class BlueFire(FireEffect):
     FIRE_COLOR = [100, 100, 255]
@@ -166,6 +170,7 @@ class BlueFire(FireEffect):
 
     SPARKLE_COLORS = [100, 100, 255], [200, 200, 255]
     SPARKLE_COLOR_CHANGE = [-255, -255, -100]
+    HEAD_COLOR = (120, 120, 255)
 
 
 class GreenFire(FireEffect):
@@ -175,4 +180,4 @@ class GreenFire(FireEffect):
     SPARKLE_COLORS = [100, 255, 100], [200, 255, 100]
     SPARKLE_COLOR_CHANGE = [-200, -255, -255]
 
-    HEAD_COLOR = (0, 155, 0)
+    HEAD_COLOR = (100, 255, 100)

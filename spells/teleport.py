@@ -3,19 +3,21 @@ from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.camera import GLOBAL_CAMERA
 from math import cos, sin, dist
 from visual.teleport_effect import TeleportEffect
-from visual.visual_effects_controller import VisualEffectsController
+from visual.base.visual_effects_controller import VisualEffectsController
 from settings.global_parameters import its_client_instance
+from spells.base_spell import SpellIcon
 
 
-class Teleport:
+class Teleport(SpellIcon):
     CD = 1
 
-    def __init__(self, player, arena=None, **kwargs):
-        self._player = player
+    def __init__(self, owner, arena=None, **kwargs):
+        super().__init__()
+        self._owner = owner
         self._next_teleport = 1
         self._clock = ROUND_CLOCK
-        self._arena = arena if arena else player._arena
-        self._camera = self._player.camera
+        self._arena = arena if arena else owner._arena
+        self._camera = getattr(self._owner, 'camera', GLOBAL_CAMERA)
         self._tp_range = 500
         self._visual_effect = TeleportEffect
 
@@ -25,9 +27,9 @@ class Teleport:
 
     def use(self, camera=its_client_instance):
         if self._next_teleport > 0:
-            angle = self._player.angle
+            angle = self._owner.angle
             x_mouse, y_mouse = GLOBAL_MOUSE.pos
-            x_player, y_player = self._player.position
+            x_player, y_player = self._owner.position
 
             if camera and 0:
                 xm, ym = self._camera.camera
@@ -43,13 +45,21 @@ class Teleport:
 
                 if self._arena.collide_point((x, y)):
                     last_dot = x, y
-                    if dist(last_dot, self._player.position) >= m_dist:
+                    if dist(last_dot, self._owner.position) >= m_dist:
                         break
                 else:
                     break
 
             if last_dot:
                 self._next_teleport = -self.CD
-                VisualEffectsController.add_effect(self._visual_effect(self._player.position, last_dot,
-                                                                       radius=self._player.get_size() * 2))
-                self._player.position = last_dot
+                VisualEffectsController.add_effect(self._visual_effect(self._owner.position, last_dot,
+                                                                       radius=self._owner.get_size() * 2, arena=self._arena))
+                self._owner.position = last_dot
+
+    @property
+    def cooldown(self):
+        return self._next_teleport
+
+    @property
+    def on_cooldown(self):
+        return self._next_teleport < 0.0

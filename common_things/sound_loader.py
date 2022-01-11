@@ -2,7 +2,6 @@ from pygame.mixer import Sound
 from pygame.mixer import music as Music
 
 import os
-import random
 from settings.common_settings import SOUNDS_FOLDER, COMMON_GAME_SETTINGS_JSON_PATH
 from settings.default_common_settings import DEFAULT_MUSIC_VOLUME, MUSIC_MUTED, MUSIC_VOLUME
 from common_things.save_and_load_json_config import load_json_config, save_json_config
@@ -27,6 +26,7 @@ class MusicPlayer:
 
         self._current_song = None
         self._current_song_path = None
+        self._current_song_length = None
 
         self._volume_lvl = settings.get(MUSIC_VOLUME, DEFAULT_MUSIC_VOLUME)  # sound lvl from 0.0 to 1.0
 
@@ -36,8 +36,19 @@ class MusicPlayer:
         Music.set_volume(self._volume_lvl)
         self.save_settings()
 
+    def get_music_pos(self):
+        return Music.get_pos()/1000  # seconds
+
     def update(self):
-        if not Music.get_busy() and not self._muted:
+        if not Music.get_busy() and not self._muted and not self._paused:
+            self.add_second_song()
+            self.play_back_music()
+
+    def play_next(self):
+        if Music.get_busy():
+            Music.unload()
+
+        if not self._muted:
             self.add_second_song()
             self.play_back_music()
 
@@ -45,9 +56,8 @@ class MusicPlayer:
         music_list = filter(lambda file: file.endswith('.mp3') or file.endswith('.wav'),
                             os.listdir(FOLDER_WITH_BACK_MUSIC))
         music_list = map(lambda music: os.path.abspath(os.path.join(FOLDER_WITH_BACK_MUSIC, music)), music_list)
-        music_list = set(music_list)
 
-        self.music_set = music_list
+        self.music_set = set(music_list)
 
     def add_second_song(self):
         if not self.music_set:
@@ -73,6 +83,10 @@ class MusicPlayer:
         if self._current_song_path and not self._muted:
             Music.load(self._current_song_path)
             Music.play(fade_ms=MusicPlayer.FADE)
+            self._current_song_length = Sound(self._current_song_path).get_length()
+
+    def pause_unpause_music(self):
+        self.resume_back_music() if self._paused else self.pause_back_music()
 
     def pause_back_music(self):
         Music.pause()
@@ -115,9 +129,13 @@ class MusicPlayer:
         self.resume_back_music()
         self.save_settings()
 
+    def busy(self):
+        return Music.get_busy()
+
     @property
     def current_song(self):
         return self._current_song
+
     @staticmethod
     def load_sound(path):
         return Sound(os.path.join(SOUNDS_FOLDER, path))
@@ -137,6 +155,10 @@ class MusicPlayer:
     @property
     def muted(self):
         return self._muted
+
+    @property
+    def song_length(self):
+        return self._current_song_length
 
 
 GLOBAL_MUSIC_PLAYER = MusicPlayer()

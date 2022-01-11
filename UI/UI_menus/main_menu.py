@@ -12,16 +12,10 @@ from settings.UI_setings.menus_settings.main_menu import MAIN_MENU_BUTTONS, exit
 from settings.global_parameters import pause_available, pause_step
 from settings.game_stages_constants import MAIN_MENU_STAGE
 
-from visual.visual_effects_controller import VisualEffectsController
-from visual.diamond_effect import DiamondEffect
-from visual.transparent_circle_effect import TransparentCircle
+from visual.base.visual_effects_controller import VisualEffectsController
+from visual.base.diamond_effect import DiamondEffect
 from visual.fire import FireEffect, VioletFire, GreenFire, GreenBlueFire, BlueFire
-from visual.tornado_effect import Tornado
-from visual.growing_line import GrowingLine
-from random import randrange, random, choice, randint
-from math import cos
-
-from common_things.global_mouse import GLOBAL_MOUSE
+from random import randrange, choice, randint
 
 VisualEffectsController.add_effect(FireEffect(HALF_SCREEN_H / 5, 100, speed=110))
 VisualEffectsController.add_effect(VioletFire(HALF_SCREEN_H / 5, 200, speed=110))

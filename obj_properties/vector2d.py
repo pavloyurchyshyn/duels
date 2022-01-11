@@ -64,6 +64,10 @@ class Vector_2d:
         """
         return sqrt(self._x * self._x + self._y * self._y)
 
+    @property
+    def dist(self):
+        return sqrt(self._x * self._x + self._y * self._y)
+
     def mul_k(self, k):
         self._x = k * self._x
         if -Vector_2d.MIN_VALUE < self._x < Vector_2d.MIN_VALUE:

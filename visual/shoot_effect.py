@@ -1,14 +1,6 @@
-from obj_properties.base_projectile import Projectile
-from obj_properties.rect_form import Rectangle
-from settings.window_settings import MAIN_SCREEN, SCREEN_W, SCREEN_H
-from common_things.camera import GLOBAL_CAMERA
-
-from pygame.draw import polygon as draw_polygon
-from pygame.draw import lines as draw_lines
-
-from visual.visual_effects_controller import VisualEffectsController
-from visual.diamond_effect import DiamondEffect
-from math import cos, sin, radians
+from visual.base.visual_effects_controller import VisualEffectsController
+from visual.base.diamond_effect import DiamondEffect
+from math import radians
 
 from random import choice
 

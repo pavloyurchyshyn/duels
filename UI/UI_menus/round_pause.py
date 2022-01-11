@@ -8,7 +8,6 @@ from settings.UI_setings.menus_settings.round_pause import ROUND_PAUSE_BUTTONS, 
 
 from common_things.stages import Stages
 from settings.game_stages_constants import ROUND_PAUSE_STAGE
-from visual.visual_effects_controller import VisualEffectsController
 
 set_main_menu_stage = Stages().set_main_menu_stage
 
