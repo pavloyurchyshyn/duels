@@ -1,4 +1,4 @@
-from common_things.common_objects_lists_dicts import SPELLS_LIST, PLAYERS_LIST, OBJECTS_LIST
+from common_things.common_objects_lists_dicts import PLAYERS_DICT, OBJECTS_LIST
 from settings.global_parameters import its_client_instance
 from settings.spells_settings.spells_constants import BASE_ICON, BASE_ICON_SIZE
 
@@ -17,10 +17,9 @@ class SpellIcon:
 class BaseSpellProjectile:
     def __init__(self):
         self._alive = 1
-        SPELLS_LIST.append(self)
 
     def check_for_players_intersection(self):
-        for player in PLAYERS_LIST:
+        for player in PLAYERS_DICT.values():
             if player.collide(self) and player != self.owner:
                 self.interact_with_player(player)
 

@@ -1,10 +1,11 @@
 from common_things.camera import GLOBAL_CAMERA
 
+from player.base.base_player import BasePlayer
+
 from obj_properties.img_lazy_load import OnePictureLazyLoad, AdditionalLazyLoad
-from obj_properties.objects_data_creator import objects_data_creator
 
 from settings.weapon_settings.base_range import *
-from settings.global_parameters import test_draw_status_is_on
+from object_controller import AllObjectsController
 
 from weapons.base.base_bullet import SimpleBullet
 from math import degrees
@@ -12,12 +13,14 @@ from weapons.base.base_weapon import BaseWeapon
 
 
 class BaseRange(BaseWeapon, OnePictureLazyLoad, AdditionalLazyLoad):
+    obj_controller = AllObjectsController()
+
     PICTURE_PATH = DEFAULT_PICTURE_PLACE
     DEFAULT_SIZE = DEFAULT_SIZE
     SHOOT_EFFECT = None
     DEFAULT_COOLDOWN = DEFAULT_COOLDOWN
 
-    def __init__(self, x, y, owner, size=None, bullet: str=SimpleBullet.NAME):
+    def __init__(self, x, y, owner, size=None, bullet: str = SimpleBullet.OBJ_NAME):
         size = size if size else BaseRange.DEFAULT_SIZE
         OnePictureLazyLoad.__init__(self, (size, size))
         BaseWeapon.__init__(self)
@@ -30,13 +33,13 @@ class BaseRange(BaseWeapon, OnePictureLazyLoad, AdditionalLazyLoad):
         self._picture_rotate = BaseRange.ROTATE  # pygame transform.rotate
 
         self.dt = 0
-        self.owner = owner
+        self.owner: BasePlayer = owner
         self.shoot_cooldown = self.DEFAULT_COOLDOWN
         self.cooldown = 1
         self._use = 0
 
         self._angle = 0
-        self._bullet_type: str = bullet
+        self._bullet_type: str = bullet if bullet else SimpleBullet.OBJ_NAME
         self._arena = owner._arena
 
     def update(self, angle, position):
@@ -50,13 +53,13 @@ class BaseRange(BaseWeapon, OnePictureLazyLoad, AdditionalLazyLoad):
         if self.SHOOT_EFFECT:
             self.SHOOT_EFFECT(*self._center, angle=self._angle, arena=self._arena)
 
-        self._arena.add_object(objects_data_creator(name=self._bullet_type,
-                                                    data={
-                                                        'x': self._center[0],
-                                                        'y': self._center[1],
-                                                        'angle': self._angle,
-                                                        'owner': self.owner,
-                                                    }))
+        self.obj_controller.add_object(dict(name=self._bullet_type,
+                                            data={
+                                                'x': self._center[0],
+                                                'y': self._center[1],
+                                                'angle': self._angle,
+                                                'owner': self.owner._unique_id,
+                                            }))
 
     def use(self):
         if self.cooldown > 0:

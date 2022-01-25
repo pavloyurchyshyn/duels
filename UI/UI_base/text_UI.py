@@ -1,7 +1,7 @@
-from common_things.font_loader import DEFAULT_FONT_SIZE
+from UI.font_loader import DEFAULT_FONT_SIZE
 from common_things.global_clock import GLOBAL_CLOCK
 from pygame import font, Surface
-from pygame.transform import rotate, scale, smoothscale
+from pygame.transform import rotate, smoothscale
 from settings.colors import WHITE
 from settings.window_settings import MAIN_SCREEN
 # from settings.screen_size import X_SCALE, Y_SCALE

@@ -11,8 +11,7 @@ from world_arena.base.arena_cell import ArenaCell
 from objects.dummy import Dummy
 from objects.ball import Ball
 from objects.gates import BallGate
-
-from spells.spells_controller import update_spells
+from objects.turret import Turret
 
 from UI.UI_menus.round_pause import ROUND_PAUSE_UI
 from UI.UI_menus.loading_menu import LOADING_MENU_UI
@@ -20,6 +19,7 @@ from UI.UI_buttons.round_pause import ROUND_PAUSE_BUTTON
 from UI.player_bot_bar import PlayerBotBar
 from UI.global_messager import GLOBAL_MESSAGER
 from UI.ball_arrow import BallArrow
+from UI.scores_text import ScoresText
 
 from visual.base.visual_effects_controller import VisualEffectsController
 
@@ -27,10 +27,12 @@ from common_things.stages import Stages
 from common_things.global_keyboard import GLOBAL_KEYBOARD
 from common_things.global_clock import ROUND_CLOCK
 from common_things.global_mouse import GLOBAL_MOUSE
-from common_things.common_objects_lists_dicts import OBJECTS_LIST, PLAYERS_LIST
+from common_things.common_objects_lists_dicts import OBJECTS_LIST, PLAYERS_DICT
 from common_things.camera import GLOBAL_CAMERA
 from common_things.global_round_parameters import GLOBAL_ROUND_PARAMETERS
 from common_things.loggers import LOGGER
+
+from object_controller import AllObjectsController
 
 from player.client_player import Player
 
@@ -48,10 +50,15 @@ class SingleStage:
 
         self._global_messager = GLOBAL_MESSAGER
         self._player_bot_bar: PlayerBotBar = None
-        self._ball = None
-        self._gates = []
+        self._ball: Ball = None
+        self._gates: [BallGate, BallGate] = []
 
-        self._ball_arrow = None
+        self._ball_arrow: BallArrow = None
+        self._objects_controller: AllObjectsController = None
+
+        self._scores = self.global_round_parameters.scores
+        self._scores_text = ScoresText(self.global_round_parameters.scores)
+        self._scores_text.update_text()
 
     def ROUND_PAUSE(self):
         if GLOBAL_KEYBOARD.ESC and pause_available():
@@ -69,9 +76,12 @@ class SingleStage:
         """Just inside cell"""
         self._ARENA.draw()
         self._ARENA.update()
-        VisualEffectsController.update()
 
+        self._objects_controller.update()
+
+        VisualEffectsController.update()
         VisualEffectsController.draw_layer(0)
+
         m_click = self._mouse.lmb
         if m_click and ROUND_PAUSE_BUTTON.collide_point(self._mouse.pos):
             self._mouse.lmb = 0
@@ -83,6 +93,7 @@ class SingleStage:
         self._PLAYER.draw()
 
         self._ball.update()
+        self.check_for_goal()
         self._ball_arrow.update()
 
         for gate in self._gates:
@@ -91,7 +102,6 @@ class SingleStage:
 
         self._ball.draw()
 
-        update_spells()
         VisualEffectsController.draw_layer(1)
 
         if GLOBAL_KEYBOARD.ESC and pause_available():
@@ -106,6 +116,7 @@ class SingleStage:
         self._player_bot_bar.update()
         self._player_bot_bar.draw()
         self._ball_arrow.draw()
+        self._scores_text.draw()
 
         if m_click:
             ROUND_PAUSE_BUTTON.click(GLOBAL_MOUSE.pos)
@@ -127,27 +138,58 @@ class SingleStage:
         self._ball = None
         self._player_bot_bar = None
         self._ball_arrow = None
-
+        self._objects_controller.clear()
+        self._objects_controller = None
+        self._scores_text = None
         self._round_clock.reload()
-        PLAYERS_LIST.clear()
+        PLAYERS_DICT.clear()
+        self._scores.clear()
 
         GLOBAL_CAMERA.unfollow_player()
+
+    def check_for_goal(self):
+        for gate in self._gates:
+            if gate.collide(self._ball):
+                if gate.collide_borders(self._ball):
+                    self._ball.reverse_vertical()
+                    break
+
+                else:
+                    self._scores[gate.team] += 1
+                    self._scores_text.update_text()
+                    self._ball.reload()
+                    break
 
     @staticmethod
     def __load_round(self):
         try:
-            PLAYERS_LIST.clear()
+            PLAYERS_DICT.clear()
             self._ARENA = ArenaCell({}, draw_grid=True)
-            self._gates.append(BallGate(x=0, y=self._ARENA.center[1], direction_right=1))
-            self._gates.append(BallGate(x=self._ARENA.size_x, y=self._ARENA.center[1], direction_right=0))
+            LOGGER.info(f"Created arena: {self._ARENA.__dict__}")
+            self._objects_controller = AllObjectsController(self._ARENA)
+
+            self._scores['red'] = 0
+            self._scores['blue'] = 0
+
+            self._scores_text = ScoresText(self.global_round_parameters.scores)
+            self._scores_text.update_text()
+
+            self._gates.append(BallGate(x=self._ARENA._border_size, y=self._ARENA.center[1],
+                                        direction_right=1, team='red'))
+            self._gates.append(BallGate(x=self._ARENA.size_x - self._ARENA._border_size, y=self._ARENA.center[1],
+                                        direction_right=0, team='blue'))
 
             self._ball = Ball(start_pos=self._ARENA.center, arena=self._ARENA)
+            LOGGER.info(f"Created player: {self._ball.__dict__}")
+
             self.global_round_parameters.ball = self._ball
 
             self._ball_arrow = BallArrow()
             self._ball_arrow.follow_ball(self._ball)
 
             self._PLAYER = Player(500, 500, arena=self._ARENA)
+            LOGGER.info(f"Created player: {self._PLAYER.__dict__}")
+
             self.global_round_parameters.arena = self._ARENA
 
             self._player_bot_bar = PlayerBotBar(self._PLAYER)
@@ -155,8 +197,11 @@ class SingleStage:
             self._round_clock.reload()
 
             OBJECTS_LIST.append(Dummy(600, 600, arena=self._ARENA, camera=GLOBAL_CAMERA))
+            OBJECTS_LIST.append(Turret(500, 500))
+
 
             time.sleep(1)
+
         except Exception as e:
             self._global_messager.add_message(text='Failed to load round')
             self._global_messager.add_message(text=f'{e}')

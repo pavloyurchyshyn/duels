@@ -5,17 +5,24 @@ from pygame import transform
 from pygame.draw import circle
 from math import degrees
 from common_things.global_clock import ROUND_CLOCK
+from common_things.camera import GLOBAL_CAMERA
+from common_things.global_round_parameters import GLOBAL_ROUND_PARAMETERS
+from common_things.all_objects_names_classes_dict import all_names_objects_dict_wrapper
+from settings.weapon_settings.types_and_names import OBJECT_TYPE
 
 from obj_properties.img_lazy_load import OnePictureLazyLoad
 from obj_properties.circle_form import Circle
 from obj_properties.physic_body import PhysicalObj
 
 
+@all_names_objects_dict_wrapper
 class Dummy(Circle, PhysicalObj, OnePictureLazyLoad):
+    OBJ_NAME = NAME
+    OBJ_TYPE = OBJECT_TYPE
     PICTURE_PATH = 'player/player_jojo.png'
 
     def __init__(self, x, y,
-                 arena, camera,
+                 arena=None,
                  size=DUMMY_SIZE,
                  **kwargs):
         super().__init__(x, y, R=size)
@@ -23,8 +30,8 @@ class Dummy(Circle, PhysicalObj, OnePictureLazyLoad):
         PhysicalObj.__init__(self, f_coef=FRICTION_K)
         OnePictureLazyLoad.__init__(self, size=self.image_size, angle=-90)
 
-        self._arena = arena
-        self.camera = camera
+        self._arena = arena if arena else GLOBAL_ROUND_PARAMETERS.arena
+        self.camera = GLOBAL_CAMERA
         self._d_time = 0
         self._time = 0
 

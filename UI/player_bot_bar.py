@@ -1,4 +1,3 @@
-from pygame.transform import scale, rotate
 from pygame.draw import rect as draw_rect
 from pygame.draw import line as draw_line
 from pygame.rect import Rect
@@ -7,7 +6,7 @@ from UI.UI_base.progress_bar_UI import ProgressBar
 from UI.UI_base.animation import Animation
 
 from common_things.sprites_functions import get_surface
-from common_things.font_loader import DEFAULT_FONT
+from UI.font_loader import DEFAULT_FONT
 
 from settings.UI_setings.player_bot_bar_settigns import BAR_X_SIZE, BAR_Y_SIZE
 from settings.window_settings import MAIN_SCREEN

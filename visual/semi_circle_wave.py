@@ -22,7 +22,7 @@ class SemiCircleWave(Projectile, BaseEffect):
                  width=1,
                  width_scale=0,
                  alive_time=None,
-                 closed =0,
+                 closed=0,
                  **kwargs):
         super(SemiCircleWave, self).__init__(x=x, y=y, angle=angle, speed=speed,
                                              arena=arena, stop_if_out_of_arena=0,

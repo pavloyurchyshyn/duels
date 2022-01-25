@@ -4,14 +4,11 @@ from settings.window_settings import MAIN_SCREEN
 from common_things.sound_loader import GLOBAL_MUSIC_PLAYER
 from common_things.sprites_functions import get_surface
 from common_things.global_mouse import GLOBAL_MOUSE
-from UI.UI_base.animation import Animation
 from UI.UI_base.progress_bar_UI import ProgressBar
-from UI.UI_base.text_UI import Text
 from UI.UI_base.button_UI import Button
-from pygame import SRCALPHA, Surface
 from pygame.draw import rect as draw_rect
 from pygame.draw import circle as draw_circle
-from common_things.font_loader import custom_font_size
+from UI.font_loader import custom_font_size
 from common_things.global_clock import GLOBAL_CLOCK
 from math import cos
 from settings.colors import WHITE

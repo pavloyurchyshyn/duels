@@ -1,6 +1,6 @@
 from obj_properties.rect_form import Rectangle
 
-from pygame import transform, Surface, mouse
+from pygame import transform, Surface
 from pygame.draw import rect as DrawRect
 from pygame.constants import SRCALPHA
 from pygame import draw
@@ -8,7 +8,7 @@ from pygame import draw
 from UI.UI_base.text_UI import Text
 from UI.UI_controller import UI_TREE
 from common_things.global_clock import GLOBAL_CLOCK
-from common_things.font_loader import DEFAULT_FONT_SIZE
+from UI.font_loader import DEFAULT_FONT_SIZE
 
 from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE, \
     DEFAULT_BUTTON_Y_SIZE, DEFAULT_CLICK_DELAY, DEFAULT_BORDER_WIDTH, CLICK_ANIMATION_DURATION

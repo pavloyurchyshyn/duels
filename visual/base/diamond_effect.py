@@ -18,6 +18,7 @@ class DiamondEffect(Projectile, BaseEffect):
                  tail_len=TAIL_LEN,
                  head_len=HEAD_LEN,
                  width_len=WIDTH_LEN,
+                 live_time=None,
                  fill_form=0,
                  lines_width=5,
                  lighting=0,
@@ -48,6 +49,9 @@ class DiamondEffect(Projectile, BaseEffect):
         self.head_scale_per_second = self.head * scale_per_second[1]
         self.width_scale_per_second = self.width * scale_per_second[2]
 
+
+        self.alive_time = live_time
+
         self.build_points()
 
     def scale(self, dt):
@@ -75,8 +79,13 @@ class DiamondEffect(Projectile, BaseEffect):
             if self._speed or self._angle_change or any(self._scale_per_second):
                 self.build_points()
 
+            if self.alive_time is not None:
+                self.alive_time -= self._clock_dt
+                self._alive = self.alive_time > 0
+
             if self.dead:
                 self.start_dead_effect()
+
 
     def build_points(self):
         dx, dy = self._camera.camera

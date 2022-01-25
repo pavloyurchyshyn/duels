@@ -15,7 +15,7 @@ class Camera:
         self._old_player_pos = [-9999, - 9999]
         self._old_player_angle = None
 
-        self._move_speed = 1250
+        self._move_speed = 1000
         self._max_range = 100
         self._angle_add = 250
 

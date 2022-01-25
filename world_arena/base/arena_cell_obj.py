@@ -2,9 +2,9 @@ from obj_properties.rect_form import Rectangle
 from settings.arena_settings import STANDARD_ARENA_X_SIZE, STANDARD_ARENA_BORDER_SIZE, ELEMENT_SIZE, \
     STANDARD_ARENA_Y_SIZE
 from common_things.common_objects_lists_dicts import BULLETS_LIST, OBJECTS_LIST, PARTICLE_LIST_L1, \
-    ALL_OBJECT_DICT, NEW_OBJECTS, DEAD_OBJECTS, MELEE_HITS_LIST
+    ALL_OBJECT_DICT, NEW_OBJECTS_KEYS, DEAD_OBJECTS_KEYS, MELEE_HITS_LIST
 from settings.weapon_settings.types_and_names import BULLETS_TYPE
-from common_things.object_creator import add_object
+from object_controller import AllObjectsController
 from settings.global_parameters import its_client_instance
 
 
@@ -34,66 +34,12 @@ class ArenaCellObject(Rectangle):
         self._exit_borders = {}
         self.__create_borders()
 
-        # -------- LISTS --------
-        self._objects = OBJECTS_LIST
-        self._bullets = BULLETS_LIST
-        self._particles = PARTICLE_LIST_L1
-
-        self.all_objects_dict = ALL_OBJECT_DICT
-        self.all_objects_counter = 1
-        self.dead_objects_keys = set()
-
-        self._dead_objects = DEAD_OBJECTS
-        self._new_objects = NEW_OBJECTS
+        self._object_controller = AllObjectsController(arena=self)
 
     def update(self):
         self._update()
 
     def _update(self):
-        for obj in self._objects.copy():
-            obj.update()
-            if obj.dead:
-                self.dead_objects_keys.add(obj.KEY)
-            elif not self.server_instance:
-                obj.draw()
-
-        for bullet in self._bullets.copy():
-            bullet.update()
-            if bullet.dead:
-                self.dead_objects_keys.add(bullet.KEY)
-
-            elif not self.server_instance:
-                bullet.draw()
-
-        for hit in MELEE_HITS_LIST.copy():
-            hit.update()
-            if hit.dead:
-                MELEE_HITS_LIST.remove(hit)
-
-        if self.server_instance and self.dead_objects_keys:
-            self._dead_objects.extend(self.dead_objects_keys)
-
-        while self.dead_objects_keys:
-            self.delete_object_by_key(obj_key=self.dead_objects_keys.pop())
-
-    def delete_object_by_key(self, obj_key):
-        if obj_key in self.all_objects_dict:
-            obj = self.all_objects_dict.pop(obj_key)
-            if obj.TYPE == BULLETS_TYPE:
-                self._bullets.remove(obj)
-
-    def add_object(self, obj_data):
-        add_object(self, obj_data)
-
-    def can_go(self):
-        # TODO
-        pass
-
-    def get_position_dict(self) -> dict:
-        # TODO: make logic
-        return {}
-
-    def build_cell(self):
         pass
 
     def __create_borders(self):
@@ -123,21 +69,3 @@ class ArenaCellObject(Rectangle):
 
         return 0
 
-    @property
-    def dead_objects(self):
-        dead_obj = self._dead_objects.copy()
-        self._dead_objects.clear()
-        return dead_obj
-
-    @property
-    def new_objects(self):
-        new_obj = self._new_objects.copy()
-        self._new_objects.clear()
-        return new_obj
-
-    def __del__(self):
-        for objects_pull in (self._bullets, self._objects, MELEE_HITS_LIST,
-                             self._particles, self.all_objects_dict,
-                             self._dead_objects, self._new_objects
-                             ):
-            objects_pull.clear()

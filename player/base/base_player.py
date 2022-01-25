@@ -7,14 +7,14 @@ from abc import abstractmethod
 from math import atan2, cos, sin, radians
 from world_arena.base.arena_cell_obj import ArenaCellObject
 
-from common_things.common_objects_lists_dicts import BULLETS_LIST, PLAYERS_LIST, SPELLS_LIST
+from common_things.common_objects_lists_dicts import BULLETS_LIST, PLAYERS_DICT, SPELLS_LIST
 from common_things.loggers import LOGGER
 
 from settings.players_settings.player_settings import *
 from settings.global_parameters import GLOBAL_SETTINGS
 from settings.default_keys import UP_C, LEFT_C, RIGHT_C, DOWN_C, SPRINT_C, \
     WEAPON_1_C, WEAPON_2_C, SPELL_1_C, SPELL_2_C, SPELL_3_C
-
+from uuid import uuid4
 rad_180 = radians(180)
 
 
@@ -79,9 +79,10 @@ class BasePlayer(Circle, PhysicalObj):
 
         self._switch_cd = kwargs.get('switch_cd', -0.5)
         self._next_switch = 1
+        self._unique_id = kwargs.get('unique_id', str(uuid4()))
 
-        if add_self_to_list:
-            PLAYERS_LIST.append(self)
+        if add_self_to_list and self not in PLAYERS_DICT.values():
+            PLAYERS_DICT[self._unique_id] = self
 
     def _build_weapon(self):
         for key, weapon in self._weapon.items():
@@ -104,7 +105,7 @@ class BasePlayer(Circle, PhysicalObj):
     def check_for_weapon_switch(self, commands):
         if self._next_switch >= 0.0:
             for key in self._weapon:
-                if key in commands:
+                if key in commands and self._active_weapon != self._weapon[key]:
                     self._active_weapon = self._weapon[key]
                     self._next_switch = self._switch_cd
         elif self._next_switch < 0.0:
@@ -130,16 +131,6 @@ class BasePlayer(Circle, PhysicalObj):
 
     def draw(self):
         raise NotImplementedError('Draw has to be implemented in subclasses')
-
-    # def check_for_bullets_interaction(self):
-    #     for bullet in self.bullets_list:
-    #         if bullet.alive and self.collide_point(bullet.position):
-    #             bullet.interact_with_object(self)
-    #
-    # def check_for_spells_interaction(self):
-    #     for spell in self.spells_list:
-    #         if spell.alive and self.collide(spell):
-    #             spell.interact_with_object(self)
 
     def update_hands_endpoints(self):
         self._hands_endpoint[0] = self._center[0] + cos(self._angle) * self.PLAYER_HANDS_SIZE
@@ -295,8 +286,8 @@ class BasePlayer(Circle, PhysicalObj):
 
     def __del__(self):
         try:
-            if self in PLAYERS_LIST:
-                PLAYERS_LIST.remove(self)
+            if self._unique_id in PLAYERS_DICT:
+                PLAYERS_DICT.remove(self._unique_id)
         except ValueError as e:
             LOGGER.warning(f"Player not in list: {e}")
             # print('error')

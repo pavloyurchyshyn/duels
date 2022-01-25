@@ -1,2 +1,4 @@
 DUMMY_SIZE = 25
 FRICTION_K = 2
+
+NAME = 'Dummy'

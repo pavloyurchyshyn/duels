@@ -10,7 +10,7 @@ from math import sin, cos, radians
 from pygame.draw import line as draw_line
 
 
-class SimpleLine(Projectile):
+class SimpleLineEffect(Projectile):
     EFFECT_TYPE = GROWING_LINE_TYPE
 
     def __init__(self, x, y, angle=0,
@@ -20,9 +20,9 @@ class SimpleLine(Projectile):
                  vertical=0,
                  arena=Rectangle(0, 0, SCREEN_W, SCREEN_H),
                  scale_per_sec_k=-1, **kwargs):
-        super(SimpleLine, self).__init__(x=x, y=y, angle=angle,
-                                         arena=arena, speed=speed,
-                                         **kwargs)
+        super(SimpleLineEffect, self).__init__(x=x, y=y, angle=angle,
+                                               arena=arena, speed=speed,
+                                               **kwargs)
 
         self.line_width = line_width
         self._color = color
@@ -36,15 +36,18 @@ class SimpleLine(Projectile):
     def update(self):
         dt = GLOBAL_CLOCK.d_time
         self._update(delta_time=dt)
+        l_l = self._line_len
         self.scale(dt)
 
-        x, y = self.int_position
-        dx, dy = GLOBAL_CAMERA.camera
+        if self._speed or l_l != self._line_len:
 
-        x0 = x + dx + cos(self._angle + self._add_angle) * self._line_len
-        y0 = y + dy + sin(self._angle + self._add_angle) * self._line_len
+            x, y = self.int_position
+            dx, dy = GLOBAL_CAMERA.camera
 
-        self._line_dots = ((x + dx, y + dy), (x0, y0))
+            x0 = x + dx + cos(self._angle + self._add_angle) * self._line_len
+            y0 = y + dy + sin(self._angle + self._add_angle) * self._line_len
+
+            self._line_dots = ((x + dx, y + dy), (x0, y0))
 
     def scale(self, dt):
         self._line_len += self._scale_p_second * dt
@@ -52,5 +55,6 @@ class SimpleLine(Projectile):
     def draw(self):
         draw_line(MAIN_SCREEN, self._color, self._line_dots[0], self._line_dots[1], self.line_width)
 
+    @staticmethod
     def alive_condition(self):
         return self._line_len >= 1 and self._speed >= 1

@@ -1,22 +1,19 @@
-from settings.init_pygame import *
-
 from pygame.time import Clock
 from pygame import event as EVENT
 from pygame import key as KEY
 from pygame import quit as PY_QUIT
-from pygame import QUIT, K_ESCAPE, MOUSEBUTTONDOWN
-from pygame import display, draw, Surface, constants, mouse
+from pygame import K_ESCAPE, MOUSEBUTTONDOWN
+from pygame import display, draw, mouse
 
 from settings.colors import WHITE
 from settings.common_settings import VERSION
-from common_things.font_loader import DEFAULT_FONT
-from settings.window_settings import MAIN_SCREEN, MAIN_SCREEN_RECT, SCREEN_H, SCREEN_W  # main screen of all game
+from UI.font_loader import DEFAULT_FONT
+from settings.window_settings import MAIN_SCREEN, MAIN_SCREEN_RECT  # main screen of all game
 
 from common_things.global_clock import GLOBAL_CLOCK
 from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.global_keyboard import GLOBAL_KEYBOARD
 
-from time import time
 from sys import exit as SYS_EXIT
 
 display.set_caption(f'Boss Fight V{VERSION}')

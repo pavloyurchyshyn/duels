@@ -22,7 +22,7 @@ try:
     from settings.window_settings import MAIN_SCREEN, MAIN_SCREEN_RECT
     from settings.game_stages_constants import ROUND_STAGE
 
-    from common_things.font_loader import DEFAULT_FONT
+    from UI.font_loader import DEFAULT_FONT
     from common_things.global_clock import GLOBAL_CLOCK, ROUND_CLOCK
     from common_things.global_mouse import GLOBAL_MOUSE
     from common_things.global_keyboard import GLOBAL_KEYBOARD

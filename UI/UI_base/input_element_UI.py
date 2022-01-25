@@ -5,11 +5,11 @@ from obj_properties.rect_form import Rectangle
 from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.global_keyboard import GLOBAL_KEYBOARD
 from common_things.global_clock import GLOBAL_CLOCK
-from common_things.font_loader import DEFAULT_FONT_SIZE
+from UI.font_loader import DEFAULT_FONT_SIZE
 
 from settings.window_settings import MAIN_SCREEN
 from settings.colors import YELLOW, WHITE, GREY
-from settings.global_parameters import GLOBAL_SETTINGS, test_draw_status_is_on
+from settings.global_parameters import test_draw_status_is_on
 
 # from settings.screen_size import X_SCALE, Y_SCALE
 X_SCALE, Y_SCALE = 1, 1

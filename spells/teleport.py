@@ -2,13 +2,13 @@ from common_things.global_clock import ROUND_CLOCK
 from common_things.global_mouse import GLOBAL_MOUSE
 from common_things.camera import GLOBAL_CAMERA
 from math import cos, sin, dist
-from visual.teleport_effect import TeleportEffect
 from visual.base.visual_effects_controller import VisualEffectsController
 from settings.global_parameters import its_client_instance
 from spells.base_spell import SpellIcon
+from obj_properties.img_lazy_load import AdditionalLazyLoad
 
 
-class Teleport(SpellIcon):
+class Teleport(SpellIcon, AdditionalLazyLoad):
     CD = 1
 
     def __init__(self, owner, arena=None, **kwargs):
@@ -19,6 +19,12 @@ class Teleport(SpellIcon):
         self._arena = arena if arena else owner._arena
         self._camera = getattr(self._owner, 'camera', GLOBAL_CAMERA)
         self._tp_range = 500
+        self._visual_effect = None
+        AdditionalLazyLoad.__init__(self, its_client_instance())
+
+    def additional_lazy_load(self):
+        from visual.teleport_effect import TeleportEffect
+
         self._visual_effect = TeleportEffect
 
     def update(self):
@@ -53,7 +59,8 @@ class Teleport(SpellIcon):
             if last_dot:
                 self._next_teleport = -self.CD
                 VisualEffectsController.add_effect(self._visual_effect(self._owner.position, last_dot,
-                                                                       radius=self._owner.get_size() * 2, arena=self._arena))
+                                                                       radius=self._owner.get_size() * 2,
+                                                                       arena=self._arena))
                 self._owner.position = last_dot
 
     @property

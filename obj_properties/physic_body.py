@@ -63,6 +63,8 @@ class PhysicalObj:
                 self._make_dots()
             else:
                 self._velocity.stop()
+    def reverse(self):
+        self._velocity.reverse()
 
     def stop(self):
         self._velocity.stop()
