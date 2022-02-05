@@ -25,4 +25,5 @@ class ShootEffect:
                                                              color_change=[250, 250, 250],
                                                              fill_form=1,
                                                              arena=arena,
+                                                             round_clock=1,
                                                              ))

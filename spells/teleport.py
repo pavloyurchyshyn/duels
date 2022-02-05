@@ -58,7 +58,7 @@ class Teleport(SpellIcon, AdditionalLazyLoad):
 
             if last_dot:
                 self._next_teleport = -self.CD
-                VisualEffectsController.add_effect(self._visual_effect(self._owner.position, last_dot,
+                VisualEffectsController.add_effect(self._visual_effect(self._owner.position, last_dot, round_clock=1,
                                                                        radius=self._owner.get_size() * 2,
                                                                        arena=self._arena))
                 self._owner.position = last_dot

@@ -1,7 +1,4 @@
-# import os
-# from settings.common_settings import SETTINGS_PATH
-
-KEYS_CONFIG_FILE = 'keyboard_settings.json'  # os.path.join(SETTINGS_PATH, 'keyboard_settings.json')
+KEYS_CONFIG_FILE = 'keyboard_config.json'
 
 UP_C = 'up'
 DOWN_C = 'down'
@@ -25,22 +22,29 @@ SELF_DAMAGE = 'self_damage'
 SELF_REVISE = 'self_revise'
 TEST_MESSAGE = 'test_message'
 
-DEFAULT_GAME_KEYS = {
-    'w': UP_C,
-    'a': LEFT_C,
-    'd': RIGHT_C,
-    's': DOWN_C,
+DEFAULT_COMMAND_KEY = {
+    UP_C: 'w',
+    LEFT_C: 'a',
+    RIGHT_C: 'd',
+    DOWN_C: 's',
 
-    '1': WEAPON_1_C,
-    '2': WEAPON_2_C,
-    #'3': WEAPON_3_C,
+    WEAPON_1_C: '1',
+    WEAPON_2_C: '2',
+    # WEAPON_3_C: '3',
 
-    'q': SPELL_1_C,  # q
-    'e': SPELL_2_C,  # e
-    'space': SPELL_3_C,  # space
+    SPELL_1_C: 'q',
+    SPELL_2_C: 'e',
+    SPELL_3_C: 'space',
 
-    'left shift': SPRINT_C,
-    'p': SELF_DAMAGE,
-    'o': TEST_MESSAGE,
-    'l': SELF_REVISE,
+    SPRINT_C: 'left shift',
+    SELF_DAMAGE: 'p',
+    TEST_MESSAGE: 'o',
+    SELF_REVISE: 'l',
+}
+
+TEXT_TO_RAW = {
+    ' ': 'space',
+    SPELL_3_C: 'space',
+
+    SPRINT_C: 'left shift',
 }

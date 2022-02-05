@@ -1,105 +1,86 @@
-from common_things.stages import Stages
-from settings.window_settings import SCREEN_W
+from settings.window_settings import SCREEN_W, SCREEN_H, HALF_SCREEN_W, X_SCALE, Y_SCALE
 from settings.window_settings import MAIN_SCREEN
-from settings.colors import WHITE, GREY_DARK_2, GREY_BLUE, GREY_RED, GREY_GREEN, PLAYERS_COLORS
-from settings.players_settings.player_settings import PLAYER_SIZE
-from settings.common_settings import COMMON_GAME_SETTINGS_JSON_PATH as CGSJP
+from settings.colors import WHITE, GREY_DARK_2
+from settings.screen_size import X_SCALE, Y_SCALE
+from settings.global_parameters import set_fps
+
 from common_things.sound_loader import GLOBAL_MUSIC_PLAYER
+from common_things.stages import Stages
+from common_things.global_keyboard import GLOBAL_KEYBOARD
+
 from UI.UI_buttons.music_volume_progress_bar import VOLUME_PROGRESS_BAR
 from UI.UI_buttons.mute_music_button import MUTE_MUSIC_BUTTON
-
 from UI.UI_base.button_UI import Button
+from UI.UI_base.text_UI import Text
 from UI.UI_base.input_element_UI import InputElement
+from UI.UI_controller import UI_TREE
 
-from common_things.save_and_load_json_config import get_parameter_from_json_config, save_param_to_cgs
-from common_things.img_loader import normalize_color
-from player.simple_player import SimplePlayer
-
-# from settings.screen_size import X_SCALE, Y_SCALE
-X_SCALE, Y_SCALE = 1, 1
+MAIN_MENU_SETTINGS_BUTTONS = {}
 
 SOUND_ADD_ID = 'sound_add'
 SOUND_MINUS_ID = 'sound_minus'
 EXIT_ID = 'exit'
 RELOAD_COLOR_ID = 'change_color'
 
+# ------- KEYBOARD SETTINGS -----------
+KEYBOARD_SETTINGS_TEXT = Text('Key settings', x=HALF_SCREEN_W + HALF_SCREEN_W // 4, y=10 * Y_SCALE, font_size=30)
 
-# --------- SKIN SETTINGS ---------------
-def reload_color():
-    face_color = normalize_color((int(FACE_INPUT_R.text), int(FACE_INPUT_G.text), int(FACE_INPUT_B.text), 255))
-    body_color = normalize_color((int(BODY_INPUT_R.text), int(BODY_INPUT_G.text), int(BODY_INPUT_B.text), 255))
-    PLAYER_PIC.update_color(body_color=body_color, face_color=face_color)
-    save_param_to_cgs('player_skin', {'body': tuple(body_color), 'face': tuple(face_color)})
+KEYBOARD_TEXT_DATA = {}
+KEYBOARD_TEXT_OBJS = []
+INPUT_ELEMENTS = []
 
+x_pos_command = HALF_SCREEN_W + 100 * X_SCALE
+x_pos_key = HALF_SCREEN_W + 100 * X_SCALE + 300 * X_SCALE
+x_pos_warn = x_pos_key + 130 * X_SCALE
+y_pos = 20 * Y_SCALE + KEYBOARD_SETTINGS_TEXT.size[1]
+y_size = 50 * Y_SCALE
+x_size = 100 * X_SCALE
+y_step = 10 * Y_SCALE
 
-__player_color = get_parameter_from_json_config('player_skin', CGSJP, def_value=PLAYERS_COLORS['blue'])
-f_r, f_g, f_b = __player_color['face'][:3]
-b_r, b_g, b_b = __player_color['body'][:3]
-save_param_to_cgs('player_skin', __player_color)
-PLAYER_PIC = SimplePlayer(1500 * X_SCALE, 200 * Y_SCALE, turn_off_camera=True,
-                          size=PLAYER_SIZE * 5, add_self_to_list=0,
-                          player_color=__player_color, follow_mouse=1,
-                          draw_health_points=False, arena=None)
+COMMANDS_WHICH_USING_KEY = []
 
-FACE_INPUT_R = InputElement(1250 * X_SCALE, 100 * Y_SCALE, text=f'{f_r}', size_x=50, size_y=40,
-                            text_active_color=GREY_RED, id='face_inp_r')
-FACE_INPUT_G = InputElement(1250 * X_SCALE, 150 * Y_SCALE, text=f'{f_g}', size_x=50, size_y=40,
-                            text_active_color=GREY_GREEN, id='face_inp_g')
-FACE_INPUT_B = InputElement(1250 * X_SCALE, 200 * Y_SCALE, text=f'{f_b}', size_x=50, size_y=40,
-                            text_active_color=GREY_BLUE, id='face_inp_b')
-
-BODY_INPUT_R = InputElement(1250 * X_SCALE, 300 * Y_SCALE, text=f'{b_r}', size_x=50, size_y=40,
-                            text_active_color=GREY_RED, id='body_inp_r')
-BODY_INPUT_G = InputElement(1250 * X_SCALE, 350 * Y_SCALE, text=f'{b_g}', size_x=50, size_y=40,
-                            text_active_color=GREY_GREEN, id='body_inp_g')
-BODY_INPUT_B = InputElement(1250 * X_SCALE, 400 * Y_SCALE, text=f'{b_b}', size_x=50, size_y=40,
-                            text_active_color=GREY_BLUE, id='body_inp_b')
-
-COLORS_INPUTS_LIST = [FACE_INPUT_B, FACE_INPUT_G, FACE_INPUT_R, BODY_INPUT_B, BODY_INPUT_G, BODY_INPUT_R]
-
-COLORS_BUTTONS_DICT = {}
+for key, command in GLOBAL_KEYBOARD.get_key_command_values():
+    KEYBOARD_TEXT_DATA[command] = {'kwargs': {
+        'size': (x_size, y_size),
+        'x': x_pos_command,
+        'y': y_pos,
+        'text': command.lower().capitalize().replace('_', ' '),
+        'font_size': 25,
+    }}
 
 
-def add_color(inp_el):
-    value = int(inp_el.text)
-    value += 5
-    if value > 255:
-        value = 255
-    inp_el.text = str(value)
+    def on_input_action(self):
+        command_ = self.id
+        new_key = self._text_text if self._text_text else None
+
+        if not new_key:
+            GLOBAL_KEYBOARD.change(command=command_, new_key=new_key)
+            self._text_text = None
+            return
+
+        for comm in GLOBAL_KEYBOARD.get_commands_by_key(new_key):
+            if comm != command_:
+                UI_TREE.get_element('main_menu_settings', comm).text = '!'
+
+        GLOBAL_KEYBOARD.change(command=command_, new_key=new_key)
+        self._text_text = new_key.upper()
 
 
-def minus_color(inp_el):
-    value = int(inp_el.text)
-    value -= 5
-    if value < 0:
-        value = 0
-    inp_el.text = str(value)
+    inp_el = InputElement(x=x_pos_key, y=y_pos,
+                          size_x=x_size, size_y=y_size,
+                          text=key.upper() if key else '_',
+                          id=command,
+                          on_change_action=on_input_action,
+                          active_border_width=1,
+                          non_active_border_width=1,
+                          last_raw_input=1,
+                          one_input=1,
+                          default_text='!'
+                          )
 
+    INPUT_ELEMENTS.append(inp_el)
 
-for color_inp in COLORS_INPUTS_LIST:
-    COLORS_BUTTONS_DICT[f'{color_inp.__class__.__name__}_{color_inp.y0}'] = {
-        'kwargs': {
-            'x': 1200 * X_SCALE,
-            'y': color_inp.y0,
-            'size_x': 40,
-            'size_y': 40,
-            'text': '-',
-            'on_click_action': minus_color,
-            'on_click_action_args': (color_inp,),
-        }
-    }
-
-    COLORS_BUTTONS_DICT[f'{color_inp.__class__.__name__}_{color_inp._center}'] = {
-        'kwargs': {
-            'x': 1310 * X_SCALE,
-            'y': color_inp.y0,
-            'size_x': 40,
-            'size_y': 40,
-            'text': '+',
-            'on_click_action': add_color,
-            'on_click_action_args': (color_inp,),
-        }
-    }
+    y_pos += y_size + y_step
 
 
 # ------- SOUND SETTINGS --------------
@@ -123,10 +104,15 @@ MUSIC_VOLUME_VALUE = Button(x=50 * X_SCALE, y=100 * Y_SCALE,
                             border_width=0,
                             transparent=1)
 
-# -------------------------------------------------------------
+KEYBOARD_TEXT_DATA['_FPS'] = {'kwargs': {
+    'size': (50, 50),
+    'x': 50 * X_SCALE,
+    'y': 150 * Y_SCALE,
+    'text': 'FPS: ',
+    'font_size': 25,
+}}
 
-
-MAIN_MENU_SETTINGS_BUTTONS = {
+SOUND_BUTTONS = {
     '_sound_minus': {
         'kwargs': {
             'size_x': 40,
@@ -136,6 +122,7 @@ MAIN_MENU_SETTINGS_BUTTONS = {
             'text': '-',
             'on_click_action': minus_music_volume,
             'id': SOUND_ADD_ID,
+            'border_width': 1,
         }
     },
 
@@ -147,7 +134,9 @@ MAIN_MENU_SETTINGS_BUTTONS = {
             'y': 100 * Y_SCALE,
             'text': '+',
             'on_click_action': add_music_volume,
-            'id': SOUND_MINUS_ID
+            'id': SOUND_MINUS_ID,
+            'border_width': 1,
+
         }
     },
 
@@ -160,18 +149,61 @@ MAIN_MENU_SETTINGS_BUTTONS = {
             'text': 'X',
             'on_click_action': Stages().set_main_menu_stage,
             'id': EXIT_ID,
+            'border_width': 1,
+
         }
     },
 
-    '_set_color': {
+    '_set_fps_60': {
         'kwargs': {
-            'x': 1500 * X_SCALE,
-            'y': 300 * Y_SCALE,
-            'text': 'Reload color',
-            'on_click_action': reload_color,
-            'id': RELOAD_COLOR_ID
-        }
-    }
+            'size_x': 40,
+            'size_y': 40,
+            'x': 110 * X_SCALE,
+            'y': 150 * Y_SCALE,
+            'text': '60',
+            'on_click_action': set_fps,
+            'on_click_action_args': (60, ),
+            'id': 'fps_60',
+            'border_width': 1,
 
+        }
+    },
+
+    '_set_fps_120': {
+        'kwargs': {
+            'size_x': 40,
+            'size_y': 40,
+            'x': 160 * X_SCALE,
+            'y': 150 * Y_SCALE,
+            'text': '120',
+            'on_click_action': set_fps,
+            'on_click_action_args': (120, ),
+            'border_width': 1,
+
+            'id': 'fps_120',
+        }
+    },
+
+    '_set_fps_no_limit': {
+        'kwargs': {
+            'size_x': 100,
+            'size_y': 40,
+            'x': 210 * X_SCALE,
+            'y': 150 * Y_SCALE,
+            'text': 'No limit',
+            'on_click_action': set_fps,
+            'on_click_action_args': (0, ),
+            'id': 'fps_0',
+            'border_width': 1,
+
+        }
+    },
 }
-MAIN_MENU_SETTINGS_BUTTONS.update(COLORS_BUTTONS_DICT)
+# -------------------------------------------------------------
+
+MAIN_MENU_SETTINGS_BUTTONS.update(SOUND_BUTTONS)
+
+# MAIN_MENU_SETTINGS_BUTTONS.clear()
+# KEYBOARD_TEXT_DATA.clear()
+# INPUT_ELEMENTS.clear()
+# KEYBOARD_TEXT_OBJS.clear()

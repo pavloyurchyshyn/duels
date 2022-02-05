@@ -6,3 +6,4 @@ logs/
 common_game_settings.json
 keyboard_settings.json
 __.py
+keyboard_config.json

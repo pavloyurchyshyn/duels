@@ -37,11 +37,11 @@ class Player(BasePlayer, PlayerLazyLoad):
         self.use_self_force()
         c = self.camera.camera
         abs_mouse_pos = mouse_pos[0] - c[0], mouse_pos[1] - c[1]
+
         self.rotate_to_cursor(abs_mouse_pos)
         self.make_step(commands)
+        self._make_dots()
 
-        # self.health_points_text.change_pos(self._center[0], self._center[1] + self._size)
-        self.face_anim.update(d_time=time_d, position=self._center, angle=self._angle)
         self.update_hands_endpoints()
         self.check_for_weapon_switch(commands)
 
@@ -61,27 +61,13 @@ class Player(BasePlayer, PlayerLazyLoad):
         elif mouse[2]:
             self.alt_use_weapon()
 
-        self._make_dots()
+
+        if self._visual_part:
+            self._visual_part.update()
 
     def draw(self) -> None:
-        dx, dy = self.camera.camera
-        x0, y0 = self._center
-        main_screen = self.MAIN_SCREEN
-
-        circle(main_screen, self.color['body'],
-               (self._hands_endpoint[0] + dx, self._hands_endpoint[1] + dy),
-               5)
-        self._active_weapon.draw()
-
-        img_copy = self.ROTATE(self.image, -degrees(self._angle))
-        main_screen.blit(img_copy, (x0 - img_copy.get_width() // 2 + dx, y0 - img_copy.get_height() // 2 + dy))
-
-        if test_draw_status_is_on():
-            for dot in self._dots:
-                circle(main_screen, (255, 0, 0), (dot[0] + dx, dot[1] + dy), 3)
-
-        self.face_anim.draw(dx, dy)
-        # self.health_points_text.draw(dx, dy)
+        if self._visual_part:
+            self._visual_part.draw()
 
         for item in self._weapon.values():
             if item and item != self._active_weapon:
@@ -98,7 +84,8 @@ class Player(BasePlayer, PlayerLazyLoad):
                 pass
                 # TODO heal animation
             elif self._health_points > 0.0:
-                self.face_anim.change_animation('idle')
+                if self._visual_part:
+                    self._visual_part.face_animation.change_animation('idle')
 
             self._health_points = health_points
             # self.health_points_text.change_text(int(health_points))
@@ -106,7 +93,8 @@ class Player(BasePlayer, PlayerLazyLoad):
     def revise(self):
         self._health_points = self._full_health_points
         # self.health_points_text.change_text(self._health_points)
-        self.face_anim.change_animation('idle')
+        if self._visual_part:
+            self._visual_part.face_animation.change_animation('idle')
 
     @property
     def angle(self):
@@ -120,8 +108,9 @@ class Player(BasePlayer, PlayerLazyLoad):
     def damage(self, damage):
         if damage:
             self._health_points -= damage
-            # self.health_points_text.change_text(int(self._health_points))
             if self._health_points <= 0.0:
-                self.face_anim.change_animation('dying')
+                if self._visual_part:
+                    self._visual_part.face_animation.change_animation('dying')
             else:
-                self.face_anim.change_animation('rage')
+                if self._visual_part:
+                    self._visual_part.face_animation.change_animation('rage')

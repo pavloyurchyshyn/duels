@@ -12,8 +12,22 @@ try:
 
 except:
     ERROR_PICTURE = None
+    LOGGER.warning(f'Failed to load error img {"sprites/error.png"}')
 
 
+def loaded_images_wrapper(func):
+    loaded_ = {}
+
+    def wrapper(path, size, *args, **kwargs):
+        if (path, size) not in loaded_:
+            loaded_[(path, size)] = func(path, size, *args, **kwargs)
+
+        return loaded_[(path, size)]
+
+    return wrapper
+
+
+@loaded_images_wrapper
 def load_image(path: str, size: (int, int) = None, angle=90, smooth_scale=True):
     try:
         angle = angle if angle else 90
@@ -30,9 +44,11 @@ def load_image(path: str, size: (int, int) = None, angle=90, smooth_scale=True):
                 pic = transform.scale(pic, size).convert_alpha()
 
         pic = transform.rotate(pic, angle).convert_alpha()
+        LOGGER.info(f'Loaded {path} {pic.get_size()}')
         return pic
-    except (error, FileNotFoundError):
-        print(f'No file {path}')
+    except (error, FileNotFoundError) as e:
+        LOGGER.error(f'Failed to load {path}: {e}')
+
         return transform.smoothscale(ERROR_PICTURE, size).convert_alpha()
         # exit()
 
@@ -44,7 +60,7 @@ def load_animation(pic_list, timings_list, size: (int, int) = None, anim_dict=No
     for i, path in enumerate(pic_list):
         anim_dict[i] = {'frame': load_image(path, size, angle=angle),
                         'cd': timings_list[i]}
-
+    LOGGER.info(f'Animation loaded {pic_list}')
     return anim_dict
 
 

@@ -74,6 +74,7 @@ class TeleportEffect(BaseEffect):
                                                                      color_change=(255, 255, 255),
                                                                      size_scale=-random() - 0.5,
                                                                      arena=self._arena,
+                                                                     round_clock=self._clock == ROUND_CLOCK,
                                                                      ),
                                                    layer=0)
 
@@ -96,6 +97,7 @@ class TeleportEffect(BaseEffect):
                                                                      transparent=0,
                                                                      color_change=(255, 255, 255),
                                                                      size_scale=-random() - 0.1,
+                                                                     round_clock=self._clock == ROUND_CLOCK,
                                                                      ),
                                                    layer=0)
 

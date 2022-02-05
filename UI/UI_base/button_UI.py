@@ -1,7 +1,7 @@
 from obj_properties.rect_form import Rectangle
 
 from pygame import transform, Surface
-from pygame.draw import rect as DrawRect
+from pygame.draw import rect as draw_rect
 from pygame.constants import SRCALPHA
 from pygame import draw
 
@@ -28,7 +28,7 @@ class Button(Rectangle):
     MAIN_SCREEN = MAIN_SCREEN
     UI_TREE = UI_TREE
     CLICK_ANIMATION_DUR = CLICK_ANIMATION_DURATION
-    TYPE = 'button'
+    UI_TYPE = 'button'
 
     def __init__(self, x: int = None, y: int = None,
                  p_x_pos=None, p_y_pos=None,  # percent depends on screen size
@@ -164,8 +164,8 @@ class Button(Rectangle):
         self._animation_finish_time = 0
         self._clicked_border = self.get_surface(1, (0, 0, 0, 0))
 
-        DrawRect(self._clicked_border, self._border_active_color, self._clicked_border.get_rect(),
-                 int(self._border_width * 2), **self._border_parameters)
+        draw_rect(self._clicked_border, self._border_active_color, self._clicked_border.get_rect(),
+                  int(self._border_width+2), **self._border_parameters)
 
         self._click_anim_dur = click_anim_dur if click_anim_dur else self.CLICK_ANIMATION_DUR
 
@@ -178,9 +178,9 @@ class Button(Rectangle):
         non_active_button_s = self.get_surface()
 
         # active_button_s.fill(self._background_color)  # fill background surface
-        DrawRect(active_button_s, self._background_color, active_button_s.get_rect(), 0, **self._border_parameters)
+        draw_rect(active_button_s, self._background_color, active_button_s.get_rect(), 0, **self._border_parameters)
         # non_active_button_s.fill(self._background_color)
-        DrawRect(non_active_button_s, self._background_color, non_active_button_s.get_rect(), 0, **self._border_parameters)
+        draw_rect(non_active_button_s, self._background_color, non_active_button_s.get_rect(), 0, **self._border_parameters)
 
         self._text_size = self._text_size * k if self._text_size * k >= 1 else self._text_size
 
@@ -201,11 +201,11 @@ class Button(Rectangle):
             self._non_active_text.draw()
 
         if self._border_width > 0:
-            DrawRect(active_button_s, color=self._border_active_color,
-                     rect=self._border, width=self._border_width, **self._border_parameters)
+            draw_rect(active_button_s, color=self._border_active_color,
+                      rect=self._border, width=self._border_width, **self._border_parameters)
 
-            DrawRect(non_active_button_s, color=self._border_non_active_color,
-                     rect=self._border, width=self._border_width, **self._border_parameters)
+            draw_rect(non_active_button_s, color=self._border_non_active_color,
+                      rect=self._border, width=self._border_width, **self._border_parameters)
 
         self._r_active_button = active_button_s  # should be created button picture
         self._r_active_button.convert_alpha()

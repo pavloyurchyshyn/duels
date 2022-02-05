@@ -5,13 +5,13 @@ from common_things.img_loader import recolor_picture, load_image, load_animation
 
 
 class PlayerImagesManager:
-    def __init__(self, size=None, original_size=0, angle=90):
+    def __init__(self, size=None, original_size=0, circle_size=None, angle=90):
 
         self.size = size
         if size:
             self.size = int(self.size)
             self.pic_size = (self.size, self.size) if size else size
-            self.circle_size = (int(self.size * 1.1), int(self.size * 1.1))
+            self.circle_size = circle_size if circle_size else (int(self.size * 1.1), int(self.size * 1.1))
 
         if original_size or size is None:
             self.size = self.pic_size = self.circle_size = None

@@ -45,7 +45,7 @@ class SimplePlayer(BasePlayer, PlayerLazyLoad):
         # self.update_circle_under_player()
         self.update_hands_endpoints()
 
-        self.face_anim.update(time_d, self._center, self._angle)
+        self._visual_part.update()
 
     #         self.health_points_text.change_pos(self._center[0], self._center[1] + self._size)
 
@@ -54,33 +54,8 @@ class SimplePlayer(BasePlayer, PlayerLazyLoad):
             self.under_player_circle.update(self._d_time, position=self._center)
 
     def draw(self) -> None:
-        if self.turn_off_camera:
-            dx = dy = 0
-        else:
-            dx, dy = self.camera.camera
-
-        x0, y0 = self._center
-
-        main_screen = self.MAIN_SCREEN
-        if self.under_player_circle:
-            self.under_player_circle.draw(dx=dx, dy=dy)
-
-        img_copy = transform.rotate(transform.scale(self.image, self.img_size), -degrees(self._angle))
-        main_screen.blit(img_copy, (x0 - img_copy.get_width() // 2 + dx, y0 - img_copy.get_height() // 2 + dy))
-
-        if test_draw_status_is_on():
-            for dot in self._dots:
-                draw.circle(main_screen, (255, 0, 0), (dot[0] + dx, dot[1] + dy), 3)
-
-        draw.circle(main_screen,
-                    self.color['body'],
-                    (self._hands_endpoint[0] + dx, self._hands_endpoint[1] + dy),
-                    3)
-
-        self.face_anim.draw(dx, dy)
-
-        # if self._draw_health_points:
-        #   self.health_points_text.draw(dx, dy)
+        if self._visual_part:
+            self._visual_part.draw()
 
     @property
     def health_points(self):

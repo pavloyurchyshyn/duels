@@ -20,12 +20,12 @@ def base_hit_effect_func(self, x, y, angle):
         tail_len = 25 + 25 * random()
         speed = 100 + 200 * random()
 
-        effect = DiamondEffect(x=x, y=y, angle=angle + add_angle, speed=speed,
+        effect = DiamondEffect(x=x, y=y, angle=angle + add_angle, speed=speed, round_clock=1,
                                live_time=live_time, scale_per_second=(1, 1, 1), fill_form=1,
                                head_len=50, tail_len=tail_len, width_len=2 + 5 * random())
         VisualEffectsController.add_effect(effect)
 
-        effect = DiamondEffect(x=x, y=y, angle=angle - add_angle, speed=speed,
+        effect = DiamondEffect(x=x, y=y, angle=angle - add_angle, speed=speed, round_clock=1,
                                live_time=live_time, scale_per_second=(1, 1, 1), fill_form=1,
                                head_len=50, tail_len=tail_len, width_len=2 + 5 * random())
         VisualEffectsController.add_effect(effect)
@@ -33,11 +33,11 @@ def base_hit_effect_func(self, x, y, angle):
         add_angle = r25 + (0.5 if random() > 0.5 else -0.5) * random()
         tail_len = 55 + 25 * random()
 
-        effect = DiamondEffect(x=x, y=y, angle=angle + add_angle, speed=speed,
+        effect = DiamondEffect(x=x, y=y, angle=angle + add_angle, speed=speed, round_clock=1,
                                live_time=live_time, scale_per_second=(1, 1, 1), fill_form=1,
                                head_len=50, tail_len=tail_len, width_len=2 + 5 * random())
         VisualEffectsController.add_effect(effect)
-        effect = DiamondEffect(x=x, y=y, angle=angle - add_angle, speed=speed,
+        effect = DiamondEffect(x=x, y=y, angle=angle - add_angle, speed=speed, round_clock=1,
                                live_time=live_time, scale_per_second=(1, 1, 1), fill_form=1,
                                head_len=50, tail_len=tail_len, width_len=2 + 5 * random())
 

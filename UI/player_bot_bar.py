@@ -13,7 +13,7 @@ from settings.window_settings import MAIN_SCREEN
 from settings.screen_size import X_SCALE, Y_SCALE, SCREEN_H, SCREEN_W
 
 from player.base.base_player import BasePlayer
-from player.player_images import PlayerImagesManager
+from player.base_visual.player_images import PlayerImagesManager
 
 
 class PlayerBotBar:
@@ -71,9 +71,9 @@ class PlayerBotBar:
 
     def follow_player(self, player):
         self._player = player
-        color = (tuple(player.color['body']), tuple(player.color['face']))
+        color = (tuple(player._visual_part._body_color), tuple(player._visual_part._face_color))
         if color not in PlayerBotBar.LOADED_SKINS:
-            skin = PlayerBotBar.IMAGE_MANAGER.get_new_skin(player.color)
+            skin = PlayerBotBar.IMAGE_MANAGER.get_new_skin(color)
             idle_anim, other_anim = skin['idle_animation'], skin['other_animation']
             skin['face'] = Animation((self.PORTRAIT_X_POS, self.PORTRAIT_Y_POS),
                                      idle_frames=idle_anim, **other_anim)
@@ -145,17 +145,10 @@ class PlayerBotBar:
             draw_rect(MAIN_SCREEN, (255, 255, 255), spell['rect'], 5)
 
     def draw(self):
-        #  body = scale(rotate(self._player.high_image, -90), (self.PORTRAIT_X_SIZE, self.PORTRAIT_X_SIZE))
-        # portrait = scale(rotate(self._player.high_face_anim.image, -90), (self.PORTRAIT_X_SIZE, self.PORTRAIT_X_SIZE))
-
-        # MAIN_SCREEN.blit(self.current_skin['body'], (100, 100))
-
         MAIN_SCREEN.blit(self.current_skin['body'], self.player_portrait_rect)
-        face_frame = self.current_skin['face'].animations[self._player.face_anim.current_anim][self._player.face_anim.frame]['frame']
+        face_frame = self.current_skin['face'].animations[self._player._visual_part.face_animation.current_anim][self._player._visual_part.face_animation.frame]['frame']
         MAIN_SCREEN.blit(face_frame, self.player_portrait_rect)
-        # MAIN_SCREEN.blit(portrait, (0, 0), self.player_portrait_rect)
 
-        # MAIN_SCREEN.blit(self.player_portrait_surface, (self.PORTRAIT_X_POS, self.PORTRAIT_Y_POS))
         draw_rect(MAIN_SCREEN, (255, 255, 255), self.player_portrait_rect, 2, 5)
 
         self._draw_icons()

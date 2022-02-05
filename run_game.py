@@ -21,6 +21,7 @@ try:
     from settings.common_settings import VERSION, FPS
     from settings.window_settings import MAIN_SCREEN, MAIN_SCREEN_RECT
     from settings.game_stages_constants import ROUND_STAGE
+    from settings.global_parameters import get_slow_motion_k, update_slow_motion, get_fps
 
     from UI.font_loader import DEFAULT_FONT
     from common_things.global_clock import GLOBAL_CLOCK, ROUND_CLOCK
@@ -120,13 +121,14 @@ try:
             events = EVENT.get()
             finish = time()
 
-            clock.tick()
+            clock.tick(get_fps())
             dt = finish - start
             start = finish
             # update time
             G_Clock.update(dt)
             if STAGES.current_stage == ROUND_STAGE:  # solo game or leave it for animation?
-                R_Clock.update(dt)
+                update_slow_motion(d_time=dt)
+                R_Clock.update(dt*get_slow_motion_k())
 
             # update mouse and keyboard
             G_Mouse.update()

@@ -86,7 +86,7 @@ class UI_controller(metaclass=Singleton):
             pressed_keys = GLOBAL_KEYBOARD.pressed
             commands = GLOBAL_KEYBOARD.commands
 
-            focused_element_not_inp = (not self.focused_element) or self.focused_element.TYPE != 'input'
+            focused_element_not_inp = (not self.focused_element) or self.focused_element.UI_TYPE != 'input'
             x = y = 0
             if pressed_keys[constants.K_UP] or (UP_C in commands and focused_element_not_inp):
                 y -= 1
@@ -101,14 +101,14 @@ class UI_controller(metaclass=Singleton):
             if x:
                 new = self.__make_x_step(foc_el, x)
                 if new:
-                    if self.focused_element.TYPE == 'input':
+                    if self.focused_element.UI_TYPE == 'input':
                         self.focused_element.unfocus()
 
                     self.focused_element = new
             elif y:
                 new = self.__make_y_step(foc_el, y)
                 if new:
-                    if self.focused_element.TYPE == 'input':
+                    if self.focused_element.UI_TYPE == 'input':
                         self.focused_element.unfocus()
                         
                     self.focused_element = new
@@ -183,15 +183,6 @@ class UI_controller(metaclass=Singleton):
         color = 256 * abs(cos(GLOBAL_CLOCK.time)) #* 0.5
         self.color = (color, color, color)
 
-        # self.color[-1] += self.color_step * GLOBAL_CLOCK.d_time
-        # if self.color[-1] > 255:
-        #     self.color_step = -1
-        #     self.color[-1] = 255
-        #
-        # elif self.color[-1] < 0:
-        #     self.color_step = 1
-        #     self.color[-1] = 0
-
     def draw(self):
         if self.focused_element:
             x0, y0 = self.focused_element.left_top
@@ -211,7 +202,9 @@ class UI_controller(metaclass=Singleton):
                 self.tree[menu.name] = {button.id: button}
 
     def add_menu(self, menu, *elements, enter_focus=None):
+
         self.tree[menu.name] = {button.id: button for button in elements if button.id}
+        # print(list(self.tree.items())[-1])
 
         if enter_focus:
             self.enter_default_focus[menu.name] = enter_focus
@@ -236,7 +229,7 @@ class UI_controller(metaclass=Singleton):
 
     @property
     def enter_possible(self):
-        return self.next_step > 0
+        return self.next_enter > 0
 
 
 UI_TREE = UI_controller()

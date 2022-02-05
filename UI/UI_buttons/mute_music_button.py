@@ -37,4 +37,5 @@ MUTE_MUSIC_BUTTON = Button(**{
     'active_pic': not GLOBAL_MUSIC_PLAYER.muted,
     'screen': MAIN_SCREEN,
     'id': MUTE_MUSIC_ID,
+    'border_width': 1,
 })

@@ -12,7 +12,7 @@ class Camera:
         self.max_x = SCREEN_W - int(STANDARD_ARENA_X_SIZE) + 2
         self.max_y = SCREEN_H - int(STANDARD_ARENA_Y_SIZE)
 
-        self._old_player_pos = [-9999, - 9999]
+        self._old_player_pos = [-9999, -9999]
         self._old_player_angle = None
 
         self._move_speed = 1000
@@ -43,6 +43,7 @@ class Camera:
         self._real_position = [0, 0]
 
     def follow_player(self, player):
+        self._old_player_pos = [-9999, -9999]
         self._player = player
         self.update()
 

@@ -1,5 +1,5 @@
 from settings.window_settings import MAIN_SCREEN
-# from settings.screen_size import GAME_SCALE
+from settings.screen_size import GAME_SCALE
 from settings.default_common_settings import DEFAULT_CROSSHAIR_SIZE
 from common_things.save_and_load_json_config import get_param_from_cgs, save_param_to_cgs
 from common_things.sprites_functions import get_surface
@@ -12,7 +12,7 @@ from settings.default_common_settings import CROSSHAIR_SURFACE_SIZE_KEY, DEFAULT
 from pygame.draw import line as draw_line
 from pygame.draw import circle as draw_circle
 from pygame import mouse
-from pygame.transform import rotate
+from pygame.transform import rotate, scale, smoothscale
 
 from math import cos, sin, radians
 
@@ -30,25 +30,19 @@ class Mouse:
         self._scroll_top = 0
         self._scroll_bot = 0
 
-        self._size = get_param_from_cgs(CROSSHAIR_SURFACE_SIZE_KEY)
-        self._line_size = DEFAULT_CROSSHAIR_LINE_SIZE
-        self._dot_exists = DEFAULT_CROSSHAIR_DOT_EXISTS
-        self._dot_size = DEFAULT_CROSSHAIR_DOT_SIZE
-        self._line_center_distance = DEFAULT_CROSSHAIR_LINE_CENTER_DISTANCE
-        self._line_wight = DEFAULT_CROSSHAIR_LINE_WIGHT
-        self._rotate = DEFAULT_CROSSHAIR_ROTATE
-        self._color = DEFAULT_CROSSHAIR_COLOR
+        self._size = get_param_from_cgs(CROSSHAIR_SURFACE_SIZE_KEY, DEFAULT_CROSSHAIR_SIZE)
+        self._line_size = get_param_from_cgs(CROSSHAIR_LINE_SIZE_KEY, DEFAULT_CROSSHAIR_LINE_SIZE)
+        self._dot_exists = get_param_from_cgs(CROSSHAIR_DOT_EXISTS_KEY, DEFAULT_CROSSHAIR_DOT_EXISTS)
+        self._dot_size = get_param_from_cgs(CROSSHAIR_DOT_SIZE_KEY, DEFAULT_CROSSHAIR_DOT_SIZE)
+        self._line_center_distance = get_param_from_cgs(CROSSHAIR_LINE_CENTER_DISTANCE_KEY, DEFAULT_CROSSHAIR_LINE_CENTER_DISTANCE)
+        self._line_wight = get_param_from_cgs(CROSSHAIR_LINE_WIGHT_KEY, DEFAULT_CROSSHAIR_LINE_WIGHT)
+        self._rotate = get_param_from_cgs(CROSSHAIR_ROTATE_KEY, DEFAULT_CROSSHAIR_ROTATE)
+        self._color = get_param_from_cgs(CROSSHAIR_COLOR_KEY, DEFAULT_CROSSHAIR_COLOR)
 
         self._picture = None
 
         self.load_crosshair_parameters()
         self.create_crosshair()
-        # try:
-        #     from common_things.img_loader import load_image
-        #     self._picture = load_image('sprites/m_cursor.png', Mouse.MOUSE_SIZE, 0, smooth_scale=False)
-        #     mouse.set_pos(500, 500)
-        # except:
-        #     pass
 
         self.mouse.set_visible(False)
 
@@ -99,7 +93,8 @@ class Mouse:
         if self._dot_exists:
             draw_circle(crosshair_surface, self._color, surface_center, self._dot_size)
 
-        self._picture = rotate(crosshair_surface, self._rotate)
+        pic = rotate(crosshair_surface, self._rotate)
+        self._picture = smoothscale(pic, (pic.get_width()*GAME_SCALE, pic.get_height()*GAME_SCALE))
 
     def draw(self):
         Mouse.MAIN_SCREEN.blit(self._picture, (self._pos[0] - self._picture.get_width() // 2,

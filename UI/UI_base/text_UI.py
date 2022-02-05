@@ -28,6 +28,8 @@ class Text:
         x = int(x) if x else None
         y = int(y) if y else None
         text = str(text)
+        self.y0 = y
+        self.x0 = x
         self.font_size = font_size if font_size is not None else DEFAULT_FONT_SIZE
         self._text = text.replace('\t', '    ')
         self._text_font = font_t
@@ -49,7 +51,7 @@ class Text:
         self._color = color
         self._antialias = antial
 
-        self.render_text()
+        self.render()
 
         self.set_x(x)
         self.set_y(y)
@@ -107,13 +109,13 @@ class Text:
 
     def change_text(self, text):
         self._text = str(text)
-        self.render_text()
+        self.render()
         if self.auto_draw:
             self.draw()
 
     def add_text(self, text):
         self._text = ' '.join((self._text, text))
-        self.render_text()
+        self.render()
         if self.auto_draw:
             self.draw()
 
@@ -139,7 +141,7 @@ class Text:
         else:
             self._screen.blit(self._r_text_img, (self._x + dx, self._y + dy))
 
-    def render_text(self):
+    def render(self):
         self._render_font()
 
         self._r_text_img_original = self._r_text_font.render(self._text, self._antialias, self._color).convert_alpha()

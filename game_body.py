@@ -9,16 +9,16 @@ from settings.game_stages_constants import MAIN_MENU_STAGE, MAIN_MENU_SETTINGS_S
 
 from UI.UI_controller import UI_TREE
 from UI.UI_menus.main_menu import MAIN_MENU_UI
-from UI.UI_menus.main_menu_settings import MAIN_MENU_SETTINGS_UI
-
 from UI.UI_menus.multiplayer import MULTIPLAYER_UI
 from UI.UI_menus.mul_round_pause import MUL_ROUND_PAUSE_UI
+from UI.global_messager import GLOBAL_MESSAGER
+from UI.music_player import MusicPlayerUI
 
 from common_things.camera import GLOBAL_CAMERA
 from common_things.stages import Stages
 from common_things.global_keyboard import GLOBAL_KEYBOARD
 from common_things.sound_loader import GLOBAL_MUSIC_PLAYER
-from UI.global_messager import GLOBAL_MESSAGER
+
 
 from network.server_controller import SERVER_CONTROLLER
 
@@ -27,8 +27,9 @@ import sys
 
 from game_stages_classes.multiplayer_stage import GLOBAL_MUL_STAGE
 from game_stages_classes.single_round_stage import SINGLE_STAGE
+from game_stages_classes.settings import SETTINGS_UI
+
 from pygame import quit as close_program_pygame
-from UI.music_player import MusicPlayerUI
 
 m_player = MusicPlayerUI(200, 20)
 
@@ -110,8 +111,8 @@ class GameBody:
         MAIN_MENU_UI.draw()
 
     def MAIN_MENU_SETTINGS(self):
-        MAIN_MENU_SETTINGS_UI.update()
-        MAIN_MENU_SETTINGS_UI.draw()
+        SETTINGS_UI.update()
+        SETTINGS_UI.draw()
 
     def _check_alt_and_f4(self):
         # TODO if in round -> save game

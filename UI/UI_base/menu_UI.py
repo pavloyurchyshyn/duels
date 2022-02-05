@@ -6,6 +6,7 @@ from obj_properties.rect_form import Rectangle
 from settings.window_settings import SCREEN_W, SCREEN_H, MAIN_SCREEN
 
 from UI.UI_base.button_UI import Button
+from UI.UI_base.text_UI import Text
 from UI.UI_controller import UI_TREE
 from common_things.global_mouse import GLOBAL_MOUSE
 
@@ -24,6 +25,9 @@ class MenuUI(Rectangle):
                  name,
                  buttons: dict = {},
                  buttons_objects: list = [],
+
+                 texts: dict = {},
+                 texts_objects: list = [],
 
                  screen=None,
 
@@ -57,6 +61,10 @@ class MenuUI(Rectangle):
         self._buttons = []
         self._buttons_objects = buttons_objects
 
+        self._text_values = texts
+        self._texts = []
+        self._texts_objects = texts_objects
+
         self._elements = []
 
         self._surface = surface if surface else self.get_surface()
@@ -87,9 +95,30 @@ class MenuUI(Rectangle):
         for element in self._elements:
             element.draw(dx, dy)
 
+    def create_text(self):
+        for text in self._text_values:
+            if 'screen' in text:
+                screen = text.pop('screen')
+            else:
+                screen = self._surface
+            text_data = self._text_values[text]
+            t = Text(*text_data.get('args', ()),
+                     **text_data.get('kwargs', {}),
+                     screen=screen)
+
+            self._elements.append(t)
+            self._texts.append(t)
+
+        for text in self._texts_objects:
+            self._elements.append(text)
+            self._texts.append(text)
+
+        self._elements.sort(key=self.__sort_value, reverse=True)
+        self._texts.sort(key=self.__sort_value, reverse=True)
+
     def create_buttons(self):
         for button in self._buttons_values:
-            if 'screen' in self._buttons_values:
+            if 'screen' in button:
                 screen = button.pop('screen')
             else:
                 screen = self._surface

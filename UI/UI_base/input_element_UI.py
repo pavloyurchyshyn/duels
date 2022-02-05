@@ -11,9 +11,7 @@ from settings.window_settings import MAIN_SCREEN
 from settings.colors import YELLOW, WHITE, GREY
 from settings.global_parameters import test_draw_status_is_on
 
-# from settings.screen_size import X_SCALE, Y_SCALE
-X_SCALE, Y_SCALE = 1, 1
-
+from settings.screen_size import X_SCALE, Y_SCALE
 from settings.UI_setings.button_settings import DEFAULT_BUTTON_X_SIZE, DEFAULT_BUTTON_Y_SIZE, DEFAULT_BORDER_WIDTH
 
 from pygame import draw, Surface
@@ -24,7 +22,7 @@ class InputElement(Rectangle):
     INPUT_DELAY = 0.1
     DEF_X_SIZE = DEFAULT_BUTTON_X_SIZE
     DEF_Y_SIZE = DEFAULT_BUTTON_Y_SIZE
-    TYPE = 'input'
+    UI_TYPE = 'input'
 
     def __init__(self, x, y, size_x=None, size_y=None,
                  surface=None,
@@ -46,6 +44,8 @@ class InputElement(Rectangle):
                  non_active_border_color=GREY,
                  on_change_action=None,
                  id=None,
+                 last_raw_input=0,
+                 one_input=0,
                  ):
         x = int(x)
         y = int(y)
@@ -101,8 +101,11 @@ class InputElement(Rectangle):
         if autobuild:
             self.build()
 
+        self.last_raw_input = last_raw_input
+        self.one_input = one_input
+
     def click(self, xy):
-        self._focused = 1
+        self._focused = self.collide_point(xy)
 
     def update(self):
         if self._mouse.lmb:
@@ -115,31 +118,42 @@ class InputElement(Rectangle):
                     self.build()
 
         if self._focused:
-            prev_text = self._text_text
-            add_text = self._key.text
-            if prev_text == self._default_text and self._first_enter:
-                self._text_text = ''
-                self._first_enter = 0
+            if (self._key.ENTER and self.TREE.enter_possible) or self._key.ESC:
+                self._focused = 0
+                self.set_default_text()
+                return
 
-            if add_text and prev_text.endswith(add_text[:0]):
-                if self._clock.time > self._next_input:
-                    self._next_input = self._clock.time + self.INPUT_DELAY
-                    self._text_text = f'{self._text_text}{add_text}'
+            prev_text = self._text_text
+            if self.last_raw_input:
+                if self._key.last_raw_text:
+                    if self.one_input:
+                        self._text_text = self._key.last_raw_text
+                    else:
+                        self._text_text = f"{self._text_text}{self._key.last_raw_text}"
             else:
-                self._text_text = f'{self._text_text}{add_text}'
+                add_text = self._key.text
+                if self.last_raw_input:
+                    self._text_text = add_text
+                else:
+                    if prev_text == self._default_text and self._first_enter:
+                        self._text_text = ''
+                        self._first_enter = 0
+
+                    if add_text and prev_text.endswith(add_text[:0]):
+                        if self._clock.time > self._next_input:
+                            self._next_input = self._clock.time + self.INPUT_DELAY
+                            self._text_text = f'{self._text_text}{add_text}'
+                    else:
+                        self._text_text = f'{self._text_text}{add_text}'
 
             if self._key.BACKSPACE:
                 if self._clock.time > self._next_input:
                     self._next_input = self._clock.time + self.INPUT_DELAY
                     self._text_text = self._text_text[:-1]
 
-            if (self._key.ENTER and self.TREE.enter_possible) or self._key.ESC:
-                self._focused = 0
-                self.set_default_text()
-
             if prev_text != self._text_text:
                 if self._on_change_action:
-                    self._on_change_action()
+                    self._on_change_action(self)
                 self.build()
 
     def set_default_text(self):

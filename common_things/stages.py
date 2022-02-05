@@ -7,6 +7,7 @@ class Stages(metaclass=Singleton):
     def __init__(self):
         self.current_stage = 'main_menu'
         # self.set_start_round_stage()
+        self.set_main_menu_settings_stage()
 
     def get_current_stage(self) -> str:
         return self.current_stage
