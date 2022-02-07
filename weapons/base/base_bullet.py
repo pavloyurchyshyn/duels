@@ -90,6 +90,7 @@ class SimpleBullet(Projectile, OnePictureLazyLoad, Point, AdditionalLazyLoad):
         for player in PLAYERS_DICT.values():
             if player != self.owner and player.collide(self):
                 self.interact_with_object(player)
+                player._visual_part.hit_effect(*self.position, self._angle, arena=self.arena)
 
     def draw(self):
         dx, dy = GLOBAL_CAMERA.camera

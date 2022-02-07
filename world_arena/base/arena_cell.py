@@ -64,5 +64,5 @@ class ArenaCell(ArenaCellObject):
             draw.lines(self._ARENA_SURFACE, (255, 50, 50), True, border._dots[1:], 2)
 
     @property
-    def picture(self):
+    def surface(self):
         return self._ARENA_SURFACE

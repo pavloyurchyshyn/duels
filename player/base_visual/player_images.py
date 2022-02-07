@@ -1,6 +1,6 @@
 from settings.players_settings.player_pic_and_anim import *
 from settings.colors import PLAYERS_COLORS
-
+from pygame.transform import smoothscale
 from common_things.img_loader import recolor_picture, load_image, load_animation
 
 
@@ -16,12 +16,12 @@ class PlayerImagesManager:
         if original_size or size is None:
             self.size = self.pic_size = self.circle_size = None
 
-        self.raw_body = load_image(BODY_IMAGE, size=self.pic_size, angle=angle)
+        self.raw_body = load_image(BODY_IMAGE, size=None, angle=angle)
         self.raw_animations = {
-            ANIM_IDLE_K: load_animation(IDLE_IMAGES, IDLE_TIMES, size=self.pic_size, angle=angle),
-            ANIM_RAGE_K: load_animation(RAGE_IMAGES, RAGE_TIMES, size=self.pic_size, angle=angle),
-            ANIM_DEAD_K: load_animation(DEAD_IMAGES, DEAD_TIMES, size=self.pic_size, angle=angle),
-            ANIM_DYING_K: load_animation(DYING_IMAGES, DYING_TIMES, size=self.pic_size, angle=angle)
+            ANIM_IDLE_K: load_animation(IDLE_IMAGES, IDLE_TIMES, size=None, angle=angle),
+            ANIM_RAGE_K: load_animation(RAGE_IMAGES, RAGE_TIMES, size=None, angle=angle),
+            ANIM_DEAD_K: load_animation(DEAD_IMAGES, DEAD_TIMES, size=None, angle=angle),
+            ANIM_DYING_K: load_animation(DYING_IMAGES, DYING_TIMES, size=None, angle=angle)
         }
 
         self.raw_animations[ANIM_RAGE_K]['end'] = ANIM_IDLE_K
@@ -38,7 +38,7 @@ class PlayerImagesManager:
             body_color, face_color = colors['body'], colors['face']
 
         return {
-            'body': recolor_picture(self.raw_body.copy(), body_color),
+            'body': recolor_picture(smoothscale(self.raw_body.copy(), self.pic_size), body_color),
             'idle_animation': self.recolor_animation(ANIM_IDLE_K, face_color),
             'other_animation': {
                 ANIM_RAGE_K: self.recolor_animation(ANIM_RAGE_K, face_color),
@@ -52,12 +52,11 @@ class PlayerImagesManager:
         new_animation = {}
 
         for frame_num in animation:
-
             if frame_num == 'end':
                 new_animation['end'] = animation['end']
             else:
                 frame = animation[frame_num]['frame'].copy()
-                new_animation[frame_num] = {'frame': recolor_picture(frame, color),
+                new_animation[frame_num] = {'frame': smoothscale(recolor_picture(frame, color), self.pic_size),
                                             'cd': animation[frame_num]['cd']}
         return new_animation
 

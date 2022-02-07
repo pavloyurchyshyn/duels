@@ -9,7 +9,6 @@ try:
     # maybe another pictures will load
     ERROR_PICTURE = image.load('sprites/error.png').convert_alpha()
     ERROR_PICTURE = transform.rotate(ERROR_PICTURE, 90).convert_alpha()
-
 except:
     ERROR_PICTURE = None
     LOGGER.warning(f'Failed to load error img {"sprites/error.png"}')
@@ -20,6 +19,7 @@ def loaded_images_wrapper(func):
 
     def wrapper(path, size, *args, **kwargs):
         if (path, size) not in loaded_:
+            LOGGER.info(f'Loading {path} {size}')
             loaded_[(path, size)] = func(path, size, *args, **kwargs)
 
         return loaded_[(path, size)]
@@ -53,7 +53,7 @@ def load_image(path: str, size: (int, int) = None, angle=90, smooth_scale=True):
         # exit()
 
 
-# @time_control_wrapper
+@time_control_wrapper
 def load_animation(pic_list, timings_list, size: (int, int) = None, anim_dict=None, angle=90) -> dict:
     anim_dict = anim_dict if type(anim_dict) is dict else {}
 
@@ -77,7 +77,7 @@ def normalize_color(color) -> tuple:
     return tuple(map(_normalize_color, color))
 
 
-# @time_control_wrapper
+@time_control_wrapper
 def recolor_picture(picture, color):
     w, h = picture.get_size()
     t = Color((0, 0, 0, 0))

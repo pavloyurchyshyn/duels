@@ -89,7 +89,7 @@ class Camera:
 
                 self._camera[i] = current_pos
 
-            self.__normalize_camera()
+        self.__normalize_camera()
 
     def update(self):
         if self._player and self._player.alive:

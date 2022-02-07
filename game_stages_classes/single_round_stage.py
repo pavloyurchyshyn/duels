@@ -45,7 +45,7 @@ class SingleStage:
     def __init__(self):
         self.global_round_parameters = GLOBAL_ROUND_PARAMETERS
         self.STAGE_CONTROLLER = Stages()
-        self._ARENA = None
+        self._ARENA: ArenaCell = None
         self._PLAYER: Player = None
         self._round_clock = ROUND_CLOCK
 
@@ -80,6 +80,7 @@ class SingleStage:
         """Just inside cell"""
         self._ARENA.draw()
         self._ARENA.update()
+        self._ball.draw()
 
         self._objects_controller.update()
 
@@ -106,8 +107,6 @@ class SingleStage:
         for gate in self._gates:
             gate.update()
             gate.draw()
-
-        self._ball.draw()
 
         VisualEffectsController.draw_layer(1)
 

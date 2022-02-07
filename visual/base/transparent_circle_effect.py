@@ -63,6 +63,7 @@ class TransparentCircle(Projectile, BaseEffect):
 
         if self._alive_time:
             self._alive_time -= dt
+
         self._half_size = self._size // 2
         self._update(delta_time=dt)
         self.update_color()

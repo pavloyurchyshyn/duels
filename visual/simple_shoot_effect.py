@@ -2,7 +2,7 @@ from visual.base.visual_effects_controller import VisualEffectsController
 from visual.base.diamond_effect import DiamondEffect
 from math import radians
 
-from random import choice
+from random import choice, random
 
 
 class ShootEffect:
@@ -18,8 +18,8 @@ class ShootEffect:
                                                              angle=angle + radians(i),
                                                              speed=1000,
                                                              tail_len=10,
-                                                             head_len=50,
-                                                             width_len=5,
+                                                             head_len=50 + 30*random(),
+                                                             width_len=5 + 15*random(),
                                                              color=choice(self.colors).copy(),
                                                              scale_per_second=[2, 2, 3],
                                                              color_change=[250, 250, 250],

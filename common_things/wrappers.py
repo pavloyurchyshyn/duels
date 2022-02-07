@@ -7,9 +7,7 @@ def time_control_wrapper(func):
         start = time()
         res = func(*args, **kwargs)
 
-        LOGGER.info(f' -------------------------------------------------------')
-        LOGGER.info(f' {func.__name__} was running for {time() - start} seconds.')
-        LOGGER.info(f' -------------------------------------------------------')
+        LOGGER.info(f' {func.__name__} {*args, kwargs} was running for {time() - start} seconds.')
         return res
 
     return wrapper

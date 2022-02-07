@@ -14,6 +14,8 @@ from common_things.save_and_load_json_config import get_param_from_cgs
 from common_things.global_clock import GLOBAL_CLOCK
 from common_things.camera import GLOBAL_CAMERA
 
+from visual.player_effects.hit_blood_drops import player_hit_effect
+
 
 class PlayerVisualPart:
     screen = MAIN_SCREEN
@@ -43,6 +45,8 @@ class PlayerVisualPart:
 
         self.camera = kwargs.get('camera', GLOBAL_CAMERA)
 
+        self.hit_effect = player_hit_effect
+
     def load_new_skin(self, body_color, face_color):
         self._body_color = body_color
         self._face_color = face_color
@@ -60,7 +64,6 @@ class PlayerVisualPart:
 
     def update(self):
         time_d = GLOBAL_CLOCK.d_time
-
         self.face_animation.update(time_d, self._player._center, self._player._angle)
 
     def draw(self) -> None:
@@ -75,7 +78,7 @@ class PlayerVisualPart:
         if self.under_circle:
             self.under_circle.draw(dx=dx, dy=dy)
 
-        img_copy = transform.rotate(transform.scale(self.body, self._body_img_size), -degrees(self._player._angle))
+        img_copy = transform.rotate(self.body, -degrees(self._player._angle))
         main_screen.blit(img_copy, (x0 - img_copy.get_width() // 2 + dx, y0 - img_copy.get_height() // 2 + dy))
 
         if test_draw_status_is_on():

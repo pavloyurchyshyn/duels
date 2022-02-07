@@ -22,7 +22,7 @@ class BaseEffect:
     DRAW_POLYGON = polygon
     DRAW_RECT = rect
 
-    def __init__(self, color=None, color_change=None, color_change_func=None, live_time=-1, **kwargs):
+    def __init__(self, color=None, color_change=None, color_change_func=None, **kwargs):
         if self.EFFECT_TYPE is None:
             raise Exception('Bad effect type value!')
 
@@ -36,7 +36,6 @@ class BaseEffect:
 
         self._screen = kwargs.get('screen', self.MAIN_SCREEN)
 
-        self._live_time = live_time
         self._alive_time = kwargs.get('alive_time')
         if not getattr(self, '_clock', 0):
             self._clock = ROUND_CLOCK if kwargs.get('round_clock') else GLOBAL_CLOCK

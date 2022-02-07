@@ -1,4 +1,8 @@
 from common_things.loggers import LOGGER
+from common_things.save_and_load_json_config import get_cgs_config
+
+LOGGER.info(f'Global parameters: {get_cgs_config()}')
+
 import traceback
 import sys
 
@@ -24,6 +28,7 @@ try:
     from settings.global_parameters import get_slow_motion_k, update_slow_motion, get_fps
 
     from UI.font_loader import DEFAULT_FONT
+
     from common_things.global_clock import GLOBAL_CLOCK, ROUND_CLOCK
     from common_things.global_mouse import GLOBAL_MOUSE
     from common_things.global_keyboard import GLOBAL_KEYBOARD
@@ -128,7 +133,7 @@ try:
             G_Clock.update(dt)
             if STAGES.current_stage == ROUND_STAGE:  # solo game or leave it for animation?
                 update_slow_motion(d_time=dt)
-                R_Clock.update(dt*get_slow_motion_k())
+                R_Clock.update(dt * get_slow_motion_k())
 
             # update mouse and keyboard
             G_Mouse.update()

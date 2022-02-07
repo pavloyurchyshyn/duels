@@ -78,7 +78,7 @@ class BaseRange(BaseWeapon, OnePictureLazyLoad, AdditionalLazyLoad):
         m_screen.blit(picture, (x0 + dx - picture.get_width() // 2, y0 + dy - picture.get_height() // 2))
 
     def additional_lazy_load(self):
-        from visual.shoot_effect import ShootEffect
+        from visual.simple_shoot_effect import ShootEffect
 
         BaseRange.SHOOT_EFFECT = ShootEffect
 

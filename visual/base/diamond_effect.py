@@ -21,11 +21,10 @@ class DiamondEffect(Projectile, BaseEffect):
                  live_time=None,
                  fill_form=0,
                  lines_width=5,
-                 lighting=0,
                  round_clock=0,
                  color=[255, 255, 255, 255],
                  color_change=None,
-                 arena=None,
+                 arena=None, without_camera=0,
                  **kwargs):
         arena = arena if arena else GLOBAL_ROUND_PARAMETERS.arena
         super(DiamondEffect, self).__init__(x=x, y=y,
@@ -50,7 +49,7 @@ class DiamondEffect(Projectile, BaseEffect):
         self.width_scale_per_second = self.width * scale_per_second[2]
 
         self._live_time = live_time
-
+        self.without_camera = without_camera
         self.build_points()
 
     def scale(self, dt):
@@ -86,7 +85,7 @@ class DiamondEffect(Projectile, BaseEffect):
                 self.start_dead_effect()
 
     def build_points(self):
-        dx, dy = self._camera.camera
+        dx, dy = (0, 0) if self.without_camera else self._camera.camera
         xp, yp = self.position
 
         points = []
@@ -132,3 +131,7 @@ class DiamondEffect(Projectile, BaseEffect):
 
     def out_of_arena(self):
         return not any(map(self.arena.collide_point, self._points))
+
+    @property
+    def points(self):
+        return self._points

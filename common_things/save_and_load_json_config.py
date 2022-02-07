@@ -34,3 +34,6 @@ def save_param_to_cgs(key, value):
 
 def get_param_from_cgs(key, def_value=None):
     return get_parameter_from_json_config(key=key, def_value=def_value, path=COMMON_GAME_SETTINGS_JSON_PATH)
+
+def get_cgs_config():
+    return load_json_config(COMMON_GAME_SETTINGS_JSON_PATH)
